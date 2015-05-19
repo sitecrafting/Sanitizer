@@ -1,0 +1,36 @@
+{
+  "name": "pegasus/sanitizer",
+  "type": "Application",
+  "description": "Database Sanitisation Engine",
+  "homepage": "https://pegasus-commerce.com",
+  "license": "MIT",
+  "authors":
+  [
+    {
+      "name": "Phil Elson",
+      "email": "phil@pegasus-commerce.com"
+    }
+  ],
+  "require":
+  {
+    "php": ">=5.5.9"
+  },
+  "require-dev":
+  {
+    "symfony/yaml": "~2.8|~3.0",
+    "behat/behat": "2.4.*@stable",
+    "catfan/medoo": "~0.9.8"
+  },
+  "autoload":
+  {
+    "psr-4":
+    {
+      "Pegasus\\": "src"
+    }
+  },
+  "minimum-stability": "dev",
+  "config":
+  {
+    "bin-dir": "bin/"
+  }
+}
