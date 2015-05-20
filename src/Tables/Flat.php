@@ -28,10 +28,9 @@
  */
 namespace Pegasus\Tables;
 
-use Pegasus\Tables\AbstractTable;
+use Pegasus\Sanitizer;
 use Pegasus\Engine\Engine;
 use Pegasus\Columns\Types;
-use Pegasus\Resource\SanitizerException;
 
 class Flat extends AbstractTable
 {
@@ -68,7 +67,7 @@ class Flat extends AbstractTable
         {
             if(false == $column->exists())
             {
-                $db = Collection::getSanitizer()->getConfig()->getDatabase()->getDatabaseName();
+                $db = Sanitizer::getInstance()->getConfig()->getDatabase()->getDatabaseName();
                 throw new TableException("Column '{$column->getName()}' in table '{$this->getTableName()}' not found in database '{$db}'");
             }
         }
@@ -101,7 +100,7 @@ class Flat extends AbstractTable
     {
         if (0 == sizeof($tableData)) /* Flat tables are simple, if the array has now data then we are screwed. */
         {
-            Collection::getSanitizer()->printLn("No columns to manipulate could be found for table '{$this->getTableName()}', skipping", 'general');
+            Sanitizer::getInstance()->printLn("No columns to manipulate could be found for table '{$this->getTableName()}', skipping", 'general');
             return true;
         }
         return false;
@@ -119,23 +118,23 @@ class Flat extends AbstractTable
         {
             return $rowsEffected;
         }
-        $quick = ('quick' == Collection::getSanitizer()->getConfig()->getDatabase()->getSanitizationMode());
+        $quick = ('quick' == Sanitizer::getInstance()->getConfig()->getDatabase()->getSanitizationMode());
         $columns = $this->getColumnsForEngineQuery();
         if(true == $quick)
         {
-            return Engine::getInstance()->update($this->getTableName(), $columns);
+            return $this->engine->update($this->getTableName(), $columns);
         }
         else
         {
             $rowsUpdated = 0;
-            $rows = Engine::getInstance()->select($this->getTableName(), '*');
+            $rows = $this->engine->select($this->getTableName(), '*');
             foreach($rows as $row)
             {
                 foreach($this->getColumns() as $column)
                 {
                     $row[$column->getName()] = $column->getDefault();
                 }
-                $rowsUpdated += Engine::getInstance()->update($this->getTableName(), $row, $this->getPrimaryKeyData($row));
+                $rowsUpdated += $this->engine->update($this->getTableName(), $row, $this->getPrimaryKeyData($row));
             }
             return $rowsUpdated;
         }

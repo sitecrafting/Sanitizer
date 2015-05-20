@@ -28,7 +28,7 @@
  */
 namespace Pegasus\Columns\Types;
 
-use Pegasus\Engine\Engine;
+use Pegasus\Sanitizer;
 use Pegasus\Resource\Object;
 
 abstract class AbstractDataType extends Object
@@ -57,7 +57,7 @@ abstract class AbstractDataType extends Object
 
     public function exists()
     {
-        return Engine::getInstance()->columnExists($this->getTableName(), $this->getName());
+        return $this->getEngine()->columnExists($this->getTableName(), $this->getName());
     }
 
     public function getDefault()

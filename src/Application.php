@@ -33,7 +33,7 @@ require 'vendor/autoload.php';
 use Pegasus\Sanitizer;
 use Symfony\Component\Console\Application as ConsoleApp;
 
-$sanitizer = new Sanitizer();
+$sanitizer = Sanitizer::getInstance();
 $application = new ConsoleApp();
 $application->add($sanitizer);
 //$application->setDefaultCommand($sanitizer->getName());

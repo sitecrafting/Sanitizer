@@ -31,7 +31,7 @@ namespace Pegasus\Tables;
 use Pegasus\Columns\Mock\MockData;
 use Pegasus\Engine\Engine;
 use Pegasus\Resource\Object;
-use Pegasus\Resource\SanitizerException;
+use Pegasus\Sanitizer;
 use Pegasus\Tables;
 
 class Eav extends AbstractTable
@@ -83,14 +83,11 @@ class Eav extends AbstractTable
 
     private function configureEavColumn($column, $tableData)
     {
-        //(print_r($tableData));
         if(false == isset($tableData['control_column']))
         {
             throw new TableException("Control column undefined for column '{$column->getName()}' on table '{$this->getTableName()}'");
         }
         $controlColumn = new Object($tableData['control_column']);
-        //die($controlColumn->getName());
-        //die(print_r($controlColumn->getValues()));
         $column->setControlColumn($controlColumn);
     }
 
@@ -106,7 +103,6 @@ class Eav extends AbstractTable
         {
 
             $controlColumn = $column->getControlColumn();
-            //die(print_r($column));
             foreach($controlColumn->getValues() as $subsetIndex => $source)
             {
                 $source = new MockData($source);
@@ -122,11 +118,11 @@ class Eav extends AbstractTable
                 }
                 else
                 {
-                    Collection::getSanitizer()->printLn("No Mock Model configuration found for EAV column '{$controlColumn->getName()}'  with row id '{$subsetIndex}' in table '{$this->getTableName()}'", 'notice');
+                    Sanitizer::getInstance()->printLn("No Mock Model configuration found for EAV column '{$controlColumn->getName()}'  with row id '{$subsetIndex}' in table '{$this->getTableName()}'", 'notice');
                 }
                 if(null != $source->getComment())
                 {
-                    Collection::getSanitizer()->printLn("Comment[{$this->getTableName()}][{$controlColumn->getName()}]: {$source->getComment()}", 'general');
+                    Sanitizer::getInstance()->printLn("Comment[{$this->getTableName()}][{$controlColumn->getName()}]: {$source->getComment()}", 'general');
                 }
             }
         }
@@ -135,20 +131,20 @@ class Eav extends AbstractTable
 
     private function sanitizeSubset($tableName, $controlColumnName, $subsetIndex, $columnName, $mockModel)
     {
-        $quick = ('quick' == Collection::getSanitizer()->getConfig()->getDatabase()->getSanitizationMode());
+        $quick = ('quick' == Sanitizer::getInstance()->getConfig()->getDatabase()->getSanitizationMode());
         if(true == $quick)
         {
-            return Engine::getInstance()->update($tableName, array($columnName => $mockModel->getRandomValue()), array($controlColumnName => $subsetIndex));
+            return $this->engine->update($tableName, array($columnName => $mockModel->getRandomValue()), array($controlColumnName => $subsetIndex));
         }
         else
         {
             $rowsUpdated = 0;
-            $rows = Engine::getInstance()->select($tableName, '*', array($controlColumnName => $subsetIndex));
+            $rows = $this->engine->select($tableName, '*', array($controlColumnName => $subsetIndex));
             foreach($rows as $row)
             {
                 $row[$columnName] = $mockModel->getRandomValue();
 //                die(print_r(array('column_name' => $columnName, 'table_name' => $tableName, 'row' => $row, 'where' => $this->getPrimaryKeyData($row))));
-                $rowsUpdated += Engine::getInstance()->update($tableName, $row, $this->getPrimaryKeyData($row));
+                $rowsUpdated += $this->engine->update($tableName, $row, $this->getPrimaryKeyData($row));
             }
             return $rowsUpdated;
         }

@@ -33,12 +33,24 @@ use Pegasus\Engine\Engine;
 use Pegasus\Resource\Object;
 use Pegasus\Tables;
 use Pegasus\Columns\Types;
+use Pegasus\Sanitizer;
 
 abstract class AbstractTable extends Object
 {
     protected $truncate = false;
 
     protected $doCommand = false;
+
+    protected $engine = null;
+
+    public function __construct(Engine $engine)
+    {
+        if(null == $engine)
+        {
+            throw new TableException("Someone has passed this table a null engine");
+        }
+        $this->engine = $engine;
+    }
 
     public function addColumn(AbstractDataType $column)
     {
@@ -134,7 +146,7 @@ abstract class AbstractTable extends Object
         //Only data is a comment for this row
         if(1 == sizeof($tableData) && true == isset($tableData['comment']))
         {
-            Collection::getSanitizer()->printLn("Comment[{$this->getTableName()}]: ".$tableData['comment'], 'general');
+            Sanitizer::getInstance()->printLn("Comment[{$this->getTableName()}]: ".$tableData['comment'], 'general');
             throw new TableCommentException("This table '{$this->getTableName()}' only has a comment in the config, skipping");
         }
         //Command is the most important option, it will override all others.
@@ -147,9 +159,10 @@ abstract class AbstractTable extends Object
             }
             $this->setCommand($command);
         }
+
         if(false == $this->exists())
         {
-            $db = Collection::getSanitizer()->getConfig()->getDatabase()->getDatabaseName();
+            $db = Sanitizer::getInstance()->getConfig()->getDatabase()->getDatabaseName();
             throw new TableException("Table '{$this->getTableName()}' not found in database '{$db}'");
         }
         return true;
@@ -193,6 +206,7 @@ abstract class AbstractTable extends Object
         }
         if(null != $column)
         {
+            $column->setEngine($this->engine);
             $column->setTableName($this->getTableName());
             $column->setTable($this);
         }
@@ -226,7 +240,7 @@ abstract class AbstractTable extends Object
      */
     public function exists()
     {
-        return Engine::getInstance()->tableExists($this->getTableName());
+        return $this->engine->tableExists($this->getTableName());
     }
 
     /**
@@ -240,7 +254,7 @@ abstract class AbstractTable extends Object
      */
     public function getPrimaryKeyData($row)
     {
-        $name = Engine::getInstance()->getPrimaryKeyName($this->getTableName());
+        $name = $this->engine->getPrimaryKeyName($this->getTableName());
         return array($name => $row[$name]);
     }
 
@@ -253,7 +267,7 @@ abstract class AbstractTable extends Object
         {
             if(true == $this->doTruncate())
             {
-                return Engine::getInstance()->delete($this->getTableName(), null);
+                return $this->engine->delete($this->getTableName(), null);
             }
         }
         return false;

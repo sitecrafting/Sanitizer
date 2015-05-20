@@ -43,6 +43,7 @@
  */
 namespace Pegasus;
 
+use Pegasus\Resource\SanitizerException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -69,6 +70,24 @@ class Sanitizer extends Command
     private $satitisationRunning = false;
 
     private $printCache = array();
+
+    private $progressBar = null;
+
+    private static $sanitizer = null;
+
+    /**
+     * Retuns a Singleton instance of the sanitizer
+     *
+     * @return null|Sanitizer
+     */
+    public static function getInstance()
+    {
+        if(null == self::$sanitizer)
+        {
+            self::$sanitizer = new Sanitizer();
+        }
+        return self::$sanitizer;
+    }
 
     public function getVersion()
     {
@@ -139,21 +158,31 @@ class Sanitizer extends Command
     {
         $this->input    = $input;
         $this->output   = $output;
-        $this->loadConfig(array(
-            array('Host', $input->getOption('host')),
-            array('Password', $input->getOption('password')),
-            array('Username', $input->getOption('username')),
-            array('Database', $input->getOption('database')),
-            array('Config', $input->getOption('configuration')),
-            array('Engine', $input->getArgument('engine'))));
-        // ...
         $this->loadOutputStyles();
+        $this->loadConfig();
         $this->outputIntro();
         $this->renderOverviewTable();
+        $this->loadDatabaseEngine();
+        $this->sanitize();
+    }
 
-        Engine::start($this);
-        TableCollection::setSanitizer($this);
-        $this->sanitizeTables();
+    private function loadDatabaseEngine()
+    {
+        $engine = Engine::start(array
+        (
+            'database_type' => $this->getConfig()->getDatabase()->getEngine(),
+            'database_name' => $this->getConfig()->getDatabase()->getDatabase(),
+            'server'        => $this->getConfig()->getDatabase()->getHost(),
+            'username'      => $this->getConfig()->getDatabase()->getUsername(),
+            'password'      => $this->getConfig()->getDatabase()->getPassword(),
+            'charset'       => 'utf8'
+        ));
+        TableCollection::setEngine($engine);
+    }
+
+    private function sanitize()
+    {
+        TableCollection::sanitizeTables();
     }
 
     public function loadOutputStyles()
@@ -164,7 +193,7 @@ class Sanitizer extends Command
         $this->output->getFormatter()->setStyle('general', $style);
         $style = new OutputFormatterStyle('white', 'green', array('bold'));
         $this->output->getFormatter()->setStyle('notice', $style);
-        $style = new OutputFormatterStyle('white', 'red', array('bold', 'blink'));
+        $style = new OutputFormatterStyle('white', 'red', array('bold', 'underscore'));
         $this->output->getFormatter()->setStyle('fatal_error', $style);
     }
 
@@ -176,6 +205,7 @@ class Sanitizer extends Command
         if(true == $this->getConfig()->getIsInDeveloperMode())
         {
             $this->printLn("App is in developer mode, therefore all output will be shown!", 'warning');
+            $this->printLn("Verbosity ".$this->output->getVerbosity(), 'warning');
         }
     }
 
@@ -188,12 +218,12 @@ class Sanitizer extends Command
      */
     private function renderOverviewTable()
     {
-        if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERBOSE))
+        if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_NORMAL))
         {
             $table = new Table($this->output);
             $table->setHeaders(array('Setting', 'Value'))->setRows(array(
                 array('Host',           $this->getConfig()->getDatabase()->getHost()),
-                array('Password',       $this->getConfig()->getDatabase()->getPassword()),
+                array('Password',       $this->getSafeToDisplayPassword($this->getConfig()->getDatabase()->getPassword())),
                 array('User',           $this->getConfig()->getDatabase()->getUsername()),
                 array('Database',       $this->getConfig()->getDatabase()->getDatabase()),
                 array('Config',         $this->getConfig()->getDatabase()->getConfig()),
@@ -210,10 +240,31 @@ class Sanitizer extends Command
         }
     }
 
+    /**
+     * This method takes a string and replaces the last half of the characters with *
+     *
+     * @param $password
+     * @return string
+     */
+    private function getSafeToDisplayPassword($password)
+    {
+        $length         = strlen($password);
+        $obfuscation    = (int)$length / 2;
+        $parts          = str_split($password, $obfuscation);
+        $parts[1]       = str_repeat("*", strlen($parts[1]));
+        return $parts[0].$parts[1];
+    }
+
+    /**
+     * This method prints a line to the display.
+     *
+     * @param $message
+     * @param null $type
+     */
     public function printLn($message, $type=null)
     {
         $this->printCache[] = array('message' => $message, 'type' => $type);
-        if(false == $this->satitisationRunning)
+        if(false == $this->getSatitisationState())
         {
             $this->purgePrintCache();
         }
@@ -230,10 +281,11 @@ class Sanitizer extends Command
                 case null :
                 {
                     $this->output->writeLn($message);
+                    break;
                 }
                 case 'general' :
                 {
-                    if(true == $this->canDisplayMessage(OutputInterface::OUTPUT_NORMAL))
+                    if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERY_VERBOSE))
                     {
                         $this->output->writeLn($this->formatMessage($type, $message));
                     }
@@ -241,7 +293,7 @@ class Sanitizer extends Command
                 }
                 case 'warning' :
                 {
-                    if(true == $this->canDisplayMessage(OutputInterface::OUTPUT_NORMAL))
+                    if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERBOSE))
                     {
                         $this->output->writeLn($this->formatMessage($type, $message));
                     }
@@ -257,10 +309,7 @@ class Sanitizer extends Command
                 }
                 case 'fatal_error' :
                 {
-                    if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_QUIET))
-                    {
-                        $this->output->writeLn($this->formatMessage($type, $message));
-                    }
+                    $this->output->writeLn($this->formatMessage($type, $message));
                     break;
                 }
             }
@@ -282,7 +331,7 @@ class Sanitizer extends Command
         {
             return true;
         }
-        return ($level == $this->output->getVerbosity());
+        return ($this->output->getVerbosity() >= $level);
     }
 
     /**
@@ -301,56 +350,82 @@ class Sanitizer extends Command
      *
      * @param $databaseMap
      */
-    private function loadConfig($databaseMap)
+    private function loadConfig()
     {
-        $this->config = new SanitizerConfig($this->input->getOption('configuration'));
-        $this->config->setDatabaseOverride($databaseMap);
-        if(true == $this->config->getIsInDeveloperMode())
+        try
         {
-            error_reporting(E_ALL);
-            ini_set('display_errors', 1);
+            $this->config = new SanitizerConfig($this->input->getOption('configuration'));
+            if (true == $this->config->getIsInDeveloperMode())
+            {
+                error_reporting(E_ALL);
+                ini_set('display_errors', 1);
+            }
+            $this->config->setDatabaseOverride(array(
+                array('Host', $this->input->getOption('host')),
+                array('Password', $this->input->getOption('password')),
+                array('Username', $this->input->getOption('username')),
+                array('Database', $this->input->getOption('database')),
+                array('Config', $this->input->getOption('configuration')),
+                array('Engine', $this->input->getArgument('engine'))));
+        }
+        catch(SanitizerException $exception)
+        {
+            $this->printLn($exception->getMessage(), 'fatal_error');
+            exit(-1);
         }
     }
 
     /**
-     * This method iterates over the tables.
+     * Returns the app mode. There are two options.
+     * Sanitize, Verify
+     *
+     * @return mixed
      */
-    private function sanitizeTables()
+    public function getMode()
+    {
+        return $this->input->getOption('mode');
+    }
+
+
+    public function setSatitisationRunning()
     {
         $this->satitisationRunning = true;
-        $sanitized = array();
-        $tables = TableCollection::getCollection();
-        if('sanitize' == $this->input->getOption('mode'))
-        {
-            $tableCount = sizeof($tables);
-            $progress = new ProgressBar($this->output, $tableCount);
-            $progress->setBarWidth(100);
-            foreach($tables as $table)
-            {
-                $rows = $table->sanitize();
-                if(true == $table->doCommand())
-                {
-                    $sanitized[] = "{$table->getCommand()} applied to {$table->getTableName()} and effected {$rows} rows";
-                }
-                else
-                {
-                    $sanitized[] = "Sanitized {$table->getTableName()} and updated {$rows} rows";
-                }
-                $progress->advance();
-            }
-            $progress->finish();
-            $this->output->writeLn("\n");
-            foreach($sanitized as $san)
-            {
-                $this->printLn($san, 'notice');
-            }
-        }
-        else
-        {
-            $this->printLn($this->input->getOption('mode').' mode selected, exiting before sanitisation', 'general');
-        }
-        $this->output->writeLn("\n");
+    }
+
+
+    public function setSatitisationNotRunning()
+    {
         $this->satitisationRunning = false;
         $this->purgePrintCache();
+    }
+
+    public function getSatitisationState()
+    {
+        return $this->satitisationRunning;
+    }
+
+    public function startProgressBar($count)
+    {
+        $this->progressBar = new ProgressBar($this->output, $count);
+        $this->progressBar->setBarWidth(100);
+        return $this;
+    }
+
+    public function advanceProgressBar()
+    {
+        if(null != $this->progressBar)
+        {
+            $this->progressBar->advance();
+        }
+        return $this;
+    }
+
+    public function advanceProgressFinish()
+    {
+        if(null != $this->progressBar)
+        {
+            $this->progressBar->finish();
+        }
+        return $this;
     }
 }

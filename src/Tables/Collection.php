@@ -30,6 +30,7 @@
 namespace Pegasus\Tables;
 
 use Behat\Gherkin\Exception\Exception;
+use Pegasus\Engine\Engine;
 use Pegasus\Resource\SanitizerException;
 use Pegasus\Sanitizer;
 use Pegasus\Tables;
@@ -38,19 +39,15 @@ class Collection
 {
     const KEY_TABLE_TYPE = 'type';
 
-    /**
-     * @var $sanitizer Sanitizer
-     */
-    private static $sanitizer = null;
-
-    public static function setSanitizer(Sanitizer $sanitizer)
+    private static $engine = null;
+    
+    public static function setEngine(Engine $engine)
     {
-        self::$sanitizer = $sanitizer;
-    }
-
-    public static function getSanitizer()
-    {
-        return self::$sanitizer;
+        if(null == $engine)
+        {
+            throw new TableException("Someone has passed this table collection a null engine");
+        }
+        self::$engine = $engine;
     }
 
     public static function getCollection()
@@ -59,7 +56,7 @@ class Collection
         if(null == $collection)
         {
             $collection     = array();
-            $tables         = self::$sanitizer->getConfig()->getTables();
+            $tables         = Sanitizer::getInstance()->getConfig()->getTables();
             foreach ($tables as $tableName => $tableConfig)
             {
                 try
@@ -68,11 +65,11 @@ class Collection
                 }
                 catch(TableCommentException $e)
                 {
-                    self::getSanitizer()->printLn($e->getMessage(), 'notice');
+                    Sanitizer::getInstance()->printLn($e->getMessage(), 'notice');
                 }
                 catch(SanitizerException $e)
                 {
-                     self::getSanitizer()->printLn($e->getMessage(), 'warning');
+                     Sanitizer::getInstance()->printLn($e->getMessage(), 'warning');
                 }
             }
         }
@@ -82,7 +79,7 @@ class Collection
     private static function getTableInstance($tableName, array $tableConfig)
     {
         /* we default the type to flat */
-        $table = new Flat();
+        $table = null;
 
         /* Type has NOT been set in the config */
         if(true == isset($tableConfig[self::KEY_TABLE_TYPE]))
@@ -92,7 +89,7 @@ class Collection
             {
                 case Eav::getType() :
                 {
-                    $table = new Eav() ;
+                    $table = new Eav(self::$engine) ;
                     break;
                 }
                 /*
@@ -104,9 +101,62 @@ class Collection
                 }
             }
         }
+        if(null == $table)
+        {
+            $table = new Flat(self::$engine);
+        }
         $table->setTableName($tableName);
         $valid = $table->setTableData($tableConfig);
         return (true == $valid) ? $table : $valid;
+    }
+
+    /**
+     * This method iterates over the tables.
+     */
+    public static function sanitizeTables()
+    {
+        if(null == self::$engine)
+        {
+            throw new TableException("Someone has moved the Engine, I can't find it!");
+        }
+        $sanitizer = Sanitizer::getInstance();
+        if(null == $sanitizer)
+        {
+            throw new TableException("There seems to be a glitch with the Sanitizer instance matrix!, I just can't find it!");
+        }
+        $sanitizer->setSatitisationRunning();
+        $sanitized = array();
+        $tables = self::getCollection();
+        if('sanitize' == $sanitizer->getMode())
+        {
+            $sanitizer->startProgressBar(sizeof($tables));
+            foreach($tables as $table)
+            {
+                $rows = $table->sanitize();
+                if(true == $table->doCommand())
+                {
+                    $sanitized[] = "{$table->getCommand()} applied to {$table->getTableName()} and effected {$rows} rows";
+                }
+                else
+                {
+                    $sanitized[] = "Sanitized {$table->getTableName()} and updated {$rows} rows";
+                }
+                $sanitizer->advanceProgressBar();
+            }
+            $sanitizer->setSatitisationNotRunning();
+            $sanitizer->advanceProgressFinish();
+            $sanitizer->printLn("\n");
+            foreach($sanitized as $san)
+            {
+                $sanitizer->printLn($san, 'notice');
+            }
+        }
+        else
+        {
+            $sanitizer->printLn($sanitizer->getMode().' mode selected, exiting before sanitisation', 'general');
+        }
+        $sanitizer->setSatitisationNotRunning();
+        $sanitizer->printLn("Sanitizer finished!");
     }
 
 }

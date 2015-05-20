@@ -30,34 +30,12 @@ namespace Pegasus\Engine;
 
 require_once 'vendor/catfan/medoo/medoo.php';
 
-use Pegasus\Configuration\Config;
 use Pegasus\Resource\SanitizerException;
 use Pegasus\Sanitizer;
 
 abstract class Engine extends \medoo implements EngineInterface
 {
     private static $engine = null;
-
-    private static $sanitizer = null;
-
-    public static function getSanitizer()
-    {
-        return self::$sanitizer;
-    }
-
-    public function __construct()
-    {
-        $dbInitialisationData = array
-        (
-            'database_type' => $this->getEngineName(),
-            'database_name' => Engine::$sanitizer->getConfig()->getDatabase()->getDatabase(),
-            'server'        => Engine::$sanitizer->getConfig()->getDatabase()->getHost(),
-            'username'      => Engine::$sanitizer->getConfig()->getDatabase()->getUsername(),
-            'password'      => Engine::$sanitizer->getConfig()->getDatabase()->getPassword(),
-            'charset'       => 'utf8'
-        );
-        parent::__construct($dbInitialisationData);
-    }
 
     public abstract function getEngineName();
 
@@ -69,39 +47,29 @@ abstract class Engine extends \medoo implements EngineInterface
      * @throws EngineNotFoundException
      * @throws \Exception
      */
-    public static function start(Sanitizer $sanitizer)
+    public static function start($config)
     {
-        if(null == $sanitizer)
+        if(null == self::$engine)
         {
-            throw new \Exception("Creating an Engine instance needs Sanitizer, sadly no sanitizer was provided");
-        }
-        self::$sanitizer = $sanitizer;
-        $engineName = $sanitizer->getConfig()->getDatabase()->getEngine();
-        switch($engineName)
-        {
-            case 'mysql' :
+            if (false == isset($config['database_type']))
             {
-                self::$engine = new MySqlEngine($sanitizer);
-                break;
+                throw new SanitizerException("Engine Type/Name not found in Engine start parameters");
             }
-            default :
+            $engineName = $config['database_type'];
+            switch ($engineName)
             {
-                throw new EngineNotFoundException("Engine {$engineName} has done a runner!");
-                break;
+                case 'mysql' :
+                {
+                    self::$engine = new MySqlEngine($config);
+                    break;
+                }
+                default :
+                {
+                    throw new EngineNotFoundException("Engine {$engineName} has done a runner!");
+                    break;
+                }
             }
         }
-        return self::$engine;
-    }
-
-    /**
-     * Returns a Singleton instance of a database Engine. On the first call the Config
-     * can not be null.
-     *
-     * @return null
-     * @throws EngineNotFoundException if no engine is found.
-     */
-    public static function getInstance()
-    {
         return self::$engine;
     }
 }
