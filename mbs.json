@@ -1,13 +1,13 @@
 {
     "name":"Magento CE 1.7.0.2",
-    "developer_mode":"yes",
+    "developer_mode":"no",
     "database":
     {
         "host":"localhost",
         "username":"root",
         "password":"password",
         "databbase":"scrutinizer",
-        "sanitization_mode":"quick"
+        "sanitization_mode":"slow"
     },
     "tables":
     {
