@@ -137,7 +137,7 @@ class Sanitizer extends Command
                 'config',
                 InputOption::VALUE_OPTIONAL,
                 'Database JSON Config File',
-                'database.json'
+                'sanitize.json'
             )
             ->addOption(
                 'mode',

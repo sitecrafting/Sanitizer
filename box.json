@@ -1,0 +1,17 @@
+{
+  "chmod": "0755",
+  "directories": [
+    "src"
+  ],
+  "finder": [
+    {
+      "name": "*.php",
+      "exclude": ["spec", "feature", "html", "bin", "vagrant-transient", ".vagrant", ".idea"],
+      "in": "vendor"
+    }
+  ],
+  "git-version": "package_version",
+  "main": "src/Application.php",
+  "output": "sanitize.phar",
+  "stub": true
+}
