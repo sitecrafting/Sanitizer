@@ -28,6 +28,7 @@
  */
 namespace Pegasus\Columns\Types;
 
+use Pegasus\Engine\Engine;
 use Pegasus\Resource\Object;
 
 abstract class AbstractDataType extends Object
@@ -37,7 +38,7 @@ abstract class AbstractDataType extends Object
      *
      * @return mixed
      */
-    abstract function getDefault();
+    abstract function getBasicDefault();
 
     /**
      * This method returns an array of options
@@ -47,5 +48,26 @@ abstract class AbstractDataType extends Object
     public function option()
     {
         return array();
+    }
+
+    public function getName()
+    {
+        return $this->getColumn();
+    }
+
+    public function exists()
+    {
+        return Engine::getInstance()->columnExists($this->getTableName(), $this->getName());
+    }
+
+    public function getDefault()
+    {
+        if(null != $this->getMockModel())
+        {
+            $modelName = $this->getMockModel();
+            $model = new $modelName();
+            return $model->getRandomValue();
+        }
+        return $this->getBasicDefault();
     }
 }

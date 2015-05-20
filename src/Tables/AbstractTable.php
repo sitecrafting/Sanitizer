@@ -29,8 +29,10 @@
 namespace Pegasus\Tables;
 
 use Pegasus\Columns\Types\AbstractDataType;
+use Pegasus\Engine\Engine;
 use Pegasus\Resource\Object;
 use Pegasus\Tables;
+use Pegasus\Columns\Types;
 
 abstract class AbstractTable extends Object
 {
@@ -143,13 +145,58 @@ abstract class AbstractTable extends Object
             {
                 throw new TableException("Command '{$command}' is set but not valid for table ".$this->getTableName());
             }
+            $this->setCommand($command);
         }
         if(false == $this->exists())
         {
-            $db = 
+            $db = Collection::getSanitizer()->getConfig()->getDatabase()->getDatabaseName();
             throw new TableException("Table '{$this->getTableName()}' not found in database '{$db}'");
         }
         return true;
+    }
+
+    /**
+     * @param   $configDataType
+     * @param   $columnData
+     * @throws  TableException when a type can not be found.
+     * @return  AbstractDataType
+     */
+    protected function getInstanceFromType($configDataType, array $columnData)
+    {
+        $column = null;
+        switch($configDataType)
+        {
+            case 'timestamp' :
+            {
+                $column = new Types\Timestamp($columnData);
+                break;
+            }
+            case 'text' :
+            {
+                $column = new Types\Text($columnData);
+                break;
+            }
+            case 'varchar' :
+            {
+                $column = new Types\Varchar($columnData);
+                break;
+            }
+            case 'integer' :
+            {
+                $column = new Types\Integer($columnData);
+                break;
+            }
+            default :
+            {
+                throw new TableException("No column types could be found by '{$configDataType}' on table '{$this->getTableName()}");
+            }
+        }
+        if(null != $column)
+        {
+            $column->setTableName($this->getTableName());
+            $column->setTable($this);
+        }
+        return $column;
     }
 
     /**
@@ -172,8 +219,45 @@ abstract class AbstractTable extends Object
         return $this->doCommand;
     }
 
+    /**
+     * Returns true if the table exists
+     *
+     * @return mixed
+     */
     public function exists()
     {
+        return Engine::getInstance()->tableExists($this->getTableName());
+    }
+
+    /**
+     * This method retusn the an array in the format required by the db abstraction class.
+     *
+     * array('primaty_key' => 'value')
+     *
+     * @param $row Is the row which contains the primary key and the value etc, it is just a dumb array so there's
+     *             no way to determine which key is the primary key without querying the db.
+     * @return array
+     */
+    public function getPrimaryKeyData($row)
+    {
+        $name = Engine::getInstance()->getPrimaryKeyName($this->getTableName());
+        return array($name => $row[$name]);
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasExecutedCommand()
+    {
+        if(true == $this->doCommand())
+        {
+            if(true == $this->doTruncate())
+            {
+                return Engine::getInstance()->delete($this->getTableName(), null);
+            }
+        }
         return false;
     }
+
+    abstract function sanitize();
 }

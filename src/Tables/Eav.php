@@ -28,6 +28,10 @@
  */
 namespace Pegasus\Tables;
 
+use Pegasus\Resource\Object;
+use Pegasus\Resource\SanitizerException;
+use Pegasus\Tables;
+
 class Eav extends AbstractTable
 {
     public static function getType()
@@ -48,6 +52,55 @@ class Eav extends AbstractTable
         {
             return true;
         }
+        $this->setColumn($this->getColumnFromTableData($tableData));
+        $this->setDataType($this->getDataTypeFromTableData($tableData));
+        $column = $this->getInstanceFromType($this->getDataType(), $tableData);
+        $this->configureEavColumn($column, $tableData);
+        $this->addColumn($column);
+
         return true;
+    }
+
+    public function getDataTypeFromTableData($tableData)
+    {
+        if(true == isset($tableData['data_type']))
+        {
+            return $tableData['data_type'];
+        }
+        return 'text';
+    }
+
+    public function getColumnFromTableData($tableData)
+    {
+        if(false == isset($tableData['column']))
+        {
+            throw new TableException('Column name not defined for EAV table '.$this->getTableName());
+        }
+        return $tableData['column'];
+    }
+
+    private function configureEavColumn($column, $tableData)
+    {
+        //(print_r($tableData));
+        if(false == isset($tableData['control_column']))
+        {
+            throw new TableException("Control column undefined for column '{$column->getName()}' on table '{$this->getTableName()}'");
+        }
+        $controlColumn = new Object($tableData['control_column']);
+        //die($controlColumn->getName());
+        //die(print_r($controlColumn->getValues()));
+        $column->setControlColumn($controlColumn);
+    }
+
+    public function sanitize()
+    {
+//        //throw new SanitizerException('EAV sanitize function needs implementing');
+//        return true;
+//
+//        $rowsEffected = $this->executedCommand();
+//        if(false !== $rowsEffected)
+//        {
+//            return $rowsEffected;
+//        }
     }
 }

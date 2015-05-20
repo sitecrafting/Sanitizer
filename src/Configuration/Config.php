@@ -35,8 +35,6 @@ class Config extends Object
 {
     private $database = null;
 
-    private $tables = null;
-
     public function __construct($configFile)
     {
         if(false == file_exists($configFile))
@@ -59,7 +57,10 @@ class Config extends Object
         {
             if(2 == sizeof($configOverride))
             {
-                $this->data['database'][strtolower($configOverride[0])] = $configOverride[1];
+                if(null != $configOverride[0] && null != $configOverride[1])
+                {
+                    $this->data['database'][strtolower($configOverride[0])] = $configOverride[1];
+                }
             }
         }
 
@@ -73,7 +74,15 @@ class Config extends Object
      */
     public function getIsInDeveloperMode()
     {
-        return isset($this->data['developer_mode']);
+        if(false == isset($this->data['developer_mode']))
+        {
+            return false;
+        }
+        if('yes' == $this->data['developer_mode'])
+        {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -86,6 +95,7 @@ class Config extends Object
         if(null == $this->database)
         {
             $this->database = new Object($this->data['database']);
+            $this->database->setDatabaseName($this->database->getDatabase());
         }
         return $this->database;
     }

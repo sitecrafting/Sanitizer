@@ -37,7 +37,7 @@ class Varchar extends AbstractDataType
      *
      * @return mixed
      */
-    function getDefault()
+    function getBasicDefault()
     {
         return "Varchar";
     }

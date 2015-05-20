@@ -107,7 +107,7 @@ class Sanitizer extends Command
                 'db',
                 InputOption::VALUE_OPTIONAL,
                 'Database',
-                'sanitize'
+                'sanitizer'
             )
             ->addOption(
                 'configuration',
@@ -115,6 +115,13 @@ class Sanitizer extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Database JSON Config File',
                 'database.json'
+            )
+            ->addOption(
+                'mode',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Mode (sanitize, validate)',
+                'sanitize'
             )
         ;
     }
@@ -140,7 +147,7 @@ class Sanitizer extends Command
         $this->outputIntro();
         $this->renderOverviewTable();
 
-        //Engine::start($this->config);
+        Engine::start($this);
         TableCollection::setSanitizer($this);
         $this->sanitizeTables();
     }
@@ -177,20 +184,24 @@ class Sanitizer extends Command
      */
     private function renderOverviewTable()
     {
-        if (OutputInterface::VERBOSITY_VERBOSE <= $this->output->getVerbosity())
+        if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERBOSE))
         {
             $table = new Table($this->output);
             $table->setHeaders(array('Setting', 'Value'))->setRows(array(
-                array('Host',           $this->input->getOption('host')),
-                array('Password',       (null == $this->input->getOption('password')) ? '--empty--' : str_repeat("*", strlen($this->input->getOption('password')))),
-                array('User',           $this->input->getOption('username')),
-                array('Database',       $this->input->getOption('database')),
-                array('Config',         $this->input->getOption('configuration')),
-                array('Engine',         $this->input->getArgument('engine'))));
+                array('Host',           $this->getConfig()->getDatabase()->getHost()),
+                array('Password',       $this->getConfig()->getDatabase()->getPassword()),
+                array('User',           $this->getConfig()->getDatabase()->getUsername()),
+                array('Database',       $this->getConfig()->getDatabase()->getDatabase()),
+                array('Config',         $this->getConfig()->getDatabase()->getConfig()),
+                array('Engine',         $this->getConfig()->getDatabase()->getEngine())));
             $table->render();
-            $helper = $this->getHelper('question');
-            if (false == $helper->ask($this->input, $this->output, new ConfirmationQuestion('Are you happy to continue? [yes|no]', false))) {
-                return;
+            if('sanitize' == $this->input->getOption('mode'))
+            {
+                $helper = $this->getHelper('question');
+                if (false == $helper->ask($this->input, $this->output, new ConfirmationQuestion('Are you happy to continue? [yes|no]', false)))
+                {
+                    return;
+                }
             }
         }
     }
@@ -287,16 +298,37 @@ class Sanitizer extends Command
      */
     private function sanitizeTables()
     {
+        $sanitized = array();
         $tables = TableCollection::getCollection();
-        $tableCount = sizeof($tables);
-        $progress = new ProgressBar($this->output, $tableCount);
-        $progress->setBarWidth(100);
-        foreach($tables as $table)
+        if('sanitize' == $this->input->getOption('mode'))
         {
-            usleep(50000);
-            $progress->advance();
+            $tableCount = sizeof($tables);
+            $progress = new ProgressBar($this->output, $tableCount);
+            $progress->setBarWidth(100);
+            foreach($tables as $table)
+            {
+                $rows = $table->sanitize();
+                if(true == $table->doCommand())
+                {
+                    $sanitized[] = "{$table->getCommand()} applied to {$table->getTableName()} and effected {$rows} rows";
+                }
+                else
+                {
+                    $sanitized[] = "Sanitized {$table->getTableName()} and updated {$rows} rows";
+                }
+                $progress->advance();
+            }
+            $progress->finish();
+            $this->output->writeLn("\n");
+            foreach($sanitized as $san)
+            {
+                $this->printLn($san, 'notice');
+            }
         }
-        $progress->finish();
+        else
+        {
+            $this->printLn($this->input->getOption('mode').' mode selected, exiting before sanitisation', 'general');
+        }
         $this->output->writeLn("\n");
     }
 

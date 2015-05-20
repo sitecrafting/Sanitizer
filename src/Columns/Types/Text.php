@@ -37,7 +37,7 @@ class Text extends AbstractDataType
      *
      * @return mixed
      */
-    function getDefault()
+    function getBasicDefault()
     {
         return "Text";
     }

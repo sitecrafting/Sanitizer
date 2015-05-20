@@ -37,8 +37,8 @@ class Timestamp extends AbstractDataType
      *
      * @return mixed
      */
-    function getDefault()
+    function getBasicDefault()
     {
-        return "2012-00-00 01:00:00";
+        return date('Y-m-d H:i:s');
     }
 }

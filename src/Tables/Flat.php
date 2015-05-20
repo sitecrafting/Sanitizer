@@ -31,6 +31,7 @@ namespace Pegasus\Tables;
 use Pegasus\Tables\AbstractTable;
 use Pegasus\Engine\Engine;
 use Pegasus\Columns\Types;
+use Pegasus\Resource\SanitizerException;
 
 class Flat extends AbstractTable
 {
@@ -63,6 +64,14 @@ class Flat extends AbstractTable
             return false;
         }
         $this->loadColumnInstances($tableData);
+        foreach($this->getColumns() as $column)
+        {
+            if(false == $column->exists())
+            {
+                $db = Collection::getSanitizer()->getConfig()->getDatabase()->getDatabaseName();
+                throw new TableException("Column '{$column->getName()}' in table '{$this->getTableName()}' not found in database '{$db}'");
+            }
+        }
         return true;
     }
 
@@ -78,48 +87,8 @@ class Flat extends AbstractTable
             {
                 $configDataType = $columnData[self::FIELD_DATA_TYPE];
                 $this->addColumn($this->getInstanceFromType($configDataType, $columnData));
-
             }
         }
-    }
-
-    /**
-     * @param   $configDataType
-     * @param   $columnData
-     * @throws  TableException when a type can not be found.
-     * @return  AbstractDataType
-     */
-    private function getInstanceFromType($configDataType, array $columnData)
-    {
-        $column = null;
-        switch($configDataType)
-        {
-            case 'timestamp' :
-            {
-                $column = new Types\Timestamp($columnData);
-                break;
-            }
-            case 'text' :
-            {
-                $column = new Types\Text($columnData);
-                break;
-            }
-            case 'varchar' :
-            {
-                $column = new Types\Varchar($columnData);
-                break;
-            }
-            case 'integer' :
-            {
-                $column = new Types\Integer($columnData);
-                break;
-            }
-            default :
-            {
-                throw new TableException("No column types could be found by '{$configDataType}' on table '{$this->getTableName()}");
-            }
-        }
-        return $column;
     }
 
     /**
@@ -136,5 +105,45 @@ class Flat extends AbstractTable
             return true;
         }
         return false;
+    }
+
+    /**
+     * Sanitizes in 1 of 2 modes, quick and everything else.
+     * Quick changes every value with the table to a random selection - but they will all be the same.
+     * otherwise each column has data set individually set.
+     */
+    public function sanitize()
+    {
+        $rowsEffected = $this->hasExecutedCommand();
+        if(false !== $rowsEffected)
+        {
+            return $rowsEffected;
+        }
+        $quick = false;//('quick' == Collection::getSanitizer()->getConfig()->getDatabase()->getSanitizationMode());
+        $columns = array();
+        foreach ($this->getColumns() as $column)
+        {
+            $columns[$column->getName()] = $column->getDefault();
+        }
+        if(true == $quick)
+        {
+            return Engine::getInstance()->update($this->getTableName(), $columns);
+        }
+        else
+        {
+            $rowsUpdated = 0;
+            $rows = Engine::getInstance()->select($this->getTableName(), '*');
+            foreach($rows as $row)
+            {
+                foreach($this->getColumns() as $column)
+                {
+                    $row[$column->getName()] = $column->getDefault();
+                }
+                //die(print_r($this->getPrimaryKeyData($row)));
+                $rowsUpdated += Engine::getInstance()->update($this->getTableName(), $row, $this->getPrimaryKeyData($row));
+            }
+            return $rowsUpdated;
+        }
+        return 0;
     }
 }

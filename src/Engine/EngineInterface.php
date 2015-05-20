@@ -31,5 +31,9 @@ namespace Pegasus\Engine;
 
 interface EngineInterface
 {
+    public function tableExists($tableName);
 
+    public function columnExists($tableName, $columnName);
+
+    public function getPrimaryKeyName($tableName);
 }

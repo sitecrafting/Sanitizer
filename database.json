@@ -12,7 +12,7 @@
           "data_type":"timestamp"
         },
         {
-          "column": "created_at",
+          "column": "updated_at",
           "data_type":"timestamp"
         }
       ],
@@ -25,7 +25,7 @@
       "customer_address_entity_int": {
         "comment":"All region data in current db, please expand if you have more data"
       },
-      "customer_address_entity_text":[
+      "customer_address_entity_text":
         {
           "column": "value",
           "data_type":"text",
@@ -34,18 +34,15 @@
           {
             "name":"attribute_id",
             "values":
-            [
               {
                 "25":
                 {
                   "comment":"Street",
-                  "mock_model":"Pegasus\\Columns\\Mock\\Street.php"
+                  "mock_model":"Pegasus\\Columns\\Mock\\Street"
                 }
               }
-            ]
           }
-        }
-      ],
+        },
       "customer_address_entity_varchar":
         {
           "column": "value",
@@ -55,55 +52,53 @@
           {
             "name":"attribute_id",
             "values":
-            [
               {
                 "19":
                 {
                   "comment":"Predix / Title",
-                  "mock_model":"Pegasus\\Columns\\Mock\\Title.php"
+                  "mock_model":"Pegasus\\Columns\\Mock\\Title"
                 },
                 "20":
                 {
                   "comment":"First Name",
-                  "mock_model":"Pegasus\\Columns\\Mock\\FirstName.php"
+                  "mock_model":"Pegasus\\Columns\\Mock\\FirstName"
                 },
                 "22":
                 {
                   "comment":"Last Name",
-                  "mock_model":"Pegasus\\Columns\\Mock\\LastName.php"
+                  "mock_model":"Pegasus\\Columns\\Mock\\LastName"
                 },
                 "24":
                 {
                   "comment":"Company Name",
-                  "mock_model":"Pegasus\\Columns\\Mock\\Company.php"
+                  "mock_model":"Pegasus\\Columns\\Mock\\Company"
                 },
                 "26":
                 {
                   "comment":"City",
-                  "mock_model":"Pegasus\\Columns\\Mock\\City.php"
+                  "mock_model":"Pegasus\\Columns\\Mock\\City"
                 },
                 "27":
                 {
                   "comment":"County Id",
-                  "mock_model":"Pegasus\\Columns\\Mock\\Country.php"
+                  "mock_model":"Pegasus\\Columns\\Mock\\Country"
                 },
                 "28":
                 {
                   "comment":"Region",
-                  "mock_model":"Pegasus\\Columns\\Mock\\Region.php"
+                  "mock_model":"Pegasus\\Columns\\Mock\\Region"
                 },
                 "30":
                 {
                   "comment":"Post Code",
-                  "mock_model":"Pegasus\\Columns\\Mock\\PostCode.php"
+                  "mock_model":"Pegasus\\Columns\\Mock\\PostCode"
                 },
                 "32":
                 {
                   "comment":"Fax Number",
-                  "mock_model":"Pegasus\\Columns\\Mock\\Telephone.php"
+                  "mock_model":"Pegasus\\Columns\\Mock\\Telephone"
                 }
               }
-            ]
           }
         }
       ,
@@ -113,13 +108,13 @@
           "data_type":"timestamp"
         },
         {
-          "column": "created_at",
+          "column": "updated_at",
           "data_type":"timestamp"
         },
         {
           "column": "email",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\Email.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\Email"
         }
       ],
       "customer_entity_datetime":{
@@ -137,7 +132,6 @@
           {
             "name":"attribute_id",
             "values":
-            [
               {
                 "13":
                 {
@@ -152,7 +146,6 @@
                   "comment":"Login Attempts - Not personal data but meta data"
                 }
               }
-            ]
           }
         }
       ,
@@ -168,40 +161,38 @@
           {
             "name":"attribute_id",
             "values":
-            [
               {
                 "4":
                 {
                   "comment":"Predix / Title",
-                  "mock_model":"Pegasus\\Columns\\Mock\\Title.php"
+                  "mock_model":"Pegasus\\Columns\\Mock\\Title"
                 },
                 "5":
                 {
                   "comment":"First Name",
-                  "mock_model":"Pegasus\\Columns\\Mock\\FirstName.php"
+                  "mock_model":"Pegasus\\Columns\\Mock\\FirstName"
                 },
                 "6":
                 {
                   "comment":"Last Name",
-                  "mock_model":"Pegasus\\Columns\\Mock\\MiddleName.php"
+                  "mock_model":"Pegasus\\Columns\\Mock\\MiddleName"
                 },
                 "7":
                 {
                   "comment":"Last Name",
-                  "mock_model":"Pegasus\\Columns\\Mock\\LastName.php"
+                  "mock_model":"Pegasus\\Columns\\Mock\\LastName"
                 },
                 "8":
                 {
                   "comment":"Suffix",
-                  "mock_model":"Pegasus\\Columns\\Mock\\Suffix.php"
+                  "mock_model":"Pegasus\\Columns\\Mock\\Suffix"
                 },
                 "13":
                 {
                   "comment":"VAT Number",
-                  "mock_model":"Pegasus\\Columns\\Mock\\Vat.php"
+                  "mock_model":"Pegasus\\Columns\\Mock\\Vat"
                 }
               }
-            ]
           }
         }
       ,
@@ -209,37 +200,37 @@
         {
           "column": "customer_email",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\Email.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\Email"
         },
         {
           "column": "customer_firstname",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\FirstName.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\FirstName"
         },
         {
           "column": "customer_lastname",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\LastName.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\LastName"
         },
         {
           "column": "customer_middlename",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\MiddleName.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\MiddleName"
         },
         {
           "column": "customer_prefix",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\Title.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\Title"
         },
         {
           "column": "customer_suffix",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\Suffix.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\Suffix"
         },
         {
           "column": "customer_taxvat",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\Vat.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\Vat"
         },
         {
           "column": "remote_ip",
@@ -251,91 +242,91 @@
         {
           "column": "fax",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\Telephone.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\Telephone"
         },
         {
           "column": "region",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\Region.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\Region"
         },
         {
           "column": "postcode",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\PostCode.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\PostCode"
         },
         {
           "column": "lastname",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\LastName.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\LastName"
         },
         {
           "column": "street",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\Street.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\Street"
         },
         {
           "column": "city",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\City.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\City"
         },
         {
           "column": "email",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\Email.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\Email"
         },
         {
           "column": "country_id",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\Country.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\Country"
         },
         {
           "column": "telephone",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\Telephone.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\Telephone"
         },
         {
           "column": "firstname",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\FirstName.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\FirstName"
         },
         {
           "column": "prefix",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\Title.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\Title"
         },
         {
           "column": "middlename",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\MiddleName.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\MiddleName"
         },
         {
           "column": "suffix",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\Suffix.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\Suffix"
         },
         {
           "column": "company",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\Company.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\Company"
         }
       ],
       "sales_flat_order_grid":[
         {
           "column": "shipping_name",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\FullName.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\FullName"
         },
         {
           "column": "billing_name",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\FullName.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\FullName"
         },
         {
           "column": "created_at",
           "data_type":"timestamp"
         },
         {
-          "column": "created_at",
+          "column": "updated_at",
           "data_type":"timestamp"
         }
       ],
@@ -374,14 +365,14 @@
         {
           "column": "billing_name",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\FullName.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\FullName"
         },
         {
           "column": "created_at",
           "data_type":"timestamp"
         },
         {
-          "column": "created_at",
+          "column": "order_created_at",
           "data_type":"timestamp"
         }
       ],
@@ -395,14 +386,14 @@
         {
           "column": "shipping_name",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\FullName.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\FullName"
         },
         {
           "column": "created_at",
           "data_type":"timestamp"
         },
         {
-          "column": "created_at",
+          "column": "order_created_at",
           "data_type":"timestamp"
         }
       ],
@@ -411,9 +402,9 @@
       },
       "sales_flat_shipment_track":[
         {
-          "column": "shipping_name",
+          "column": "track_number",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\TrackingNumber.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\TrackingNumber"
         }
       ],
       "catalogsearch_fulltext":{
@@ -436,14 +427,14 @@
         {
           "column": "billing_name",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\FullName.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\FullName"
         }
       ],
       "newsletter_subscriber":[
         {
           "column": "subscriber_email",
           "data_type":"text",
-          "mock_model":"Pegasus\\Columns\\Mock\\Email.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\Email"
         }
       ],
 
@@ -451,7 +442,7 @@
         {
           "column": "txn_id",
           "data_type":"varchar",
-          "mock_model":"Pegasus\\Columns\\Mock\\TransactionId.php"
+          "mock_model":"Pegasus\\Columns\\Mock\\TransactionId"
         }
       ],
       "dataflow_batch_export":{

@@ -31,29 +31,35 @@ namespace Pegasus\Engine;
 require_once 'vendor/catfan/medoo/medoo.php';
 
 use Pegasus\Configuration\Config;
+use Pegasus\Resource\SanitizerException;
+use Pegasus\Sanitizer;
 
-class Engine extends \medoo implements EngineInterface
+abstract class Engine extends \medoo implements EngineInterface
 {
-    const ENGINE_NAME = 'engine';
-
     private static $engine = null;
 
-    private static $config = null;
+    private static $sanitizer = null;
 
-    public function __construct(Config $config)
+    public static function getSanitizer()
     {
-        $this->config = $config;
+        return self::$sanitizer;
+    }
+
+    public function __construct()
+    {
         $dbInitialisationData = array
         (
-            'database_type' => self::ENGINE_NAME,
-            'database_name' => $this->config->getDatabase()->getDatabase(),
-            'server' => $this->config->getDatabase()->getHost(),
-            'username' => $this->config->getDatabase()->getUsername(),
-            'password' => $this->config->getDatabase()->getPassword(),
-            'charset' => 'utf8'
+            'database_type' => $this->getEngineName(),
+            'database_name' => Engine::$sanitizer->getConfig()->getDatabase()->getDatabase(),
+            'server'        => Engine::$sanitizer->getConfig()->getDatabase()->getHost(),
+            'username'      => Engine::$sanitizer->getConfig()->getDatabase()->getUsername(),
+            'password'      => Engine::$sanitizer->getConfig()->getDatabase()->getPassword(),
+            'charset'       => 'utf8'
         );
         parent::__construct($dbInitialisationData);
     }
+
+    public abstract function getEngineName();
 
     /**
      * Start your engines,  method is used to initialise the object
@@ -63,19 +69,20 @@ class Engine extends \medoo implements EngineInterface
      * @throws EngineNotFoundException
      * @throws \Exception
      */
-    public static function start($config)
+    public static function start(Sanitizer $sanitizer)
     {
-        if(null == $config)
+        if(null == $sanitizer)
         {
-            throw new \Exception("Creating an Engine instance needs config, sadly no config was provided");
+            throw new \Exception("Creating an Engine instance needs Sanitizer, sadly no sanitizer was provided");
         }
-        self::$config = $config;
-        $engineName = $config->getDatabase()->getEngine();
+        self::$sanitizer = $sanitizer;
+        $engineName = $sanitizer->getConfig()->getDatabase()->getEngine();
         switch($engineName)
         {
-            case MySqlEngine::ENGINE_NAME :
+            case 'mysql' :
             {
-                self::$engine = new MySqlEngine($config);
+                self::$engine = new MySqlEngine($sanitizer);
+                break;
             }
             default :
             {
@@ -83,7 +90,7 @@ class Engine extends \medoo implements EngineInterface
                 break;
             }
         }
-        return self;
+        return self::$engine;
     }
 
     /**

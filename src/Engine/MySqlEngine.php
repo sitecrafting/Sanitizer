@@ -30,5 +30,32 @@ namespace Pegasus\Engine;
 
 class MySqlEngine extends Engine
 {
-    const ENGINE_NAME = 'mysql';
+    public function getEngineName()
+    {
+       return 'mysql';
+    }
+
+    public function tableExists($tableName)
+    {
+        /* @var $result PDOStatement */
+        $result = $this->query("SHOW TABLES LIKE '{$tableName}'")->fetchAll();
+        return 1 == sizeof($result);
+    }
+
+    public function columnExists($tableName, $columnName)
+    {
+        $result = $this->query("SHOW COLUMNS FROM `{$tableName}` LIKE '{$columnName}'")->fetchAll();
+        return 1 == sizeof($result);
+    }
+
+    public function getPrimaryKeyName($tableName)
+    {
+        $sql = "SHOW KEYS FROM `{$tableName}` WHERE Key_name = 'PRIMARY'";
+        $result = $this->query($sql)->fetch();
+        if(false == isset($result['Column_name']))
+        {
+            throw new EngineException("Primary key could not be found for table '{$tableName}'");
+        }
+        return $result['Column_name'];
+    }
 }

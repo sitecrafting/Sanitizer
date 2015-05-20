@@ -37,7 +37,7 @@ class Integer extends AbstractDataType
      *
      * @return mixed
      */
-    function getDefault()
+    function getBasicDefault()
     {
         return "1000";
     }
