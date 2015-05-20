@@ -202,11 +202,12 @@ class Sanitizer extends Command
      */
     private function outputIntro()
     {
-        if(true == $this->getConfig()->getIsInDeveloperMode())
+        if(true == $this->getConfig()->getIsInDeveloperMode() || $this->getConfig()->getIsInDeveloperMode() == OutputInterface::VERBOSITY_VERY_VERBOSE)
         {
             $this->printLn("App is in developer mode, therefore all output will be shown!", 'warning');
             $this->printLn("Verbosity ".$this->output->getVerbosity(), 'warning');
         }
+        $this->printLn("Sanitisation mode '{$this->getConfig()->getDatabase()->getSanitizationMode()}'", 'normal');
     }
 
     /**
@@ -229,7 +230,7 @@ class Sanitizer extends Command
                 array('Config',         $this->getConfig()->getDatabase()->getConfig()),
                 array('Engine',         $this->getConfig()->getDatabase()->getEngine())));
             $table->render();
-            if('sanitize' == $this->input->getOption('mode'))
+            if('sanitize' == $this->getMode())
             {
                 $helper = $this->getHelper('question');
                 if (false == $helper->ask($this->input, $this->output, new ConfirmationQuestion('Are you happy to continue? [yes|no]', false)))
@@ -304,6 +305,14 @@ class Sanitizer extends Command
                     if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERY_VERBOSE))
                     {
                         $this->output->writeLn($this->formatMessage($type, $message));
+                    }
+                    break;
+                }
+                case 'normal' :
+                {
+                    if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_NORMAL))
+                    {
+                        $this->output->writeLn($message);
                     }
                     break;
                 }

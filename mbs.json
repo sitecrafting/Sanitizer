@@ -7,7 +7,7 @@
         "username":"root",
         "password":"password",
         "databbase":"scrutinizer",
-        "sanitization_mode":"slow"
+        "sanitization_mode":"full"
     },
     "tables":
     {

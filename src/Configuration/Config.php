@@ -43,7 +43,6 @@ class Config extends Object
         }
         $parsed = json_decode(file_get_contents($configFile), true);
         $this->setData($parsed);
-
     }
 
     public function setDatabaseOverride($data)
@@ -96,6 +95,10 @@ class Config extends Object
         {
             $this->database = new Object($this->data['database']);
             $this->database->setDatabaseName($this->database->getDatabase());
+            if(null == $this->database->getSanitizationMode())
+            {
+                $this->database->setSanitizationMode('full');
+            }
         }
         return $this->database;
     }
