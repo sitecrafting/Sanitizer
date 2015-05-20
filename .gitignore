@@ -1,1 +1,6 @@
 /.idea
+sql/sanitizer.base.sql
+sql/sanitizer.sql
+sql/sql/coast.sql
+sql/sql/coast_base.sql
+sql/sql/sainsburys_order_update.sql

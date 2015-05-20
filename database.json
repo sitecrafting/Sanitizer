@@ -46,7 +46,7 @@
           }
         }
       ],
-      "customer_address_entity_varchar":[
+      "customer_address_entity_varchar":
         {
           "column": "value",
           "data_type":"varchar",
@@ -106,7 +106,7 @@
             ]
           }
         }
-      ],
+      ,
       "customer_entity":[
         {
           "column": "created_at",
@@ -128,7 +128,7 @@
       "customer_entity_decimal": {
         "comment":"Currently no Magento instances we have include any data in here"
       },
-      "customer_entity_int":[
+      "customer_entity_int":
         {
           "column": "value",
           "data_type":"integer",
@@ -155,11 +155,11 @@
             ]
           }
         }
-      ],
+      ,
       "customer_entity_text":{
         "comment":"Currently no Magento instances we have include any data in here"
       },
-      "customer_entity_varchar":[
+      "customer_entity_varchar":
         {
           "column": "value",
           "data_type":"integer",
@@ -204,7 +204,7 @@
             ]
           }
         }
-      ],
+      ,
       "sales_flat_order":[
         {
           "column": "customer_email",

@@ -24,31 +24,11 @@
  * THE SOFTWARE.
  *
  * Date: 19/05/15
- * Time: 11:37
+ * Time: 07:13
  */
-namespace Pegasus\Columns\Mock;
+namespace Pegasus\Resource;
 
-use Pegasus\Columns\Mock;
-
-class PostCode extends AbstractMockData
+class SanitizerException extends \Exception
 {
-    /**
-     * Returns sanitised street names
-     *
-     * @return array
-     */
-    public function getValues()
-    {
-        return array
-        (
-            "EX33 2BP",
-            "BH12 5BB",
-            "WC1E 6BT",
-            "SO17 1BJ",
-            "BA2 7AY",
-            "BS8 1TH",
-            "G12 8QQ",
-            "HU6 7RX",
-        );
-    }
+
 }

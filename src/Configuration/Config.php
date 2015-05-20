@@ -1,7 +1,28 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: philipelson
+ *
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
  * Date: 18/05/15
  * Time: 20:43
  */
@@ -29,21 +50,30 @@ class Config extends Object
 
     public function setDatabaseOverride($data)
     {
-        if(false == isset($this->_data['database']))
+        if(false == isset($this->data['database']))
         {
-            $this->_data['database'] = array();
+            $this->data['database'] = array();
         }
 
         foreach($data as $configOverride)
         {
             if(2 == sizeof($configOverride))
             {
-                $this->_data['database'][strtolower($configOverride[0])] = $configOverride[1];
+                $this->data['database'][strtolower($configOverride[0])] = $configOverride[1];
             }
         }
 
         /* set it back to null so the next call re-initialises the database config object */
         $this->database = null;
+    }
+
+    /**
+     * Returns true if this instance is in developer mode.
+     * @return bool
+     */
+    public function getIsInDeveloperMode()
+    {
+        return isset($this->data['developer_mode']);
     }
 
     /**
@@ -55,7 +85,7 @@ class Config extends Object
     {
         if(null == $this->database)
         {
-            $this->database = new Object($this->_data['database']);
+            $this->database = new Object($this->data['database']);
         }
         return $this->database;
     }
@@ -67,6 +97,6 @@ class Config extends Object
      */
     public function getTables()
     {
-        return $this->_data['tables'];
+        return $this->data['tables'];
     }
 }

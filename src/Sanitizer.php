@@ -1,7 +1,28 @@
 <?php
 /**
  *
- * This application is designed to sanitize a database. Never ever ever ever use it on a live DB!
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
  *
  * The basic flow is this:
  * <ul><li>App loads the config</li>
@@ -15,8 +36,6 @@
  * Once the application has finished the database will be in a sanitized state.
  *
  *
- * Created by PhpStorm.
- * User: Philip Elson
  * Date: 18/05/15
  * Time: 12:50
  *
@@ -36,6 +55,7 @@ use Pegasus\Engine\Engine;
 use Pegasus\Tables\Collection as TableCollection;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 
 class Sanitizer extends Command
@@ -45,6 +65,11 @@ class Sanitizer extends Command
     private $output = null;
 
     private $input = null;
+
+    public function getVersion()
+    {
+        return '0.0.1';
+    }
 
     protected function configure()
     {
@@ -101,14 +126,8 @@ class Sanitizer extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // ...
-        $style = new OutputFormatterStyle('white', 'red', array('bold', 'blink'));
-        $output->getFormatter()->setStyle('warning', $style);
-        $style = new OutputFormatterStyle('white', 'blue', array('bold'));
-        $output->getFormatter()->setStyle('general', $style);
         $this->input    = $input;
         $this->output   = $output;
-        $this->renderOverviewTable();
         $this->loadConfig(array(
             array('Host', $input->getOption('host')),
             array('Password', $input->getOption('password')),
@@ -116,9 +135,37 @@ class Sanitizer extends Command
             array('Database', $input->getOption('database')),
             array('Config', $input->getOption('configuration')),
             array('Engine', $input->getArgument('engine'))));
+        // ...
+        $this->loadOutputStyles();
+        $this->outputIntro();
+        $this->renderOverviewTable();
+
         //Engine::start($this->config);
         TableCollection::setSanitizer($this);
         $this->sanitizeTables();
+    }
+
+    public function loadOutputStyles()
+    {
+        $style = new OutputFormatterStyle('white', 'red', array('bold'));
+        $this->output->getFormatter()->setStyle('warning', $style);
+        $style = new OutputFormatterStyle('white', 'blue', array('bold'));
+        $this->output->getFormatter()->setStyle('general', $style);
+        $style = new OutputFormatterStyle('white', 'green', array('bold'));
+        $this->output->getFormatter()->setStyle('notice', $style);
+        $style = new OutputFormatterStyle('white', 'red', array('bold', 'blink'));
+        $this->output->getFormatter()->setStyle('fatal_error', $style);
+    }
+
+    /**
+     * Outputs initial information on the app.
+     */
+    private function outputIntro()
+    {
+        if(true == $this->getConfig()->getIsInDeveloperMode())
+        {
+            $this->printLn("App is in developer mode, therefore all output will be shown!", 'warning');
+        }
     }
 
     /**
@@ -150,11 +197,73 @@ class Sanitizer extends Command
 
     public function printLn($message, $type=null)
     {
-       // if (OutputInterface::VERBOSITY_VERBOSE <= $this->output->getVerbosity())
+        switch($type)
         {
-            $message = (null == $type) ? $message : "<{$type}>{$message}</{$type}>";
-            $this->output->writeLn($message);
+            case null :
+            {
+                $this->output->writeLn($message);
+            }
+            case 'general' :
+            {
+                if(true == $this->canDisplayMessage(OutputInterface::OUTPUT_NORMAL))
+                {
+                    $this->output->writeLn($this->formatMessage($type, $message));
+                }
+                break;
+            }
+            case 'warning' :
+            {
+                if(true == $this->canDisplayMessage(OutputInterface::OUTPUT_NORMAL))
+                {
+                    $this->output->writeLn($this->formatMessage($type, $message));
+                }
+                break;
+            }
+            case 'notice' :
+            {
+                if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERY_VERBOSE))
+                {
+                    $this->output->writeLn($this->formatMessage($type, $message));
+                }
+                break;
+            }
+            case 'fatal_error' :
+            {
+                if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_QUIET))
+                {
+                    $this->output->writeLn($this->formatMessage($type, $message));
+                }
+                break;
+            }
         }
+    }
+
+    /**
+     * This function returns true if the verbosity level equal to the level provided.
+     * If this is in developer mode than it will always return true.
+     *
+     * @param $level
+     * @return bool
+     */
+    private function canDisplayMessage($level)
+    {
+        //Default to verbose
+        if(true == $this->getConfig()->getIsInDeveloperMode())
+        {
+            return true;
+        }
+        return ($level == $this->output->getVerbosity());
+    }
+
+    /**
+     * Method which adds type tags to the output if set.
+     * @param $type
+     * @param $message
+     * @return string
+     */
+    private function formatMessage($type, $message)
+    {
+        return $message = (null == $type) ? $message : "<{$type}>{$message}</{$type}>";;
     }
 
     /**
@@ -166,14 +275,29 @@ class Sanitizer extends Command
     {
         $this->config = new SanitizerConfig($this->input->getOption('configuration'));
         $this->config->setDatabaseOverride($databaseMap);
+        if(true == $this->config->getIsInDeveloperMode())
+        {
+            error_reporting(E_ALL);
+            ini_set('display_errors', 1);
+        }
     }
 
+    /**
+     * This method iterates over the tables.
+     */
     private function sanitizeTables()
     {
-        foreach(TableCollection::getCollection() as $table)
+        $tables = TableCollection::getCollection();
+        $tableCount = sizeof($tables);
+        $progress = new ProgressBar($this->output, $tableCount);
+        $progress->setBarWidth(100);
+        foreach($tables as $table)
         {
-            die(print_r($table));
+            usleep(50000);
+            $progress->advance();
         }
+        $progress->finish();
+        $this->output->writeLn("\n");
     }
 
 }

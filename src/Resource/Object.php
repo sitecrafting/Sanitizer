@@ -1,12 +1,35 @@
 <?php
-namespace Pegasus\Resource;
-
 /**
- * Created by PhpStorm.
- * User: philipelson
+ *
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * //TODO As this is borrowed from Magento, I need to re-implement this at some point! so it's not OSL 3 reciprocal
+ *
  * Date: 18/05/15
  * Time: 20:51
  */
+namespace Pegasus\Resource;
+
 class Object
 {
 
@@ -15,13 +38,7 @@ class Object
      *
      * @var array
      */
-    protected $_data = array();
-
-    /**
-     * Data changes flag (true after setData|unsetData call)
-     * @var $_hasDataChange bool
-     */
-    protected $_hasDataChanges = false;
+    protected $data = array();
 
     /**
      * Original data that was loaded
@@ -72,7 +89,6 @@ class Object
      */
     public function __construct()
     {
-        //$this->_initOldFieldsMap();
         if ($this->_oldFieldsMap) {
             $this->_prepareSyncFieldsMap();
         }
@@ -81,7 +97,7 @@ class Object
         if (empty($args[0])) {
             $args[0] = array();
         }
-        $this->_data = $args[0];
+        $this->data = $args[0];
         $this->_addFullNames();
 
         $this->_construct();
@@ -89,11 +105,11 @@ class Object
 
     protected function _addFullNames()
     {
-        $existedShortKeys = array_intersect($this->_syncFieldsMap, array_keys($this->_data));
+        $existedShortKeys = array_intersect($this->_syncFieldsMap, array_keys($this->data));
         if (!empty($existedShortKeys)) {
             foreach ($existedShortKeys as $key) {
                 $fullFieldName = array_search($key, $this->_syncFieldsMap);
-                $this->_data[$fullFieldName] = $this->_data[$key];
+                $this->data[$fullFieldName] = $this->data[$key];
             }
         }
     }
@@ -135,15 +151,14 @@ class Object
      */
     public function setData($key, $value=null)
     {
-        $this->_hasDataChanges = true;
         if(is_array($key)) {
-            $this->_data = $key;
+            $this->data = $key;
             $this->_addFullNames();
         } else {
-            $this->_data[$key] = $value;
+            $this->data[$key] = $value;
             if (isset($this->_syncFieldsMap[$key])) {
                 $fullFieldName = $this->_syncFieldsMap[$key];
-                $this->_data[$fullFieldName] = $value;
+                $this->data[$fullFieldName] = $value;
             }
         }
         return $this;
@@ -165,7 +180,7 @@ class Object
     public function getData($key='', $index=null)
     {
         if (''===$key) {
-            return $this->_data;
+            return $this->data;
         }
 
         $default = null;
@@ -173,7 +188,7 @@ class Object
         // accept a/b/c as ['a']['b']['c']
         if (strpos($key,'/')) {
             $keyArr = explode('/', $key);
-            $data = $this->_data;
+            $data = $this->data;
             foreach ($keyArr as $i=>$k) {
                 if ($k==='') {
                     return $default;
@@ -193,12 +208,12 @@ class Object
         }
 
         // legacy functionality for $index
-        if (isset($this->_data[$key])) {
+        if (isset($this->data[$key])) {
             if (is_null($index)) {
-                return $this->_data[$key];
+                return $this->data[$key];
             }
 
-            $value = $this->_data[$key];
+            $value = $this->data[$key];
             if (is_array($value)) {
                 //if (isset($value[$index]) && (!empty($value[$index]) || strlen($value[$index]) > 0)) {
                 /**
@@ -227,7 +242,7 @@ class Object
      */
     protected function _getData($key)
     {
-        return isset($this->_data[$key]) ? $this->_data[$key] : null;
+        return isset($this->data[$key]) ? $this->data[$key] : null;
     }
 
 
@@ -241,9 +256,9 @@ class Object
     public function hasData($key='')
     {
         if (empty($key) || !is_string($key)) {
-            return !empty($this->_data);
+            return !empty($this->data);
         }
-        return array_key_exists($key, $this->_data);
+        return array_key_exists($key, $this->data);
     }
 
     /**
@@ -295,9 +310,9 @@ class Object
 
             case 'has' :
                 $key = $this->_underscore(substr($method,3));
-                return isset($this->_data[$key]);
+                return isset($this->data[$key]);
         }
-        throw new PegasusException("Invalid method ".get_class($this)."::".$method."(".print_r($args,1).")");
+        throw new SanitizerException("Invalid method ".get_class($this)."::".$method."(".print_r($args,1).")");
     }
 
     /**
@@ -332,7 +347,7 @@ class Object
      */
     public function isEmpty()
     {
-        if (empty($this->_data)) {
+        if (empty($this->data)) {
             return true;
         }
         return false;

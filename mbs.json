@@ -1,5 +1,6 @@
 {
     "name":"Magento CE 1.7.0.2",
+    "developer_mode":"yes",
     "database":
     {
         "host":"localhost"
@@ -25,7 +26,7 @@
       "customer_address_entity_int": {
         "comment":"All region data in current db, please expand if you have more data"
       },
-      "customer_address_entity_text":[
+      "customer_address_entity_text":
         {
           "column": "value",
           "data_type":"text",
@@ -55,8 +56,8 @@
             ]
           }
         }
-      ],
-      "customer_address_entity_varchar":[
+      ,
+      "customer_address_entity_varchar":
         {
           "column": "value",
           "data_type":"varchar",
@@ -116,7 +117,7 @@
             ]
           }
         }
-      ],
+      ,
       "customer_entity":[
         {
           "column": "created_at",
@@ -138,7 +139,7 @@
       "customer_entity_decimal": {
         "comment":"Currently no Magento instances we have include any data in here"
       },
-      "customer_entity_int":[
+      "customer_entity_int":
         {
           "column": "value",
           "data_type":"integer",
@@ -165,11 +166,11 @@
             ]
           }
         }
-      ],
+      ,
       "customer_entity_text":{
         "comment":"Currently no Magento instances we have include any data in here"
       },
-      "customer_entity_varchar":[
+      "customer_entity_varchar":
         {
           "column": "value",
           "data_type":"integer",
@@ -214,7 +215,7 @@
             ]
           }
         }
-      ],
+      ,
       "sales_flat_order":[
         {
           "column": "customer_email",
