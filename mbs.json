@@ -1,6 +1,6 @@
 {
     "name":"Magento CE 1.7.0.2",
-    "developer_mode":"no",
+    "developer_mode":"yes",
     "database":
     {
         "host":"localhost",

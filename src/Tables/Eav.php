@@ -28,6 +28,8 @@
  */
 namespace Pegasus\Tables;
 
+use Pegasus\Columns\Mock\MockData;
+use Pegasus\Engine\Engine;
 use Pegasus\Resource\Object;
 use Pegasus\Resource\SanitizerException;
 use Pegasus\Tables;
@@ -94,13 +96,61 @@ class Eav extends AbstractTable
 
     public function sanitize()
     {
-//        //throw new SanitizerException('EAV sanitize function needs implementing');
-//        return true;
-//
-//        $rowsEffected = $this->executedCommand();
-//        if(false !== $rowsEffected)
-//        {
-//            return $rowsEffected;
-//        }
+        $rows = 0;
+        $rowsEffected = $this->hasExecutedCommand();
+        if(false !== $rowsEffected)
+        {
+            return $rowsEffected;
+        }
+        foreach($this->getColumns() as $column)
+        {
+
+            $controlColumn = $column->getControlColumn();
+            //die(print_r($column));
+            foreach($controlColumn->getValues() as $subsetIndex => $source)
+            {
+                $source = new MockData($source);
+                if(null != $source->getMockModel())
+                {
+                    $modelName      = $source->getMockModel();
+                    if(false == class_exists($modelName))
+                    {
+                        throw new TableException("Unable to find Mock Model with the name '{$modelName}' in table '{$this->getTableName()}' with row id '{$subsetIndex}' ");
+                    }
+                    $model          = new $modelName();
+                    $rows += $this->sanitizeSubset($this->getTableName(), $controlColumn->getName(), $subsetIndex, $column->getColumn(), $model);
+                }
+                else
+                {
+                    Collection::getSanitizer()->printLn("No Mock Model configuration found for EAV column '{$controlColumn->getName()}'  with row id '{$subsetIndex}' in table '{$this->getTableName()}'", 'notice');
+                }
+                if(null != $source->getComment())
+                {
+                    Collection::getSanitizer()->printLn("Comment[{$this->getTableName()}][{$controlColumn->getName()}]: {$source->getComment()}", 'general');
+                }
+            }
+        }
+        return $rows;
+    }
+
+    private function sanitizeSubset($tableName, $controlColumnName, $subsetIndex, $columnName, $mockModel)
+    {
+        $quick = ('quick' == Collection::getSanitizer()->getConfig()->getDatabase()->getSanitizationMode());
+        if(true == $quick)
+        {
+            return Engine::getInstance()->update($tableName, array($columnName => $mockModel->getRandomValue()), array($controlColumnName => $subsetIndex));
+        }
+        else
+        {
+            $rowsUpdated = 0;
+            $rows = Engine::getInstance()->select($tableName, '*', array($controlColumnName => $subsetIndex));
+            foreach($rows as $row)
+            {
+                $row[$columnName] = $mockModel->getRandomValue();
+//                die(print_r(array('column_name' => $columnName, 'table_name' => $tableName, 'row' => $row, 'where' => $this->getPrimaryKeyData($row))));
+                $rowsUpdated += Engine::getInstance()->update($tableName, $row, $this->getPrimaryKeyData($row));
+            }
+            return $rowsUpdated;
+        }
     }
 }

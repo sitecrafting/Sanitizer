@@ -66,6 +66,10 @@ class Sanitizer extends Command
 
     private $input = null;
 
+    private $satitisationRunning = false;
+
+    private $printCache = array();
+
     public function getVersion()
     {
         return '0.0.1';
@@ -208,45 +212,60 @@ class Sanitizer extends Command
 
     public function printLn($message, $type=null)
     {
-        switch($type)
+        $this->printCache[] = array('message' => $message, 'type' => $type);
+        if(false == $this->satitisationRunning)
         {
-            case null :
+            $this->purgePrintCache();
+        }
+    }
+
+    private function purgePrintCache()
+    {
+        foreach($this->printCache as $item)
+        {
+            $message    = $item['message'];
+            $type       = $item['type'];
+            switch($type)
             {
-                $this->output->writeLn($message);
-            }
-            case 'general' :
-            {
-                if(true == $this->canDisplayMessage(OutputInterface::OUTPUT_NORMAL))
+                case null :
                 {
-                    $this->output->writeLn($this->formatMessage($type, $message));
+                    $this->output->writeLn($message);
                 }
-                break;
-            }
-            case 'warning' :
-            {
-                if(true == $this->canDisplayMessage(OutputInterface::OUTPUT_NORMAL))
+                case 'general' :
                 {
-                    $this->output->writeLn($this->formatMessage($type, $message));
+                    if(true == $this->canDisplayMessage(OutputInterface::OUTPUT_NORMAL))
+                    {
+                        $this->output->writeLn($this->formatMessage($type, $message));
+                    }
+                    break;
                 }
-                break;
-            }
-            case 'notice' :
-            {
-                if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERY_VERBOSE))
+                case 'warning' :
                 {
-                    $this->output->writeLn($this->formatMessage($type, $message));
+                    if(true == $this->canDisplayMessage(OutputInterface::OUTPUT_NORMAL))
+                    {
+                        $this->output->writeLn($this->formatMessage($type, $message));
+                    }
+                    break;
                 }
-                break;
-            }
-            case 'fatal_error' :
-            {
-                if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_QUIET))
+                case 'notice' :
                 {
-                    $this->output->writeLn($this->formatMessage($type, $message));
+                    if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERY_VERBOSE))
+                    {
+                        $this->output->writeLn($this->formatMessage($type, $message));
+                    }
+                    break;
                 }
-                break;
+                case 'fatal_error' :
+                {
+                    if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_QUIET))
+                    {
+                        $this->output->writeLn($this->formatMessage($type, $message));
+                    }
+                    break;
+                }
             }
         }
+        $this->printCache = array();
     }
 
     /**
@@ -298,6 +317,7 @@ class Sanitizer extends Command
      */
     private function sanitizeTables()
     {
+        $this->satitisationRunning = true;
         $sanitized = array();
         $tables = TableCollection::getCollection();
         if('sanitize' == $this->input->getOption('mode'))
@@ -330,6 +350,7 @@ class Sanitizer extends Command
             $this->printLn($this->input->getOption('mode').' mode selected, exiting before sanitisation', 'general');
         }
         $this->output->writeLn("\n");
+        $this->satitisationRunning = false;
+        $this->purgePrintCache();
     }
-
 }

@@ -28,53 +28,11 @@
  */
 namespace Pegasus\Columns\Mock;
 
-use Pegasus\Resource\Object;
-
-abstract class AbstractMockData extends Object
+class MockData extends AbstractMockData
 {
-    abstract function getValues();
 
-    /**
-     * For quick sanitisation, this returns true if all the fields can be updated to the same value.
-     *
-     * @return bool
-     */
-    public function supportsMassUpdate()
+    function getValues()
     {
-        return true;
+        return array();
     }
-
-    /**
-     * All values must be unique
-     *
-     * @return bool
-     */
-    public function valuesMustBeUnique()
-    {
-        return false;
-    }
-
-    /**
-     * Returns a shuffled array.
-     *
-     * @return mixed
-     */
-    public function getRandom()
-    {
-        $values = $this->getValues();
-        shuffle($values);
-        return $values;
-    }
-
-    /**
-     * Returns a single random value from this class
-     *
-     * @return mixed
-     */
-    public function getRandomValue()
-    {
-        $data = $this->getRandom();
-        return $data[rand(0, sizeof($data)-1)];
-    }
-
 }

@@ -119,12 +119,8 @@ class Flat extends AbstractTable
         {
             return $rowsEffected;
         }
-        $quick = false;//('quick' == Collection::getSanitizer()->getConfig()->getDatabase()->getSanitizationMode());
-        $columns = array();
-        foreach ($this->getColumns() as $column)
-        {
-            $columns[$column->getName()] = $column->getDefault();
-        }
+        $quick = ('quick' == Collection::getSanitizer()->getConfig()->getDatabase()->getSanitizationMode());
+        $columns = $this->getColumnsForEngineQuery();
         if(true == $quick)
         {
             return Engine::getInstance()->update($this->getTableName(), $columns);
@@ -139,11 +135,20 @@ class Flat extends AbstractTable
                 {
                     $row[$column->getName()] = $column->getDefault();
                 }
-                //die(print_r($this->getPrimaryKeyData($row)));
                 $rowsUpdated += Engine::getInstance()->update($this->getTableName(), $row, $this->getPrimaryKeyData($row));
             }
             return $rowsUpdated;
         }
         return 0;
+    }
+
+    private function getColumnsForEngineQuery()
+    {
+        $columns = array();
+        foreach ($this->getColumns() as $column)
+        {
+            $columns[$column->getName()] = $column->getDefault();
+        }
+        return $columns;
     }
 }
