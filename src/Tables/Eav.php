@@ -101,7 +101,6 @@ class Eav extends AbstractTable
         }
         foreach($this->getColumns() as $column)
         {
-
             $controlColumn = $column->getControlColumn();
             foreach($controlColumn->getValues() as $subsetIndex => $source)
             {
@@ -115,7 +114,6 @@ class Eav extends AbstractTable
                     }
                     $model          = new $modelName();
                     $rows += $this->sanitizeSubset($this->getTableName(), $controlColumn->getName(), $subsetIndex, $column->getColumn(), $model);
-                    //$this->getTerminalPrinter()->printLn("Sanitized Eav {$this->getTableName()} subset of column {$column->getColumn()} with {$controlColumn->getName()} equal to {$subsetIndex} ", 'notice');
                 }
                 else
                 {
@@ -126,6 +124,8 @@ class Eav extends AbstractTable
                     $this->getTerminalPrinter()->printLn("Comment[{$this->getTableName()}][{$controlColumn->getName()}]: {$source->getComment()}", 'general');
                 }
             }
+            $this->getTerminalPrinter()->printLn("Sanitized Eav {$this->getTableName()} subset of column {$column->getColumn()} with {$controlColumn->getName()} equal to {$subsetIndex} ", 'notice');
+
         }
         return $rows;
     }

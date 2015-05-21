@@ -123,7 +123,7 @@ class Flat extends AbstractTable
         if(true == $quick)
         {
             $rows = $this->engine->update($this->getTableName(), $columns);
-            //$this->getTerminalPrinter()->printLn("Sanitized Flat {$this->getTableName()}", 'notice');
+            $this->getTerminalPrinter()->printLn("Sanitized Flat {$this->getTableName()}", 'notice');
             return $rows;
         }
         else
@@ -138,8 +138,8 @@ class Flat extends AbstractTable
                     $rowSubset[$column->getName()] = $column->getDefault();
                 }
                 $rowsUpdated += $this->engine->update($this->getTableName(), $rowSubset, $this->getPrimaryKeyData($row));
-                //$this->getTerminalPrinter()->printLn("Sanitized Flat {$this->getTableName()} ", 'notice');
             }
+            $this->getTerminalPrinter()->printLn("Sanitized Flat {$this->getTableName()} ", 'notice');
             return $rowsUpdated;
         }
         return 0;
