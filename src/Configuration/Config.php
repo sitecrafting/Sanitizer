@@ -112,4 +112,17 @@ class Config extends Object
     {
         return $this->data['tables'];
     }
+
+    /**
+     * Returns the log path, defaults to ./sanitizer.log
+     * @return mixed
+     */
+    public function getLogPath()
+    {
+        if(null == parent::getLogPath())
+        {
+            parent::setLogPath('sanitizer.log');
+        }
+        return parent::getLogPath();
+    }
 }

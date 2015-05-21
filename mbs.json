@@ -1,12 +1,13 @@
 {
     "name":"Magento CE 1.7.0.2",
     "developer_mode":"no",
+    "log_path":"sanitizer.log",
     "database":
     {
         "host":"localhost",
         "username":"root",
         "password":"password",
-        "databbase":"scrutinizer",
+        "database":"sanitizer",
         "sanitization_mode":"full"
     },
     "tables":

@@ -57,6 +57,8 @@ use Pegasus\Tables\Collection as TableCollection;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 
 class Sanitizer extends Command
@@ -74,6 +76,8 @@ class Sanitizer extends Command
     private $progressBar = null;
 
     private static $sanitizer = null;
+
+    private $log = null;
 
     /**
      * Retuns a Singleton instance of the sanitizer
@@ -134,7 +138,7 @@ class Sanitizer extends Command
             )
             ->addOption(
                 'configuration',
-                'config',
+                'co',
                 InputOption::VALUE_OPTIONAL,
                 'Database JSON Config File',
                 'sanitize.json'
@@ -160,10 +164,17 @@ class Sanitizer extends Command
         $this->output   = $output;
         $this->loadOutputStyles();
         $this->loadConfig();
+        $this->loadLoggers();
         $this->outputIntro();
         $this->renderOverviewTable();
         $this->loadDatabaseEngine();
         $this->sanitize();
+    }
+
+    private function loadLoggers()
+    {
+        $this->log = new Logger('Sanitizer');
+        $this->log->pushHandler(new StreamHandler($this->getConfig()->getLogPath(), Logger::INFO));
     }
 
     private function loadDatabaseEngine()
@@ -265,6 +276,7 @@ class Sanitizer extends Command
     public function printLn($message, $type=null)
     {
         $this->printCache[] = array('message' => $message, 'type' => $type);
+        $this->log->addInfo($message, array('type' => $type));
         if(false == $this->getSatitisationState())
         {
             $this->purgePrintCache();
