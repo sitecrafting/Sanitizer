@@ -115,7 +115,7 @@ class Eav extends AbstractTable
                     }
                     $model          = new $modelName();
                     $rows += $this->sanitizeSubset($this->getTableName(), $controlColumn->getName(), $subsetIndex, $column->getColumn(), $model);
-                    $this->getTerminalPrinter()->printLn("Sanitized Eav {$this->getTableName()} subset of column {$column->getColumn()} with {$controlColumn->getName()} equal to {$subsetIndex} ", 'notice');
+                    //$this->getTerminalPrinter()->printLn("Sanitized Eav {$this->getTableName()} subset of column {$column->getColumn()} with {$controlColumn->getName()} equal to {$subsetIndex} ", 'notice');
                 }
                 else
                 {
@@ -143,8 +143,9 @@ class Eav extends AbstractTable
             $rows = $this->engine->select($tableName, '*', array($controlColumnName => $subsetIndex));
             foreach($rows as $row)
             {
-                $row[$columnName] = $mockModel->getRandomValue();
-                $rowsUpdated += $this->engine->update($tableName, $row, $this->getPrimaryKeyData($row));
+                $newData = array();
+                $newData[$columnName] = $mockModel->getRandomValue();
+                $rowsUpdated += $this->engine->update($tableName, $newData, $this->getPrimaryKeyData($row));
             }
             return $rowsUpdated;
         }

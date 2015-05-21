@@ -43,6 +43,7 @@
  */
 namespace Pegasus;
 
+use Pegasus\Configuration\Config;
 use Pegasus\Resource\SanitizerException;
 use Pegasus\Resource\TerminalPrinter;
 use Symfony\Component\Console\Command\Command;
@@ -108,41 +109,49 @@ class Sanitizer extends Command implements TerminalPrinter
                 'engine',
                 InputArgument::OPTIONAL,
                 'Database Engine',
-                'mysql'
+                Config::INPUT_ENGINE
             )
             ->addOption(
                 'host',
                 'o',
                 InputOption::VALUE_OPTIONAL,
                 'Database Host',
-                'localhost'
+                Config::INPUT_HOST
             )
             ->addOption(
                 'password',
                 'p',
                 InputOption::VALUE_REQUIRED,
-                'Database Password'
+                'Database Password',
+                Config::INPUT_PASSWORD_DEFAULT
             )
             ->addOption(
                 'username',
                 'u',
                 InputOption::VALUE_OPTIONAL,
                 'Database User',
-                'root'
+                Config::INPUT_USER
             )
             ->addOption(
                 'database',
                 'db',
                 InputOption::VALUE_OPTIONAL,
                 'Database',
-                'sanitizer'
+                Config::INPUT_DATABASE
             )
             ->addOption(
                 'configuration',
-                'co',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 'Database JSON Config File',
-                'sanitize.json'
+                Config::INPUT_CONFIGURATION_FILE
+            )
+            ->addOption(
+                'mode',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Sanitisation Mode (full|quiet)',
+                Config::INPUT_MODE
             )
         ;
     }
@@ -167,7 +176,7 @@ class Sanitizer extends Command implements TerminalPrinter
 
     protected function loadLoggers()
     {
-        $this->log = new Logger('Validation');
+        $this->log = new Logger('Sanitizer');
         $this->log->pushHandler(new StreamHandler($this->getConfig()->getLogPath(), Logger::INFO));
     }
 
@@ -379,12 +388,13 @@ class Sanitizer extends Command implements TerminalPrinter
                 ini_set('display_errors', 1);
             }
             $this->config->setDatabaseOverride(array(
-                array('Host', $this->input->getOption('host')),
-                array('Password', $this->input->getOption('password')),
-                array('Username', $this->input->getOption('username')),
-                array('Database', $this->input->getOption('database')),
-                array('Config', $this->input->getOption('configuration')),
-                array('Engine', $this->input->getArgument('engine'))));
+                array('Host',           $this->input->getOption('host')),
+                array('Password',       $this->input->getOption('password')),
+                array('Username',       $this->input->getOption('username')),
+                array('Database',       $this->input->getOption('database')),
+                array('Config',         $this->input->getOption('configuration')),
+                array('Engine',         $this->input->getArgument('engine')),
+                array('Mode',         $this->input->getOption('mode'))));
         }
         catch(SanitizerException $exception)
         {

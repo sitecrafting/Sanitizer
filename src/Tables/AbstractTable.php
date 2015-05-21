@@ -43,6 +43,8 @@ abstract class AbstractTable extends Object
 
     protected $engine = null;
 
+    protected $primaryKeyName = null;
+
     public function __construct(Engine $engine)
     {
         if(null == $engine)
@@ -254,8 +256,12 @@ abstract class AbstractTable extends Object
      */
     public function getPrimaryKeyData($row)
     {
-        $name = $this->engine->getPrimaryKeyName($this->getTableName());
-        return array($name => $row[$name]);
+        if(null == $this->primaryKeyName)
+        {
+            $this->primaryKeyName = $this->engine->getPrimaryKeyName($this->getTableName());
+        }
+
+        return array($this->primaryKeyName => $row[$this->primaryKeyName]);
     }
 
     /**

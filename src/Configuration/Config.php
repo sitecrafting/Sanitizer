@@ -33,6 +33,20 @@ use Pegasus\Configuration;
 
 class Config extends Object
 {
+    const INPUT_PASSWORD_DEFAULT        = '';
+
+    const INPUT_CONFIGURATION_FILE      ='sanitize.json';
+
+    const INPUT_ENGINE                  = 'mysql';
+
+    const INPUT_HOST                    = 'localhost';
+
+    const INPUT_USER                    = 'root';
+
+    const INPUT_DATABASE                = 'sanitizer';
+
+    const INPUT_MODE                    = 'full';
+
     private $database = null;
 
     public function __construct($configFile)
@@ -45,6 +59,12 @@ class Config extends Object
         $this->setData($parsed);
     }
 
+    /**
+     * This method overrides the default values from command line options if the options are different to the default.
+     *
+     *
+     * @param $data
+     */
     public function setDatabaseOverride($data)
     {
         if(false == isset($this->data['database']))
@@ -52,19 +72,124 @@ class Config extends Object
             $this->data['database'] = array();
         }
 
+        $this->databaseConfigInitialise();
+
         foreach($data as $configOverride)
         {
             if(2 == sizeof($configOverride))
             {
                 if(null != $configOverride[0] && null != $configOverride[1])
                 {
-                    $this->data['database'][strtolower($configOverride[0])] = $configOverride[1];
+                    $key = strtolower($configOverride[0]);
+                    switch($key)
+                    {
+                        case 'password' :
+                        {
+                            //If the input has been changed by the user then we should use it
+                            if($configOverride[1] != self::INPUT_PASSWORD_DEFAULT)
+                            {
+                                $this->data['database'][$key] = $configOverride[1];
+                            }
+                            break;
+                        }
+                        case 'engine' :
+                        {
+                            //If the input has been changed by the user then we should use it
+                            if($configOverride[1] != self::INPUT_ENGINE)
+                            {
+                                $this->data['database'][$key] = $configOverride[1];
+                            }
+                            break;
+                        }
+                        case 'config' :
+                        {
+                            //If the input has been changed by the user then we should use it
+                            if($configOverride[1] != self::INPUT_CONFIGURATION_FILE)
+                            {
+                                $this->data['database'][$key] = $configOverride[1];
+                            }
+                            break;
+                        }
+                        case 'username' :
+                        {
+                            //If the input has been changed by the user then we should use it
+                            if($configOverride[1] != self::INPUT_USER)
+                            {
+                                $this->data['database'][$key] = $configOverride[1];
+                            }
+                            break;
+                        }
+                        case 'host' :
+                        {
+                            //If the input has been changed by the user then we should use it
+                            if($configOverride[1] != self::INPUT_HOST)
+                            {
+                                $this->data['database'][$key] = $configOverride[1];
+                            }
+                            break;
+                        }
+                        case 'database' :
+                        {
+                            //If the input has been changed by the user then we should use it
+                            if($configOverride[1] != self::INPUT_DATABASE)
+                            {
+                                $this->data['database'][$key] = $configOverride[1];
+                            }
+                            break;
+                        }
+                        case 'mode' :
+                        {
+                            //If the input has been changed by the user then we should use it
+                            if($configOverride[1] != self::INPUT_DATABASE)
+                            {
+                                $this->data['database']['sanitization_mode'] = $configOverride[1];
+                            }
+                            break;
+                        }
+                    }
                 }
             }
         }
 
         /* set it back to null so the next call re-initialises the database config object */
         $this->database = null;
+    }
+
+    /**
+     * This method initialises the database info to the defaults.
+     *
+     * I'm sure there is a nicer way to do this based on the Options fields but right now ....
+     */
+    private function databaseConfigInitialise()
+    {
+        if(false == isset($this->data['database']['engine']))
+        {
+            $this->data['database']['engine'] = self::INPUT_ENGINE;
+        }
+        if(false == isset($this->data['database']['password']))
+        {
+            $this->data['database']['password'] = self::INPUT_PASSWORD_DEFAULT;
+        }
+        if(false == isset($this->data['database']['config']))
+        {
+            $this->data['database']['config'] = self::INPUT_CONFIGURATION_FILE;
+        }
+        if(false == isset($this->data['database']['database']))
+        {
+            $this->data['database']['database'] = self::INPUT_DATABASE;
+        }
+        if(false == isset($this->data['database']['host']))
+        {
+            $this->data['database']['host'] = self::INPUT_HOST;
+        }
+        if(false == isset($this->data['database']['username']))
+        {
+            $this->data['database']['username'] = self::INPUT_USER;
+        }
+        if(false == isset($this->data['database']['sanitization_mode']))
+        {
+            $this->data['database']['sanitization_mode'] = self::INPUT_MODE;
+        }
     }
 
     /**
