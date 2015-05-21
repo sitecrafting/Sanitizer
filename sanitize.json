@@ -1,5 +1,5 @@
 {
-    "name":"Magento CE 1.7.0.2",
+    "name":"Magento CE 1.7.0.2 - default",
     "database":
     {
         "host":"localhost",

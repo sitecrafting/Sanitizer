@@ -232,21 +232,26 @@ class Sanitizer extends Command
     {
         if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_NORMAL))
         {
+            $tableData = array(
+                array('Config Name',            $this->getConfig()->getName()),
+                array('Host',                   $this->getConfig()->getDatabase()->getHost()),
+                array('Password',               $this->getSafeToDisplayPassword($this->getConfig()->getDatabase()->getPassword())),
+                array('User',                   $this->getConfig()->getDatabase()->getUsername()),
+                array('Database',               $this->getConfig()->getDatabase()->getDatabase()),
+                array('Config',                 $this->getConfig()->getDatabase()->getConfig()),
+                array('Engine',                 $this->getConfig()->getDatabase()->getEngine()),
+                array('Mode',                   $this->getConfig()->getDatabase()->getSanitizationMode()));
+            $this->logTableData($tableData);
             $table = new Table($this->output);
-            $table->setHeaders(array('Setting', 'Value'))->setRows(array(
-                array('Host',           $this->getConfig()->getDatabase()->getHost()),
-                array('Password',       $this->getSafeToDisplayPassword($this->getConfig()->getDatabase()->getPassword())),
-                array('User',           $this->getConfig()->getDatabase()->getUsername()),
-                array('Database',       $this->getConfig()->getDatabase()->getDatabase()),
-                array('Config',         $this->getConfig()->getDatabase()->getConfig()),
-                array('Engine',         $this->getConfig()->getDatabase()->getEngine())));
+            $table->setHeaders(array('Setting', 'Value'))->setRows($tableData);
             $table->render();
             if('sanitize' == $this->getMode())
             {
                 $helper = $this->getHelper('question');
                 if (false == $helper->ask($this->input, $this->output, new ConfirmationQuestion('Are you happy to continue? [yes|no]', false)))
                 {
-                    return;
+                    $this->printLn("Exiting due to user", "log");
+                    exit(-1);
                 }
             }
         }
@@ -448,5 +453,18 @@ class Sanitizer extends Command
             $this->progressBar->finish();
         }
         return $this;
+    }
+
+    /**
+     * @param $tableData
+     */
+    private function logTableData($tableData)
+    {
+        foreach ($tableData as $enteries)
+        {
+            $name = $enteries[0];
+            $value = $enteries[1];
+            $this->printLn("Sanitize settings: {$name}:{$value}", 'log');
+        }
     }
 }
