@@ -93,7 +93,7 @@ class Sanitizer extends Command
         return self::$sanitizer;
     }
 
-    public function getVersion()
+    public static function getVersion()
     {
         return '0.0.1';
     }
@@ -281,7 +281,10 @@ class Sanitizer extends Command
     public function printLn($message, $type=null)
     {
         $this->printCache[] = array('message' => $message, 'type' => $type);
-        $this->log->addInfo($message, array('type' => $type));
+        if(null != $this->log)
+        {
+            $this->log->addInfo($message, array('type' => $type));
+        }
         if(false == $this->getSatitisationState())
         {
             $this->purgePrintCache();

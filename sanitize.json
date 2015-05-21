@@ -3,7 +3,8 @@
     "database":
     {
         "host":"localhost",
-        "password":"password"
+        "password":"password",
+        "sanitization_mode":"quick"
     },
     "tables":
     {

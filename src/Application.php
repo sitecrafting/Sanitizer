@@ -27,14 +27,13 @@
  * Time: 12:50
  */
 
-
 require 'vendor/autoload.php';
 
 use Pegasus\Sanitizer;
+use Pegasus\Version;
 use Symfony\Component\Console\Application as ConsoleApp;
 
-$sanitizer = Sanitizer::getInstance();
 $application = new ConsoleApp();
-$application->add($sanitizer);
-//$application->setDefaultCommand($sanitizer->getName());
+$application->add(Sanitizer::getInstance());
+$application->add(new Version());
 $application->run();
