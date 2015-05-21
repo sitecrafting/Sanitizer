@@ -31,9 +31,11 @@ require 'vendor/autoload.php';
 
 use Pegasus\Sanitizer;
 use Pegasus\Version;
+use Pegasus\Validation;
 use Symfony\Component\Console\Application as ConsoleApp;
 
 $application = new ConsoleApp();
 $application->add(Sanitizer::getInstance());
 $application->add(new Version());
+$application->add(Validation::getInstance());
 $application->run();

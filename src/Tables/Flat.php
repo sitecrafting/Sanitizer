@@ -67,7 +67,7 @@ class Flat extends AbstractTable
         {
             if(false == $column->exists())
             {
-                $db = Sanitizer::getInstance()->getConfig()->getDatabase()->getDatabaseName();
+                $db = $this->getTerminalPrinter()->getConfig()->getDatabase()->getDatabaseName();
                 throw new TableException("Column '{$column->getName()}' in table '{$this->getTableName()}' not found in database '{$db}'");
             }
         }
@@ -100,7 +100,7 @@ class Flat extends AbstractTable
     {
         if (0 == sizeof($tableData)) /* Flat tables are simple, if the array has now data then we are screwed. */
         {
-            Sanitizer::getInstance()->printLn("No columns to manipulate could be found for table '{$this->getTableName()}', skipping", 'general');
+            $this->getTerminalPrinter()->printLn("No columns to manipulate could be found for table '{$this->getTableName()}', skipping", 'general');
             return true;
         }
         return false;
@@ -118,11 +118,13 @@ class Flat extends AbstractTable
         {
             return $rowsEffected;
         }
-        $quick = ('quick' == Sanitizer::getInstance()->getConfig()->getDatabase()->getSanitizationMode());
+        $quick = ('quick' == $this->getTerminalPrinter()->getConfig()->getDatabase()->getSanitizationMode());
         $columns = $this->getColumnsForEngineQuery();
         if(true == $quick)
         {
-            return $this->engine->update($this->getTableName(), $columns);
+            $rows = $this->engine->update($this->getTableName(), $columns);
+            $this->getTerminalPrinter()->printLn("Sanitized Flat {$this->getTableName()}", 'notice');
+            return $rows;
         }
         else
         {
@@ -135,6 +137,7 @@ class Flat extends AbstractTable
                     $row[$column->getName()] = $column->getDefault();
                 }
                 $rowsUpdated += $this->engine->update($this->getTableName(), $row, $this->getPrimaryKeyData($row));
+                $this->getTerminalPrinter()->printLn("Sanitized Flat {$this->getTableName()} ", 'notice');
             }
             return $rowsUpdated;
         }

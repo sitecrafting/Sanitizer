@@ -146,7 +146,7 @@ abstract class AbstractTable extends Object
         //Only data is a comment for this row
         if(1 == sizeof($tableData) && true == isset($tableData['comment']))
         {
-            Sanitizer::getInstance()->printLn("Comment[{$this->getTableName()}]: ".$tableData['comment'], 'general');
+            $this->getTerminalPrinter()->printLn("Comment[{$this->getTableName()}]: ".$tableData['comment'], 'general');
             throw new TableCommentException("This table '{$this->getTableName()}' only has a comment in the config, skipping");
         }
         //Command is the most important option, it will override all others.
@@ -162,7 +162,7 @@ abstract class AbstractTable extends Object
 
         if(false == $this->exists())
         {
-            $db = Sanitizer::getInstance()->getConfig()->getDatabase()->getDatabaseName();
+            $db = $this->getTerminalPrinter()->getConfig()->getDatabase()->getDatabaseName();
             throw new TableException("Table '{$this->getTableName()}' not found in database '{$db}'");
         }
         return true;

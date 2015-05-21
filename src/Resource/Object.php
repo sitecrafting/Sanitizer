@@ -160,11 +160,11 @@ class Object
 
     protected function addFullNames()
     {
-        $existedShortKeys = array_intersect($this->_syncFieldsMap, array_keys($this->_data));
+        $existedShortKeys = array_intersect($this->_syncFieldsMap, array_keys($this->data));
         if (!empty($existedShortKeys)) {
             foreach ($existedShortKeys as $key) {
                 $fullFieldName = array_search($key, $this->_syncFieldsMap);
-                $this->_data[$fullFieldName] = $this->_data[$key];
+                $this->data[$fullFieldName] = $this->data[$key];
             }
         }
     }

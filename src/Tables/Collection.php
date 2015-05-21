@@ -32,6 +32,7 @@ namespace Pegasus\Tables;
 use Behat\Gherkin\Exception\Exception;
 use Pegasus\Engine\Engine;
 use Pegasus\Resource\SanitizerException;
+use Pegasus\Resource\TerminalPrinter;
 use Pegasus\Sanitizer;
 use Pegasus\Tables;
 
@@ -40,6 +41,8 @@ class Collection
     const KEY_TABLE_TYPE = 'type';
 
     private static $engine = null;
+
+    private static $printer = null;
     
     public static function setEngine(Engine $engine)
     {
@@ -50,26 +53,37 @@ class Collection
         self::$engine = $engine;
     }
 
+    public static function setTerminalPrinter(TerminalPrinter $printer)
+    {
+        self::$printer = $printer;
+    }
+
+    private static function getTerminalPrinter()
+    {
+        return self::$printer;
+    }
+
     public static function getCollection()
     {
         static $collection = null;
         if(null == $collection)
         {
             $collection     = array();
-            $tables         = Sanitizer::getInstance()->getConfig()->getTables();
+            $tables         = self::getTerminalPrinter()->getConfig()->getTables();
             foreach ($tables as $tableName => $tableConfig)
             {
                 try
                 {
                     $collection[] = self::getTableInstance($tableName, $tableConfig);
+                    self::getTerminalPrinter()->printLn("Added $tableName to sanitise list ", 'notice');
                 }
                 catch(TableCommentException $e)
                 {
-                    Sanitizer::getInstance()->printLn($e->getMessage(), 'notice');
+                    self::getTerminalPrinter()->printLn($e->getMessage(), 'notice');
                 }
                 catch(SanitizerException $e)
                 {
-                     Sanitizer::getInstance()->printLn($e->getMessage(), 'warning');
+                     self::getTerminalPrinter()->printLn($e->getMessage(), 'warning');
                 }
             }
         }
@@ -105,6 +119,7 @@ class Collection
         {
             $table = new Flat(self::$engine);
         }
+        $table->setTerminalPrinter(self::getTerminalPrinter());
         $table->setTableName($tableName);
         $valid = $table->setTableData($tableConfig);
         return (true == $valid) ? $table : $valid;
@@ -119,7 +134,7 @@ class Collection
         {
             throw new TableException("Someone has moved the Engine, I can't find it!");
         }
-        $sanitizer = Sanitizer::getInstance();
+        $sanitizer = self::getTerminalPrinter();
         if(null == $sanitizer)
         {
             throw new TableException("There seems to be a glitch with the Sanitizer instance matrix!, I just can't find it!");

@@ -115,14 +115,15 @@ class Eav extends AbstractTable
                     }
                     $model          = new $modelName();
                     $rows += $this->sanitizeSubset($this->getTableName(), $controlColumn->getName(), $subsetIndex, $column->getColumn(), $model);
+                    $this->getTerminalPrinter()->printLn("Sanitized Eav {$this->getTableName()} subset of column {$column->getColumn()} with {$controlColumn->getName()} equal to {$subsetIndex} ", 'notice');
                 }
                 else
                 {
-                    Sanitizer::getInstance()->printLn("No Mock Model configuration found for EAV column '{$controlColumn->getName()}'  with row id '{$subsetIndex}' in table '{$this->getTableName()}'", 'notice');
+                    $this->getTerminalPrinter()->printLn("No Mock Model configuration found for EAV column '{$controlColumn->getName()}'  with row id '{$subsetIndex}' in table '{$this->getTableName()}'", 'notice');
                 }
                 if(null != $source->getComment())
                 {
-                    Sanitizer::getInstance()->printLn("Comment[{$this->getTableName()}][{$controlColumn->getName()}]: {$source->getComment()}", 'general');
+                    $this->getTerminalPrinter()->printLn("Comment[{$this->getTableName()}][{$controlColumn->getName()}]: {$source->getComment()}", 'general');
                 }
             }
         }
@@ -131,7 +132,7 @@ class Eav extends AbstractTable
 
     private function sanitizeSubset($tableName, $controlColumnName, $subsetIndex, $columnName, $mockModel)
     {
-        $quick = ('quick' == Sanitizer::getInstance()->getConfig()->getDatabase()->getSanitizationMode());
+        $quick = ('quick' == $this->getTerminalPrinter()->getConfig()->getDatabase()->getSanitizationMode());
         if(true == $quick)
         {
             return $this->engine->update($tableName, array($columnName => $mockModel->getRandomValue()), array($controlColumnName => $subsetIndex));
@@ -143,7 +144,6 @@ class Eav extends AbstractTable
             foreach($rows as $row)
             {
                 $row[$columnName] = $mockModel->getRandomValue();
-//                die(print_r(array('column_name' => $columnName, 'table_name' => $tableName, 'row' => $row, 'where' => $this->getPrimaryKeyData($row))));
                 $rowsUpdated += $this->engine->update($tableName, $row, $this->getPrimaryKeyData($row));
             }
             return $rowsUpdated;

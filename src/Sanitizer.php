@@ -44,6 +44,7 @@
 namespace Pegasus;
 
 use Pegasus\Resource\SanitizerException;
+use Pegasus\Resource\TerminalPrinter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -61,23 +62,23 @@ use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
 
-class Sanitizer extends Command
+class Sanitizer extends Command implements TerminalPrinter
 {
     public $config = null;
 
-    private $output = null;
+    protected $output = null;
 
-    private $input = null;
+    protected $input = null;
 
     private $satitisationRunning = false;
 
-    private $printCache = array();
+    protected $printCache = array();
 
-    private $progressBar = null;
+    protected $progressBar = null;
 
-    private static $sanitizer = null;
+    protected static $sanitizer = null;
 
-    private $log = null;
+    protected $log = null;
 
     /**
      * Retuns a Singleton instance of the sanitizer
@@ -143,13 +144,6 @@ class Sanitizer extends Command
                 'Database JSON Config File',
                 'sanitize.json'
             )
-            ->addOption(
-                'mode',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Mode (sanitize, validate)',
-                'sanitize'
-            )
         ;
     }
 
@@ -171,9 +165,9 @@ class Sanitizer extends Command
         $this->sanitize();
     }
 
-    private function loadLoggers()
+    protected function loadLoggers()
     {
-        $this->log = new Logger('Sanitizer');
+        $this->log = new Logger('Validation');
         $this->log->pushHandler(new StreamHandler($this->getConfig()->getLogPath(), Logger::INFO));
     }
 
@@ -188,10 +182,11 @@ class Sanitizer extends Command
             'password'      => $this->getConfig()->getDatabase()->getPassword(),
             'charset'       => 'utf8'
         ));
+        TableCollection::setTerminalPrinter($this);
         TableCollection::setEngine($engine);
     }
 
-    private function sanitize()
+    protected function sanitize()
     {
         TableCollection::sanitizeTables();
     }
@@ -211,7 +206,7 @@ class Sanitizer extends Command
     /**
      * Outputs initial information on the app.
      */
-    private function outputIntro()
+    protected function outputIntro()
     {
         if(true == $this->getConfig()->getIsInDeveloperMode() || $this->getConfig()->getIsInDeveloperMode() == OutputInterface::VERBOSITY_VERY_VERBOSE)
         {
@@ -232,28 +227,22 @@ class Sanitizer extends Command
     {
         if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_NORMAL))
         {
-            $tableData = array(
-                array('Config Name',            $this->getConfig()->getName()),
-                array('Host',                   $this->getConfig()->getDatabase()->getHost()),
-                array('Password',               $this->getSafeToDisplayPassword($this->getConfig()->getDatabase()->getPassword())),
-                array('User',                   $this->getConfig()->getDatabase()->getUsername()),
-                array('Database',               $this->getConfig()->getDatabase()->getDatabase()),
-                array('Config',                 $this->getConfig()->getDatabase()->getConfig()),
-                array('Engine',                 $this->getConfig()->getDatabase()->getEngine()),
-                array('Mode',                   $this->getConfig()->getDatabase()->getSanitizationMode()));
+            $tableData = $this->getTableData();
             $this->logTableData($tableData);
             $table = new Table($this->output);
             $table->setHeaders(array('Setting', 'Value'))->setRows($tableData);
             $table->render();
-            if('sanitize' == $this->getMode())
-            {
-                $helper = $this->getHelper('question');
-                if (false == $helper->ask($this->input, $this->output, new ConfirmationQuestion('Are you happy to continue? [yes|no]', false)))
-                {
-                    $this->printLn("Exiting due to user", "log");
-                    exit(-1);
-                }
-            }
+            $this->askPermissionToContinue();
+        }
+    }
+
+    protected function askPermissionToContinue()
+    {
+        $helper = $this->getHelper('question');
+        if (false == $helper->ask($this->input, $this->output, new ConfirmationQuestion('Are you happy to continue? [yes|no]', false)))
+        {
+            $this->printLn("Exiting due to user", "log");
+            exit(-1);
         }
     }
 
@@ -291,7 +280,7 @@ class Sanitizer extends Command
         }
     }
 
-    private function purgePrintCache()
+    protected function purgePrintCache()
     {
         foreach($this->printCache as $item)
         {
@@ -369,7 +358,7 @@ class Sanitizer extends Command
      * @param $message
      * @return string
      */
-    private function formatMessage($type, $message)
+    protected function formatMessage($type, $message)
     {
         return $message = (null == $type) ? $message : "<{$type}>{$message}</{$type}>";;
     }
@@ -412,7 +401,7 @@ class Sanitizer extends Command
      */
     public function getMode()
     {
-        return $this->input->getOption('mode');
+        return 'sanitize';
     }
 
 
@@ -469,5 +458,14 @@ class Sanitizer extends Command
             $value = $enteries[1];
             $this->printLn("Sanitize settings: {$name}:{$value}", 'log');
         }
+    }
+
+    /**
+     * @return array
+     */
+    protected function getTableData()
+    {
+        $tableData = array(array('Config Name', $this->getConfig()->getName()), array('Host', $this->getConfig()->getDatabase()->getHost()), array('Password', $this->getSafeToDisplayPassword($this->getConfig()->getDatabase()->getPassword())), array('User', $this->getConfig()->getDatabase()->getUsername()), array('Database', $this->getConfig()->getDatabase()->getDatabase()), array('Config', $this->getConfig()->getDatabase()->getConfig()), array('Engine', $this->getConfig()->getDatabase()->getEngine()), array('Mode', $this->getConfig()->getDatabase()->getSanitizationMode()));
+        return $tableData;
     }
 }
