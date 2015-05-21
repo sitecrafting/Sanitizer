@@ -27,7 +27,15 @@
  * Time: 12:50
  */
 
-require 'vendor/autoload.php';
+if (file_exists(__DIR__.'/../vendor/autoload.php'))
+{
+    require_once __DIR__.'/../vendor/autoload.php';
+}
+else
+{
+    require_once 'phar://sanitizer.phar/vendor/autoload.php';
+}
+
 
 use Pegasus\Sanitizer;
 use Pegasus\Version;

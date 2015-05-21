@@ -1,16 +1,25 @@
 {
   "chmod": "0755",
   "directories": [
-    "src"
+    "src",
+    "vendor",
+    "vendor/*"
   ],
   "finder": [
     {
       "name": "*.php",
       "exclude": ["spec", "feature", "html", "bin", "vagrant-transient", ".vagrant", ".idea"],
+      "in": "."
+    },
+    {
+      "name": "*.php",
       "in": "vendor"
     }
   ],
-  "git-version": "package_version",
+  "files": [
+    "vendor/autoload.php"
+  ],
+  "git-version": "0.0.1",
   "main": "src/Application.php",
   "output": "sanitize.phar",
   "stub": true
