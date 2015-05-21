@@ -65,17 +65,21 @@ class Collection
 
     public static function getCollection()
     {
-        static $collection = null;
+        static $collection  = null;
+        $possibleTables     = 0;
+        $totalAddedTables   = 0;
         if(null == $collection)
         {
             $collection     = array();
             $tables         = self::getTerminalPrinter()->getConfig()->getTables();
             foreach ($tables as $tableName => $tableConfig)
             {
+                $possibleTables++;
                 try
                 {
                     $collection[] = self::getTableInstance($tableName, $tableConfig);
                     self::getTerminalPrinter()->printLn("Added $tableName to sanitise list ", 'notice');
+                    $totalAddedTables++;
                 }
                 catch(TableCommentException $e)
                 {
@@ -87,6 +91,9 @@ class Collection
                 }
             }
         }
+        self::getTerminalPrinter()->printLn("All Possible Tables = {$possibleTables}", 'notice');
+        self::getTerminalPrinter()->printLn("Queued Tables = {$totalAddedTables}", 'notice');
+        self::getTerminalPrinter()->printLn("Skipped Tables = ".($possibleTables - $totalAddedTables), 'notice');
         return $collection;
     }
 
