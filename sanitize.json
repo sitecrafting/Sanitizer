@@ -464,6 +464,21 @@
       },
       "core_cache_tag":{
         "command":"truncate"
+      },
+      "log_url_info":{
+        "command":"truncate"
+      },
+      "log_visitor_info":{
+        "command":"truncate"
+      },
+      "log_url":{
+        "command":"truncate"
+      },
+      "report_event":{
+        "command":"truncate"
+      },
+      "log_visitor":{
+        "command":"truncate"
       }
     }
 }
