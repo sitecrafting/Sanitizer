@@ -109,9 +109,8 @@ class Update extends AbstractTable
     }
 
     /**
-     * Sanitizes in 1 of 2 modes, quick and everything else.
-     * Quick changes every value with the table to a random selection - but they will all be the same.
-     * otherwise each column has data set individually set.
+     * This implementation does an update rather than a sanitise. This allows the user to
+     * update tables quickly and repeatable when rolling down from one environment to another.
      */
     public function sanitize()
     {
