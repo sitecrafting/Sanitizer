@@ -4,12 +4,20 @@ Sanitizer is a configurable database sanitiser, built to help DBAs provide Devel
 Protecting customer data and privacy is critical all types of businesses, I work in e-commerce so the live database is riddled with personal data and given devs a copy has always been a headache, hopefully this will make the task easier. 
 
 ###Main Features
-* Configurable via json file
-* Sanitisation of Flat tables
-* Sanitisation of Eav tables
-* Updating of table data
 
-I've built this to use mainly on Magento and currently it's only been tested on MySQL. 
+* **Data Protection** - Remove personal and private information from a database to protect your customers.
+
+* **Sanitisation of EAV and Flat tables** - Row by row or bulk sanitisation of table data.
+
+* **Table Updates** - Change URLs etc for different environments
+
+* **Configurable** - Can be configured to use on any* SQL based database.
+
+* **Compatible** - Support various SQL database, including MySQL, MSSQL, SQLite, MariaDB, Sybase, Oracle, PostgreSQL and more (currently only tested on MySQL).
+
+* **Free** - Under MIT license, you can use it anywhere if you want.
+
+I've built this to use mainly on Magento but it could easily be configured to work with other databases and currently it's only been tested on MySQL.
 
 ### Prerequisites
 

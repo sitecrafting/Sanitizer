@@ -9,8 +9,6 @@
  */
 namespace Pegasus\Engine;
 
-
-
 class medoo
 {
     // General
@@ -151,7 +149,7 @@ class medoo
             }
         }
         catch (\PDOException $e) {
-            throw new Exception($e->getMessage());
+            throw new \Exception($e->getMessage());
         }
     }
 
