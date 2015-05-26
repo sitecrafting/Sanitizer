@@ -1,5 +1,5 @@
 {
-  "name":"MBS Database on Magento CE 1.7.0.2",
+  "name":"Default Magento CE 1.7.0.2 for Sanitisation",
   "developer_mode":"no",
   "log_path":"sanitizer.log",
   "database":
