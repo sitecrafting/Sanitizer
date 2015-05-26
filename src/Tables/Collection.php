@@ -29,7 +29,6 @@
  */
 namespace Pegasus\Tables;
 
-use Behat\Gherkin\Exception\Exception;
 use Pegasus\Engine\Engine;
 use Pegasus\Resource\SanitizerException;
 use Pegasus\Resource\TerminalPrinter;
@@ -110,7 +109,13 @@ class Collection
             {
                 case Eav::getType() :
                 {
-                    $table = new Eav(self::$engine) ;
+                    $table = new Eav(self::$engine);
+                    break;
+                }
+
+                case Update::getType() :
+                {
+                    $table = new Update(self::$engine);
                     break;
                 }
                 /*

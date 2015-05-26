@@ -80,7 +80,12 @@ class Flat extends AbstractTable
         {
             if(false == isset($columnData[self::FIELD_COLUMN]))
             {
-                throw new TableException("No column name could be found by on table '{$this->getTableName()}' for data ".implode(',', $columnData));
+                $data = $columnData;
+                if(true == is_array($columnData))
+                {
+                    $data = implode(',', $columnData);
+                }
+                throw new TableException("No column name could be found by on table '{$this->getTableName()}' for data ".$data);
             }
             if(true == isset($columnData[self::FIELD_DATA_TYPE]))
             {
@@ -132,11 +137,8 @@ class Flat extends AbstractTable
             $rows = $this->engine->select($this->getTableName(), '*');
             foreach($rows as $row)
             {
-                $rowSubset = array();
-                foreach($this->getColumns() as $column)
-                {
-                    $rowSubset[$column->getName()] = $column->getDefault();
-                }
+
+                $rowSubset = $this->getColumnsForEngineQuery();
                 $rowsUpdated += $this->engine->update($this->getTableName(), $rowSubset, $this->getPrimaryKeyData($row));
             }
             $this->getTerminalPrinter()->printLn("Sanitized Flat {$this->getTableName()} ", 'notice');

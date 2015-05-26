@@ -60,8 +60,20 @@ abstract class AbstractDataType extends Object
         return $this->getEngine()->columnExists($this->getTableName(), $this->getName());
     }
 
+    /**
+     * Returns the default value.
+     * 1) Overridden in the config takes precedence
+     * 2) Mock object is next priority
+     * 3) Default type is the last priority
+     *
+     * @return mixed
+     */
     public function getDefault()
     {
+        if(null != parent::getDefault())
+        {
+            return parent::getDefault();
+        }
         if(null != $this->getMockModel())
         {
             $modelName = $this->getMockModel();

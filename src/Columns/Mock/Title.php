@@ -44,11 +44,19 @@ class Title extends AbstractMockData
             "Mr",
             "Mrs",
             "Mrs",
+            "Miss",
             "Prof",
             "Dr",
             "Lord",
             "Lady",
-            "Master"
+            "Master",
+            "Capt",
+            "Countess",
+            "Dame",
+            "Earl",
+            "Revd",
+            "Sir",
+            "Sis",
         );
     }
 }
