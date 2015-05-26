@@ -164,7 +164,7 @@ abstract class AbstractTable extends Object
 
         if(false == $this->exists())
         {
-            $db = $this->getTerminalPrinter()->getConfig()->getDatabase()->getDatabaseName();
+            $db = Sanitizer::getInstance()->getConfig()->getDatabase()->getDatabaseName();
             throw new TableException("Table '{$this->getTableName()}' not found in database '{$db}'");
         }
         return true;

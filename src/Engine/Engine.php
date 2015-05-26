@@ -28,12 +28,11 @@
  */
 namespace Pegasus\Engine;
 
-require_once 'vendor/catfan/medoo/medoo.php';
-
 use Pegasus\Resource\SanitizerException;
 use Pegasus\Sanitizer;
+use Pegasus\Engine\medoo;
 
-abstract class Engine extends \medoo implements EngineInterface
+abstract class Engine extends medoo implements EngineInterface
 {
     private static $engine = null;
 

@@ -124,7 +124,7 @@ class Eav extends AbstractTable
                     $this->getTerminalPrinter()->printLn("Comment[{$this->getTableName()}][{$controlColumn->getName()}]: {$source->getComment()}", 'general');
                 }
             }
-            $this->getTerminalPrinter()->printLn("Sanitized Eav {$this->getTableName()} subset of column {$column->getColumn()} with {$controlColumn->getName()} equal to {$subsetIndex} ", 'notice');
+            $this->getTerminalPrinter()->printLn("Sanitized Eav '{$this->getTableName()}' subset of column '{$column->getColumn()}' with '{$controlColumn->getName()}' equal to '{$subsetIndex}' ", 'notice');
 
         }
         return $rows;

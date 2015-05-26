@@ -73,6 +73,7 @@ class Update extends AbstractTable
             }
             $rule->setColumnTypeInstance($this->getInstanceFromType($rule->getDataType(), $rule->getData()));
             $rules[] = $rule;
+            $this->getTerminalPrinter()->println("Another update to column '{$rule->getColumn()}' in {$this->getTableName()} marked for update to '{$rule->getTo()}'", 'notice');
         }
         $this->setRules($rules);
         $this->validateWhereClause();
@@ -120,11 +121,10 @@ class Update extends AbstractTable
         $rows = 0;
         foreach($this->getRules() as $rule)
         {
-            $dataToChange = array
-            (
-                $rule->getColumnTypeInstance()->getName() => $rule->getTo()
-            );
-            $rows += $this->engine->update($this->getTableName(), $dataToChange, $rule->getWhere());
+            $dataToChange = array($rule->getColumnTypeInstance()->getName() => $rule->getTo());
+            $rowsUpdated  = $this->engine->update($this->getTableName(), $dataToChange, $rule->getWhere());
+            $this->getTerminalPrinter()->printLn("Updated '$rowsUpdated' rows in {$this->getTableName()}' for column '{$rule->getColumn()}' to '{$rule->getTo()}'", 'notice');
+            $rows += $rowsUpdated;
         }
         return $rows;
     }

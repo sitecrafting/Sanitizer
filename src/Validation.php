@@ -50,15 +50,23 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Pegasus\Application;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
+use Symfony\Component\Console\Helper\Table;
 
 
 class Validation extends Sanitizer
 {
     static $validator = null;
 
+    public function __construct()
+    {
+        $this->setValidationRunning();
+        parent::__construct();
+    }
+
     protected function sanitize()
     {
         Collection::getCollection(); /* we just want to parse the config */
+        $this->setValidationNotRunning();
     }
 
     protected function configure()
@@ -116,6 +124,22 @@ class Validation extends Sanitizer
         ;
     }
 
+    /**
+     * Added for meaning
+     */
+    protected function setValidationRunning()
+    {
+        $this->satitisationRunning = true;
+    }
+
+    /**
+     * Added for meaning
+     */
+    protected function setValidationNotRunning()
+    {
+        $this->satitisationRunning = false;
+        $this->purgePrintCache();
+    }
 
     protected function loadLoggers()
     {
@@ -136,6 +160,9 @@ class Validation extends Sanitizer
         }
     }
 
+    /**
+     * We don't want to prompt the user, this app doesn't do any db changes.
+     */
     protected function askPermissionToContinue()
     {
         /* do nothing */
@@ -143,15 +170,18 @@ class Validation extends Sanitizer
 
     protected function purgePrintCache()
     {
+        $table = new Table($this->output);
+        $table->setHeaders(array('Message', 'Level'));
+        $rows = array();
+
         foreach ($this->printCache as $item)
         {
             $message = $item['message'];
             $type = $item['type'];
-            if('log' != $type)
-            {
-                $this->output->writeLn($this->formatMessage($type, $message));
-            }
+            $rows[] = array($message, $type);
         }
+        $table->setRows($rows);
+        $table->render();
         $this->printCache = array();
     }
 

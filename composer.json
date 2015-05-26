@@ -19,7 +19,6 @@
   {
     "symfony/yaml": "~2.8|~3.0",
     "behat/behat": "2.4.*@stable",
-    "catfan/medoo": "~0.9.8",
     "kherge/box": "~2.0",
     "monolog/monolog":"~1.13.1",
     "phpspec/phpspec": "~2.0"

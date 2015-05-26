@@ -71,7 +71,7 @@ class Sanitizer extends Command implements TerminalPrinter
 
     protected $input = null;
 
-    private $satitisationRunning = false;
+    protected $satitisationRunning = false;
 
     protected $printCache = array();
 

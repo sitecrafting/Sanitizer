@@ -1,4 +1,15 @@
 ## Sanitizer
+Sanitizer is a configurable database sanitiser, built to help DBAs provide Developers etc with up to date copies of LIVE database on test environments without sensitive or personal customer data. 
+
+Protecting customer data and privacy is critical all types of businesses, I work in e-commerce so the live database is riddled with personal data and given devs a copy has always been a headache, hopefully this will make the task easier. 
+
+###Main Features
+* Configurable via json file
+* Sanitisation of Flat tables
+* Sanitisation of Eav tables
+* Updating of table data
+
+I've built this to use mainly on Magento and currently it's only been tested on MySQL. 
 
 ### Prerequisites
 
@@ -6,7 +17,7 @@ Sanitizer requires PHP 5.3.x or greater.
 
 ## Installation
 
-Installation can be done in a couple of ways, either download the sanitize.phar file into your project directory or checkout the source and run the project. 
+Installation can be done in a couple of ways, either download the sanitize.phar file into your project directory or checkout the source and run the project. When the app is run it will show you the main options.
 
 ### Using the phar
 Using the phar is the easiest way to use sanitizer. 
@@ -104,10 +115,10 @@ Within the tables element you specify the table name, in this case *customer_add
 
 * column - specifies the column name you want to sanitize
 * data_type specifies the data type for this column, this is mainly so the correct default values can be applied to each column - available options are
-   * timestamp
-   * datetime
-   * text
-   * integer
-   * varchar
+   1. timestamp
+   2. datetime
+   3. text
+   4. integer
+   5. varchar
 
 
