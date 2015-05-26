@@ -362,11 +362,11 @@
         "data_type":"timestamp"
       }
     ],
-    "sales_flat_order_status_history":{
+    "sales_flat_order_status_history":[{
       "column": "comment",
       "data_type":"text",
       "default":"Comment has been sanitised"
-    },
+    }],
     "sales_flat_quote":{
       "command":"truncate"
     },

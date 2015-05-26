@@ -78,7 +78,6 @@ class Update extends AbstractTable
         $this->validateWhereClause();
         $this->checkAllRulesHaveColumnsWhichExist();
         return true;
-        //throw new SanitizerException('Update type setTableData not yet implemented');
     }
 
     private function validateWhereClause()
@@ -101,9 +100,13 @@ class Update extends AbstractTable
         foreach($this->getRules() as $rule)
         {
             $column = $rule->getColumnTypeInstance();
+            if(null == $column)
+            {
+                throw new TableException("Column instance not found in table {$this->getTableName()} for rule {$rule->getValue()}");
+            }
             if(false == $column->exists())
             {
-                throw new SanitizerException("Column not find column {$column->getName()} for {$this->getTableName()} ");
+                throw new TableException("Column not find column {$column->getName()} for {$this->getTableName()} ");
             }
         }
     }

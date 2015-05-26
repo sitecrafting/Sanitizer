@@ -1,5 +1,5 @@
 #
-# author phil@elsondesigns.com
+# author phil@pegasus-commerce.com
 #
 Vagrant.configure("2") do |config|
 	# All Vagrant configuration is done here. The most common configuration
