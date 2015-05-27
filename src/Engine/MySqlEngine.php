@@ -46,7 +46,7 @@ class MySqlEngine extends Engine
     {
         /* @var $result PDOStatement */
         $query = "SHOW TABLES LIKE '{$tableName}'";
-        $result = false;// $this->query($query);
+        $result = $this->query($query);
         if(false == $result)
         {
             $this->logError($query);

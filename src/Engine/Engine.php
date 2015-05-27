@@ -74,17 +74,15 @@ abstract class Engine extends medoo implements EngineInterface
 
     public function logError($query=null)
     {
-        $error = parent::error();
+        $error = $this->error();
         if(false == is_array($error))
         {
             $error = array($error);
         }
-        $this->log = new Logger('SanitizerError');
-        $this->log->pushHandler(new StreamHandler(Sanitizer::getInstance()->getConfig()->getLogPath(), Logger::CRITICAL));
-        $this->log->addInfo('Fetch Error', $error);
+        Sanitizer::getInstance()->getLog()->addInfo('Fetch Error', $error);
         if(null != $query)
         {
-            $this->log->addInfo('Fetch Error Additional Info', array('info' => $query));
+            Sanitizer::getInstance()->getLog()->log->addInfo('Fetch Error Additional Info', array('info' => $query));
         }
     }
 }

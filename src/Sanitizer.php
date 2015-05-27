@@ -158,6 +158,24 @@ class Sanitizer extends Command implements TerminalPrinter
 
     public function getConfig()
     {
+        if(null == $this->config)
+        {
+            try
+            {
+                $this->config = new SanitizerConfig($this->input->getOption('configuration'));
+                if (true == $this->config->getIsInDeveloperMode())
+                {
+                    error_reporting(E_ALL);
+                    ini_set('display_errors', 1);
+                }
+                $this->config->setDatabaseOverride(array(array('Host', $this->input->getOption('host')), array('Password', $this->input->getOption('password')), array('Username', $this->input->getOption('username')), array('Database', $this->input->getOption('database')), array('Config', $this->input->getOption('configuration')), array('Engine', $this->input->getArgument('engine')), array('Mode', $this->input->getOption('mode'))));
+            }
+            catch (SanitizerException $exception)
+            {
+                $this->printLn($exception->getMessage(), 'fatal_error');
+                exit(-1);
+            }
+        }
         return $this->config;
     }
 
@@ -166,18 +184,22 @@ class Sanitizer extends Command implements TerminalPrinter
         $this->input    = $input;
         $this->output   = $output;
         $this->loadOutputStyles();
-        $this->loadConfig();
-        $this->loadLoggers();
+        $this->getConfig();
+        $this->getLog();
         $this->outputIntro();
         $this->renderOverviewTable();
         $this->loadDatabaseEngine();
         $this->sanitize();
     }
 
-    protected function loadLoggers()
+    public function getLog()
     {
-        $this->log = new Logger('Sanitizer');
-        $this->log->pushHandler(new StreamHandler($this->getConfig()->getLogPath(), Logger::INFO));
+        if(null == $this->log)
+        {
+            $this->log = new Logger('Sanitizer');
+            $this->log->pushHandler(new StreamHandler($this->getConfig()->getLogPath(), Logger::INFO));
+        }
+        return $this->log;
     }
 
     private function loadDatabaseEngine()
@@ -374,37 +396,6 @@ class Sanitizer extends Command implements TerminalPrinter
     protected function formatMessage($type, $message)
     {
         return $message = (null == $type) ? $message : "<{$type}>{$message}</{$type}>";;
-    }
-
-    /**
-     * Method which initialises the application config.
-     *
-     * @param $databaseMap
-     */
-    private function loadConfig()
-    {
-        try
-        {
-            $this->config = new SanitizerConfig($this->input->getOption('configuration'));
-            if (true == $this->config->getIsInDeveloperMode())
-            {
-                error_reporting(E_ALL);
-                ini_set('display_errors', 1);
-            }
-            $this->config->setDatabaseOverride(array(
-                array('Host',           $this->input->getOption('host')),
-                array('Password',       $this->input->getOption('password')),
-                array('Username',       $this->input->getOption('username')),
-                array('Database',       $this->input->getOption('database')),
-                array('Config',         $this->input->getOption('configuration')),
-                array('Engine',         $this->input->getArgument('engine')),
-                array('Mode',         $this->input->getOption('mode'))));
-        }
-        catch(SanitizerException $exception)
-        {
-            $this->printLn($exception->getMessage(), 'fatal_error');
-            exit(-1);
-        }
     }
 
     /**

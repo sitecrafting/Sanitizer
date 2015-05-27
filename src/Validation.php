@@ -141,10 +141,14 @@ class Validation extends Sanitizer
         $this->purgePrintCache();
     }
 
-    protected function loadLoggers()
+    public function getLog()
     {
-        $this->log = new Logger('Validation');
-        $this->log->pushHandler(new StreamHandler($this->getConfig()->getLogPath(), Logger::INFO));
+        if(null == $this->log)
+        {
+            $this->log = new Logger('Validation');
+            $this->log->pushHandler(new StreamHandler($this->getConfig()->getLogPath(), Logger::INFO));
+        }
+        return $this->log;
     }
 
     /**
