@@ -28,6 +28,8 @@
  */
 namespace Pegasus\Engine;
 
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Pegasus\Resource\SanitizerException;
 use Pegasus\Sanitizer;
 use Pegasus\Engine\medoo;
@@ -35,8 +37,6 @@ use Pegasus\Engine\medoo;
 abstract class Engine extends medoo implements EngineInterface
 {
     private static $engine = null;
-
-    public abstract function getEngineName();
 
     /**
      * Start your engines,  method is used to initialise the object
@@ -70,5 +70,21 @@ abstract class Engine extends medoo implements EngineInterface
             }
         }
         return self::$engine;
+    }
+
+    public function logError($query=null)
+    {
+        $error = parent::error();
+        if(false == is_array($error))
+        {
+            $error = array($error);
+        }
+        $this->log = new Logger('SanitizerError');
+        $this->log->pushHandler(new StreamHandler(Sanitizer::getInstance()->getConfig()->getLogPath(), Logger::CRITICAL));
+        $this->log->addInfo('Fetch Error', $error);
+        if(null != $query)
+        {
+            $this->log->addInfo('Fetch Error Additional Info', array('info' => $query));
+        }
     }
 }

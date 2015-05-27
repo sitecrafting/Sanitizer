@@ -31,9 +31,47 @@ namespace Pegasus\Engine;
 
 interface EngineInterface
 {
+    /**
+     * Returns a string representation of the engine being used. For instance 'mysql'
+     *
+     * @return mixed
+     */
+    public function getEngineName();
+
+    /**
+     * Returns true if the table name exists in the database
+     *
+     * @param $tableName
+     * @return bool if found, false otherwise
+     * @throws FatalEngineException if an error occurred
+     */
     public function tableExists($tableName);
 
+    /**
+     * Returns true if the column exists in the table
+     *
+     * @param $tableName
+     * @param $columnName
+     * @return bool if found, false otherwise
+     * @throws FatalEngineException if an error occurred
+     */
     public function columnExists($tableName, $columnName);
 
+    /**
+     * Returns the name of the primary key column
+     *
+     * @param $tableName Is the name of the table to extract the primary key from
+     * @return string primary key column name
+     * @throws EngineException if the primary key was not found in the returned data.
+     * @throws FatalEngineException  if an error occurred
+     */
     public function getPrimaryKeyName($tableName);
+
+    /**
+     *  Log the error
+     *
+     * @param null $query
+     * @return mixed
+     */
+    public function logError($query=null);
 }

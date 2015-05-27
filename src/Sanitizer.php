@@ -97,7 +97,7 @@ class Sanitizer extends Command implements TerminalPrinter
 
     public static function getVersion()
     {
-        return '0.0.1';
+        return '0.0.2';
     }
 
     protected function configure()
@@ -287,6 +287,10 @@ class Sanitizer extends Command implements TerminalPrinter
         {
             $this->purgePrintCache();
         }
+        if('fatal_error' == $type)
+        {
+            $this->purgePrintCache();
+        }
     }
 
     protected function purgePrintCache()
@@ -336,7 +340,7 @@ class Sanitizer extends Command implements TerminalPrinter
                 }
                 case 'fatal_error' :
                 {
-                    $this->output->writeLn($this->formatMessage($type, $message));
+                    $this->output->writeLn($this->formatMessage($type, $message), 'warning');
                     break;
                 }
             }

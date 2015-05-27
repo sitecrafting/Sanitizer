@@ -30,6 +30,7 @@
 namespace Pegasus\Tables;
 
 use Pegasus\Engine\Engine;
+use Pegasus\Engine\FatalEngineException;
 use Pegasus\Resource\SanitizerException;
 use Pegasus\Resource\TerminalPrinter;
 use Pegasus\Sanitizer;
@@ -79,6 +80,11 @@ class Collection
                     $collection[] = self::getTableInstance($tableName, $tableConfig);
                     self::getTerminalPrinter()->printLn("Added $tableName to sanitise list ", 'notice');
                     $totalAddedTables++;
+                }
+                catch(FatalEngineException $e)
+                {
+                    self::getTerminalPrinter()->printLn('Fatal: '.$e->getMessage(), 'fatal_error');
+                    exit(-200);
                 }
                 catch(TableCommentException $e)
                 {
