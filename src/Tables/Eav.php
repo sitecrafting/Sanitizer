@@ -140,7 +140,7 @@ class Eav extends AbstractTable
         else
         {
             $rowsUpdated = 0;
-            $rows = $this->engine->select($tableName, '*', array($controlColumnName => $subsetIndex));
+            $rows = $this->engine->select($tableName, $this->getSelectColumns(), array($controlColumnName => $subsetIndex));
             foreach($rows as $row)
             {
                 $newData = array();

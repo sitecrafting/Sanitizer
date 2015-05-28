@@ -259,8 +259,24 @@ abstract class AbstractTable extends Object
         {
             $this->primaryKeyName = $this->engine->getPrimaryKeyName($this->getTableName());
         }
-
+//        echo $this->primaryKeyName."\n";
+//        echo $this->getTableName()."\n";
         return array($this->primaryKeyName => $row[$this->primaryKeyName]);
+    }
+
+    /**
+     * Returns this tables primary key
+     *
+     * @param null $tableName
+     * @return string
+     */
+    public function getPrimaryKeyName($tableName=null)
+    {
+        if(null == $tableName)
+        {
+            $tableName = $this->getTableName();
+        }
+        return $this->engine->getPrimaryKeyName($tableName);
     }
 
     /**
@@ -276,6 +292,16 @@ abstract class AbstractTable extends Object
             }
         }
         return false;
+    }
+
+    protected function getSelectColumns()
+    {
+        $selectColumns = array($this->getPrimaryKeyName($this->getTableName()));
+        foreach ($this->getColumns() as $column)
+        {
+            $selectColumns[] = $column->getName();
+        }
+        return $selectColumns;
     }
 
     abstract function sanitize();

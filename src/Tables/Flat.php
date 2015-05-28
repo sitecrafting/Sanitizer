@@ -134,10 +134,9 @@ class Flat extends AbstractTable
         else
         {
             $rowsUpdated = 0;
-            $rows = $this->engine->select($this->getTableName(), '*');
+            $rows = $this->engine->select($this->getTableName(), $this->getSelectColumns());
             foreach($rows as $row)
             {
-
                 $rowSubset = $this->getColumnsForEngineQuery();
                 $rowsUpdated += $this->engine->update($this->getTableName(), $rowSubset, $this->getPrimaryKeyData($row));
             }
