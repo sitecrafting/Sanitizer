@@ -102,6 +102,7 @@ class Eav extends AbstractTable
         foreach($this->getColumns() as $column)
         {
             $controlColumn = $column->getControlColumn();
+            $this->getTerminalPrinter()->printLn("Sanitizing Eav '{$this->getTableName()}' subset of column '{$column->getColumn()}' with '{$controlColumn->getName()}' ", 'notice');
             foreach($controlColumn->getValues() as $subsetIndex => $source)
             {
                 $source = new MockData($source);

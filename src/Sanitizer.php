@@ -65,6 +65,8 @@ use Monolog\Handler\StreamHandler;
 
 class Sanitizer extends Command implements TerminalPrinter
 {
+    const DEFAULT_MEMORY = '1024M';
+
     public $config = null;
 
     protected $output = null;
@@ -153,6 +155,13 @@ class Sanitizer extends Command implements TerminalPrinter
                 'Sanitisation Mode (full|quiet)',
                 Config::INPUT_MODE
             )
+            ->addOption(
+                'memory',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Memory - PHP format',
+                self::DEFAULT_MEMORY
+            )
         ;
     }
 
@@ -168,7 +177,15 @@ class Sanitizer extends Command implements TerminalPrinter
                     error_reporting(E_ALL);
                     ini_set('display_errors', 1);
                 }
-                $this->config->setDatabaseOverride(array(array('Host', $this->input->getOption('host')), array('Password', $this->input->getOption('password')), array('Username', $this->input->getOption('username')), array('Database', $this->input->getOption('database')), array('Config', $this->input->getOption('configuration')), array('Engine', $this->input->getArgument('engine')), array('Mode', $this->input->getOption('mode'))));
+                $this->config->setDatabaseOverride(array(
+                    array('Host', $this->input->getOption('host')),
+                    array('Password', $this->input->getOption('password')),
+                    array('Username', $this->input->getOption('username')),
+                    array('Database', $this->input->getOption('database')),
+                    array('Config', $this->input->getOption('configuration')),
+                    array('Engine', $this->input->getArgument('engine')),
+                    array('Mode', $this->input->getOption('mode')))
+                );
             }
             catch (SanitizerException $exception)
             {
@@ -183,6 +200,7 @@ class Sanitizer extends Command implements TerminalPrinter
     {
         $this->input    = $input;
         $this->output   = $output;
+        $this->setMemoryUsage();
         $this->loadOutputStyles();
         $this->getConfig();
         $this->getLog();
@@ -190,6 +208,14 @@ class Sanitizer extends Command implements TerminalPrinter
         $this->renderOverviewTable();
         $this->loadDatabaseEngine();
         $this->sanitize();
+    }
+
+    private function setMemoryUsage()
+    {
+        if(false == ini_set("memory_limit", $this->input->getOption('memory')))
+        {
+            ini_set("memory_limit", self::DEFAULT_MEMORY);
+        }
     }
 
     public function getLog()
@@ -459,8 +485,8 @@ class Sanitizer extends Command implements TerminalPrinter
     {
         foreach ($tableData as $enteries)
         {
-            $name = $enteries[0];
-            $value = $enteries[1];
+            $name   = $enteries[0];
+            $value  = $enteries[1];
             $this->printLn("Sanitize settings: {$name}:{$value}", 'log');
         }
     }
@@ -470,7 +496,20 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     protected function getTableData()
     {
-        $tableData = array(array('Config Name', $this->getConfig()->getName()), array('Host', $this->getConfig()->getDatabase()->getHost()), array('Password', $this->getSafeToDisplayPassword($this->getConfig()->getDatabase()->getPassword())), array('User', $this->getConfig()->getDatabase()->getUsername()), array('Database', $this->getConfig()->getDatabase()->getDatabase()), array('Config', $this->getConfig()->getDatabase()->getConfig()), array('Engine', $this->getConfig()->getDatabase()->getEngine()), array('Mode', $this->getConfig()->getDatabase()->getSanitizationMode()));
+        $tableData = array(
+            array('Config Name', $this->getConfig()->getName()),
+            array('Host', $this->getConfig()->getDatabase()->getHost()),
+            array('Password', $this->getSafeToDisplayPassword($this->getConfig()->getDatabase()->getPassword())),
+            array('User', $this->getConfig()->getDatabase()->getUsername()),
+            array('Database', $this->getConfig()->getDatabase()->getDatabase()),
+            array('Config', $this->getConfig()->getDatabase()->getConfig()),
+            array('Engine', $this->getConfig()->getDatabase()->getEngine()),
+            array('Mode', $this->getConfig()->getDatabase()->getSanitizationMode()));
+
+        if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERBOSE))
+        {
+            $tableData[] = array('Memory Limit', ini_get("memory_limit"));
+        }
         return $tableData;
     }
 }

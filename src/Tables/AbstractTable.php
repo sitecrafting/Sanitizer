@@ -37,13 +37,13 @@ use Pegasus\Sanitizer;
 
 abstract class AbstractTable extends Object
 {
-    protected $truncate = false;
+    protected $truncate         = false;
 
-    protected $doCommand = false;
+    protected $delete           = false;
 
-    protected $engine = null;
+    protected $engine           = null;
 
-    protected $primaryKeyName = null;
+    protected $primaryKeyName   = null;
 
     public function __construct(Engine $engine)
     {
@@ -114,14 +114,19 @@ abstract class AbstractTable extends Object
      */
     public function isCommandValid($command)
     {
-        $this->truncate       = false;
-        $this->doCommand      = false;
+        $this->truncate             = false;
+        $this->delete               = false;
+
         switch($command)
         {
             case 'truncate' :
             {
                 $this->truncate     = true;
-                $this->doCommand    = true;
+                return true;
+            }
+            case 'delete' :
+            {
+                $this->delete       = true;
                 return true;
             }
         }
@@ -225,13 +230,23 @@ abstract class AbstractTable extends Object
     }
 
     /**
+     * Returns true if the operation is to do a delete
+     *
+     * @return bool
+     */
+    public function doDelete()
+    {
+        return $this->delete;
+    }
+
+    /**
      * Returns true if this table is to execute a command rather than process data
      *
      * @return bool
      */
     public function doCommand()
     {
-        return $this->doCommand;
+        return (true == $this->doDelete() || true == $this->doTruncate());
     }
 
     /**
@@ -259,8 +274,6 @@ abstract class AbstractTable extends Object
         {
             $this->primaryKeyName = $this->engine->getPrimaryKeyName($this->getTableName());
         }
-//        echo $this->primaryKeyName."\n";
-//        echo $this->getTableName()."\n";
         return array($this->primaryKeyName => $row[$this->primaryKeyName]);
     }
 
@@ -288,12 +301,27 @@ abstract class AbstractTable extends Object
         {
             if(true == $this->doTruncate())
             {
-                return $this->engine->delete($this->getTableName(), null);
+                $this->getTerminalPrinter()->printLn("Truncating {$this->getTableName()} ", 'notice');
+                $commandExecuted = $this->engine->truncate($this->getTableName());
+                $this->getTerminalPrinter()->printLn("Truncated {$this->getTableName()} ", 'notice');
+                return $commandExecuted;
+            }
+            if(true == $this->doDelete())
+            {
+                $this->getTerminalPrinter()->printLn("Deleting {$this->getTableName()} ", 'notice');
+                $commandExecuted = $this->engine->delete($this->getTableName(), null);
+                $this->getTerminalPrinter()->printLn("Deleted {$this->getTableName()} ", 'notice');
+                return $commandExecuted;
             }
         }
         return false;
     }
 
+    /**
+     * Returns an array of the columns which are to be included in the select.
+     *
+     * @return array
+     */
     protected function getSelectColumns()
     {
         $selectColumns = array($this->getPrimaryKeyName($this->getTableName()));
@@ -304,5 +332,10 @@ abstract class AbstractTable extends Object
         return $selectColumns;
     }
 
+    /**
+     * Method to run the sanitation on the table.
+     *
+     * @return mixed
+     */
     abstract function sanitize();
 }

@@ -121,6 +121,7 @@ class Update extends AbstractTable
         $rows = 0;
         foreach($this->getRules() as $rule)
         {
+            $this->getTerminalPrinter()->printLn("Updating rows in {$this->getTableName()}' for column '{$rule->getColumn()}' to '{$rule->getTo()}'", 'notice');
             $dataToChange = array($rule->getColumnTypeInstance()->getName() => $rule->getTo());
             $rowsUpdated  = $this->engine->update($this->getTableName(), $dataToChange, $rule->getWhere());
             $this->getTerminalPrinter()->printLn("Updated '$rowsUpdated' rows in {$this->getTableName()}' for column '{$rule->getColumn()}' to '{$rule->getTo()}'", 'notice');

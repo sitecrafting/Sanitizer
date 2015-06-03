@@ -763,6 +763,11 @@ class medoo
         return $this->exec('DELETE FROM "' . $table . '"' . $this->where_clause($where));
     }
 
+    public function truncate($table)
+    {
+        return $this->exec('TRUNCATE FROM "' . $table . '"');
+    }
+
     public function replace($table, $columns, $search = null, $replace = null, $where = null)
     {
         if (is_array($columns))

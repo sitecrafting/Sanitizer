@@ -127,12 +127,14 @@ class Flat extends AbstractTable
         $columns = $this->getColumnsForEngineQuery();
         if(true == $quick)
         {
+            $this->getTerminalPrinter()->printLn("Sanitizing Flat {$this->getTableName()}", 'notice');
             $rows = $this->engine->update($this->getTableName(), $columns);
             $this->getTerminalPrinter()->printLn("Sanitized Flat {$this->getTableName()}", 'notice');
             return $rows;
         }
         else
         {
+            $this->getTerminalPrinter()->printLn("Sanitizing Flat {$this->getTableName()} ", 'notice');
             $rowsUpdated = 0;
             $rows = $this->engine->select($this->getTableName(), $this->getSelectColumns());
             foreach($rows as $row)

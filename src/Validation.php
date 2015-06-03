@@ -121,6 +121,13 @@ class Validation extends Sanitizer
                 'Mode (sanitize, validate)',
                 'sanitize'
             )
+            ->addOption(
+                'memory',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Memory - PHP format',
+                '2048M'
+            )
         ;
     }
 
