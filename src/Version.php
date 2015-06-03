@@ -43,35 +43,35 @@
  */
 namespace Pegasus;
 
-use Pegasus\Resource\SanitizerException;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Helper\Table;
-use Pegasus\Configuration\Config as SanitizerConfig;
 use Pegasus\Application;
-use Pegasus\Engine\Engine;
-use Pegasus\Tables\Collection as TableCollection;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
 
 
-class Version extends Command
+class Version extends Sanitizer
 {
     protected function configure()
     {
-        $this
-            ->setName('version')
-            ->setDescription('Database Sanitization Version');
+        $this->setName('version')->setDescription('Database Sanitization Version');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln("Sanitizer version = ".Sanitizer::getVersion());
+        $output->writeln("Sanitizer version = ".self::getVersion());
+    }
+
+    /**
+     * Return a singleton instance
+     *
+     * @return Version
+     */
+    public static function getInstance()
+    {
+        static $version = null;
+        if(null == $version)
+        {
+            $version = new Version();
+        }
+        return $version;
     }
 }

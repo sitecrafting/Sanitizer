@@ -44,6 +44,6 @@ use Symfony\Component\Console\Application as ConsoleApp;
 
 $application = new ConsoleApp();
 $application->add(Sanitizer::getInstance());
-$application->add(new Version());
+$application->add(Version::getInstance());
 $application->add(Validation::getInstance());
 $application->run();
