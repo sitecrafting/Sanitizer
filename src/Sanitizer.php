@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -28,8 +27,11 @@
  * <ul><li>App loads the config</li>
  * <li>App validates that the database can be connected to</li>
  * <li>App validates that the database exists</li>
- * <li>App validates all the tables are in the database which are specified in the config
- *      <ul><li>App also validates that the column is also in the table</li></ol>
+ * <li>App validates all the tables are in the database which are specified
+ * in the config
+ *  <ul>
+ *      <li>App also validates that the column is also in the table</li>
+ *  </ul>
  * </li>
  * <li>App then iterates over each table and sanitizes the data</li></ul>
  *

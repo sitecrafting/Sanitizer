@@ -21,7 +21,8 @@
     "behat/behat": "2.4.*@stable",
     "kherge/box": "~2.0",
     "monolog/monolog":"~1.13.1",
-    "phpspec/phpspec": "~2.0"
+    "phpspec/phpspec": "~2.0",
+    "squizlabs/php_codesniffer": "2.*"
   },
   "autoload":
   {
