@@ -41,7 +41,13 @@
  * Date: 18/05/15
  * Time: 12:50
  *
- * http://symfony.com/doc/current/components/console/introduction.html#using-command-arguments
+ * @category    Pegasus_Utilities
+ * @package     Sanitizer
+ * @license     MIT
+ * @link        http://pegasus-commerce.com
+ * @author      Philip Elson <phil@pegasus-commerce.com>
+ *
+ * http://symfony.com/doc/current/components/console/introduction.html
  */
 namespace Pegasus;
 
@@ -67,22 +73,65 @@ use Monolog\Handler\StreamHandler;
 
 class Sanitizer extends Command implements TerminalPrinter
 {
+    /**
+     * Default memory limit for this application is 1024MB
+     */
     const DEFAULT_MEMORY = '1024M';
 
+    /**
+     * Application confiuration instance
+     *
+     * @var null
+     */
     public $config = null;
 
+    /**
+     * Console output instance
+     *
+     * @var OutputInterface
+     */
     protected $output = null;
 
+    /**
+     * Console input instance
+     *
+     * @var InputInterface
+     */
     protected $input = null;
 
+    /**
+     * Flag which identifies if the sanitisation is running. true if running.
+     *
+     * @var bool
+     */
     protected $satitisationRunning = false;
 
+    /**
+     * Print cache used mainly when the sanitisation is running.
+     *
+     * @var array
+     */
     protected $printCache = array();
 
+    /**
+     * Progress bar used to display the progress of sanitisation.
+     *
+     * @var ProgressBar
+     */
     protected $progressBar = null;
 
+    /**
+     * Singleton instance of Sanitizer
+     *
+     * @var Sanitizer
+     */
     protected static $sanitizer = null;
 
+    /**
+     * Instance of Logger
+     * 
+     * @var Logger
+     */
     protected $log = null;
 
     /**
@@ -92,7 +141,7 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     public static function getInstance()
     {
-        if(null == self::$sanitizer) {
+        if (null == self::$sanitizer) {
             self::$sanitizer = new Sanitizer();
         }
         return self::$sanitizer;
@@ -167,7 +216,7 @@ class Sanitizer extends Command implements TerminalPrinter
 
     public function getConfig()
     {
-        if(null == $this->config) {
+        if (null == $this->config) {
             try
             {
                 $this->config = new SanitizerConfig($this->input->getOption('configuration'));
@@ -211,14 +260,14 @@ class Sanitizer extends Command implements TerminalPrinter
 
     private function setMemoryUsage()
     {
-        if(false == ini_set("memory_limit", $this->input->getOption('memory'))) {
+        if (false == ini_set("memory_limit", $this->input->getOption('memory'))) {
             ini_set("memory_limit", self::DEFAULT_MEMORY);
         }
     }
 
     public function getLog()
     {
-        if(null == $this->log) {
+        if (null == $this->log) {
             $this->log = new Logger('Sanitizer');
             $this->log->pushHandler(new StreamHandler($this->getConfig()->getLogPath(), Logger::INFO));
         }
@@ -264,7 +313,7 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     protected function outputIntro()
     {
-        if(true == $this->getConfig()->getIsInDeveloperMode() || $this->getConfig()->getIsInDeveloperMode() == OutputInterface::VERBOSITY_VERY_VERBOSE) {
+        if (true == $this->getConfig()->getIsInDeveloperMode() || $this->getConfig()->getIsInDeveloperMode() == OutputInterface::VERBOSITY_VERY_VERBOSE) {
             $this->printLn("App is in developer mode, therefore all output will be shown!", 'warning');
             $this->printLn("Verbosity ".$this->output->getVerbosity(), 'warning');
         }
@@ -282,7 +331,7 @@ class Sanitizer extends Command implements TerminalPrinter
     {
         if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_NORMAL)) {
             $tableData = $this->getTableData();
-            $this->logTableData($tableData);
+            $this->_logTableData($tableData);
             $table = new Table($this->output);
             $table->setHeaders(array('Setting', 'Value'))->setRows($tableData);
             $table->render();
@@ -323,13 +372,13 @@ class Sanitizer extends Command implements TerminalPrinter
     public function printLn($message, $type=null)
     {
         $this->printCache[] = array('message' => $message, 'type' => $type);
-        if(null != $this->log) {
+        if (null != $this->log) {
             $this->log->addInfo($message, array('type' => $type));
         }
-        if(false == $this->getSatitisationState()) {
+        if (false == $this->getSatitisationState()) {
             $this->purgePrintCache();
         }
-        if('fatal_error' == $type) {
+        if ('fatal_error' == $type) {
             $this->purgePrintCache();
         }
     }
@@ -346,40 +395,40 @@ class Sanitizer extends Command implements TerminalPrinter
                 {
                 $this->output->writeLn($message);
                     break;
-            }
+                }
             case 'general' :
                 {
-                if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERY_VERBOSE)) {
+                if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERY_VERBOSE)) {
                     $this->output->writeLn($this->formatMessage($type, $message));
                 }
                     break;
-            }
+                }
             case 'warning' :
                 {
-                if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERBOSE)) {
+                if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERBOSE)) {
                     $this->output->writeLn($this->formatMessage($type, $message));
                 }
                     break;
-            }
+                }
             case 'notice' :
                 {
-                if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERY_VERBOSE)) {
+                if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERY_VERBOSE)) {
                     $this->output->writeLn($this->formatMessage($type, $message));
                 }
                     break;
-            }
+                }
             case 'normal' :
                 {
-                if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_NORMAL)) {
+                if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_NORMAL)) {
                     $this->output->writeLn($message);
                 }
                     break;
-            }
+                }
             case 'fatal_error' :
                 {
                 $this->output->writeLn($this->formatMessage($type, $message), 'warning');
                     break;
-            }
+                }
             }
         }
         $this->printCache = array();
@@ -395,7 +444,7 @@ class Sanitizer extends Command implements TerminalPrinter
     private function canDisplayMessage($level)
     {
         //Default to verbose
-        if(true == $this->getConfig()->getIsInDeveloperMode()) {
+        if (true == $this->getConfig()->getIsInDeveloperMode()) {
             return true;
         }
         return ($this->output->getVerbosity() >= $level);
@@ -441,58 +490,82 @@ class Sanitizer extends Command implements TerminalPrinter
         return $this->satitisationRunning;
     }
 
-    public function startProgressBar($count)
+    /**
+     * Starts the progress bar and sets its width to $width
+     *
+     * @param $count is the count so far.
+     * @param $width is the width of the bar.
+     * @return $this
+     */
+    public function startProgressBar($count, $width=100)
     {
         $this->progressBar = new ProgressBar($this->output, $count);
-        $this->progressBar->setBarWidth(100);
+        $this->progressBar->setBarWidth($width);
         return $this;
     }
 
+    /**
+     * Advances the progress bar
+     *
+     * @return $this
+     */
     public function advanceProgressBar()
     {
-        if(null != $this->progressBar) {
+        if (null != $this->progressBar) {
             $this->progressBar->advance();
         }
         return $this;
     }
 
+    /**
+     * Finishes the progress bar
+     *
+     * @return $this
+     */
     public function advanceProgressFinish()
     {
-        if(null != $this->progressBar) {
+        if (null != $this->progressBar) {
             $this->progressBar->finish();
         }
         return $this;
     }
 
     /**
+     * Method which logs the table data.
+     *
      * @param $tableData
+     *
+     * @return $this
      */
-    private function logTableData($tableData)
+    private function _logTableData($tableData)
     {
-        foreach ($tableData as $enteries)
-        {
+        foreach ($tableData as $enteries) {
             $name   = $enteries[0];
             $value  = $enteries[1];
             $this->printLn("Sanitize settings: {$name}:{$value}", 'log');
         }
+        return $this;
     }
 
     /**
+     * Returns an array of table data to be displayed on the terminal
+     *
      * @return array
      */
     protected function getTableData()
     {
+        $password = $this->getConfig()->getDatabase()->getPassword();
         $tableData = array(
             array('Config Name', $this->getConfig()->getName()),
             array('Host', $this->getConfig()->getDatabase()->getHost()),
-            array('Password', $this->getSafeToDisplayPassword($this->getConfig()->getDatabase()->getPassword())),
+            array('Password', $this->getSafeToDisplayPassword($password)),
             array('User', $this->getConfig()->getDatabase()->getUsername()),
             array('Database', $this->getConfig()->getDatabase()->getDatabase()),
             array('Config', $this->getConfig()->getDatabase()->getConfig()),
             array('Engine', $this->getConfig()->getDatabase()->getEngine()),
             array('Mode', $this->getConfig()->getDatabase()->getSanitizationMode()));
 
-        if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERBOSE)) {
+        if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERBOSE)) {
             $tableData[] = array('Memory Limit', ini_get("memory_limit"));
         }
         return $tableData;
