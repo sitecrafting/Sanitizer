@@ -92,8 +92,7 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     public static function getInstance()
     {
-        if(null == self::$sanitizer)
-        {
+        if(null == self::$sanitizer) {
             self::$sanitizer = new Sanitizer();
         }
         return self::$sanitizer;
@@ -163,23 +162,21 @@ class Sanitizer extends Command implements TerminalPrinter
                 InputOption::VALUE_OPTIONAL,
                 'Memory - PHP format',
                 self::DEFAULT_MEMORY
-            )
-        ;
+            );
     }
 
     public function getConfig()
     {
-        if(null == $this->config)
-        {
+        if(null == $this->config) {
             try
             {
                 $this->config = new SanitizerConfig($this->input->getOption('configuration'));
-                if (true == $this->config->getIsInDeveloperMode())
-                {
+                if (true == $this->config->getIsInDeveloperMode()) {
                     error_reporting(E_ALL);
                     ini_set('display_errors', 1);
                 }
-                $this->config->setDatabaseOverride(array(
+                $this->config->setDatabaseOverride(
+                    array(
                     array('Host', $this->input->getOption('host')),
                     array('Password', $this->input->getOption('password')),
                     array('Username', $this->input->getOption('username')),
@@ -214,16 +211,14 @@ class Sanitizer extends Command implements TerminalPrinter
 
     private function setMemoryUsage()
     {
-        if(false == ini_set("memory_limit", $this->input->getOption('memory')))
-        {
+        if(false == ini_set("memory_limit", $this->input->getOption('memory'))) {
             ini_set("memory_limit", self::DEFAULT_MEMORY);
         }
     }
 
     public function getLog()
     {
-        if(null == $this->log)
-        {
+        if(null == $this->log) {
             $this->log = new Logger('Sanitizer');
             $this->log->pushHandler(new StreamHandler($this->getConfig()->getLogPath(), Logger::INFO));
         }
@@ -232,15 +227,17 @@ class Sanitizer extends Command implements TerminalPrinter
 
     private function loadDatabaseEngine()
     {
-        $engine = Engine::start(array
-        (
+        $engine = Engine::start(
+            array
+            (
             'database_type' => $this->getConfig()->getDatabase()->getEngine(),
             'database_name' => $this->getConfig()->getDatabase()->getDatabase(),
             'server'        => $this->getConfig()->getDatabase()->getHost(),
             'username'      => $this->getConfig()->getDatabase()->getUsername(),
             'password'      => $this->getConfig()->getDatabase()->getPassword(),
             'charset'       => 'utf8'
-        ));
+            )
+        );
         TableCollection::setTerminalPrinter($this);
         TableCollection::setEngine($engine);
     }
@@ -267,8 +264,7 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     protected function outputIntro()
     {
-        if(true == $this->getConfig()->getIsInDeveloperMode() || $this->getConfig()->getIsInDeveloperMode() == OutputInterface::VERBOSITY_VERY_VERBOSE)
-        {
+        if(true == $this->getConfig()->getIsInDeveloperMode() || $this->getConfig()->getIsInDeveloperMode() == OutputInterface::VERBOSITY_VERY_VERBOSE) {
             $this->printLn("App is in developer mode, therefore all output will be shown!", 'warning');
             $this->printLn("Verbosity ".$this->output->getVerbosity(), 'warning');
         }
@@ -279,13 +275,12 @@ class Sanitizer extends Command implements TerminalPrinter
      * THis method renders the DB config data as a table allowing the user to confirm the data is accurate and they're
      * happy to continue.
      *
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
      */
     private function renderOverviewTable()
     {
-        if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_NORMAL))
-        {
+        if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_NORMAL)) {
             $tableData = $this->getTableData();
             $this->logTableData($tableData);
             $table = new Table($this->output);
@@ -298,8 +293,7 @@ class Sanitizer extends Command implements TerminalPrinter
     protected function askPermissionToContinue()
     {
         $helper = $this->getHelper('question');
-        if (false == $helper->ask($this->input, $this->output, new ConfirmationQuestion('Are you happy to continue? [yes|no]', false)))
-        {
+        if (false == $helper->ask($this->input, $this->output, new ConfirmationQuestion('Are you happy to continue? [yes|no]', false))) {
             $this->printLn("Exiting due to user", "log");
             exit(-1);
         }
@@ -308,7 +302,7 @@ class Sanitizer extends Command implements TerminalPrinter
     /**
      * This method takes a string and replaces the last half of the characters with *
      *
-     * @param $password
+     * @param  $password
      * @return string
      */
     private function getSafeToDisplayPassword($password)
@@ -324,21 +318,18 @@ class Sanitizer extends Command implements TerminalPrinter
      * This method prints a line to the display.
      *
      * @param $message
-     * @param null $type
+     * @param null    $type
      */
     public function printLn($message, $type=null)
     {
         $this->printCache[] = array('message' => $message, 'type' => $type);
-        if(null != $this->log)
-        {
+        if(null != $this->log) {
             $this->log->addInfo($message, array('type' => $type));
         }
-        if(false == $this->getSatitisationState())
-        {
+        if(false == $this->getSatitisationState()) {
             $this->purgePrintCache();
         }
-        if('fatal_error' == $type)
-        {
+        if('fatal_error' == $type) {
             $this->purgePrintCache();
         }
     }
@@ -351,48 +342,44 @@ class Sanitizer extends Command implements TerminalPrinter
             $type       = $item['type'];
             switch($type)
             {
-                case null :
+            case null :
                 {
+                $this->output->writeLn($message);
+                    break;
+            }
+            case 'general' :
+                {
+                if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERY_VERBOSE)) {
+                    $this->output->writeLn($this->formatMessage($type, $message));
+                }
+                    break;
+            }
+            case 'warning' :
+                {
+                if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERBOSE)) {
+                    $this->output->writeLn($this->formatMessage($type, $message));
+                }
+                    break;
+            }
+            case 'notice' :
+                {
+                if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERY_VERBOSE)) {
+                    $this->output->writeLn($this->formatMessage($type, $message));
+                }
+                    break;
+            }
+            case 'normal' :
+                {
+                if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_NORMAL)) {
                     $this->output->writeLn($message);
-                    break;
                 }
-                case 'general' :
+                    break;
+            }
+            case 'fatal_error' :
                 {
-                    if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERY_VERBOSE))
-                    {
-                        $this->output->writeLn($this->formatMessage($type, $message));
-                    }
+                $this->output->writeLn($this->formatMessage($type, $message), 'warning');
                     break;
-                }
-                case 'warning' :
-                {
-                    if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERBOSE))
-                    {
-                        $this->output->writeLn($this->formatMessage($type, $message));
-                    }
-                    break;
-                }
-                case 'notice' :
-                {
-                    if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERY_VERBOSE))
-                    {
-                        $this->output->writeLn($this->formatMessage($type, $message));
-                    }
-                    break;
-                }
-                case 'normal' :
-                {
-                    if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_NORMAL))
-                    {
-                        $this->output->writeLn($message);
-                    }
-                    break;
-                }
-                case 'fatal_error' :
-                {
-                    $this->output->writeLn($this->formatMessage($type, $message), 'warning');
-                    break;
-                }
+            }
             }
         }
         $this->printCache = array();
@@ -402,14 +389,13 @@ class Sanitizer extends Command implements TerminalPrinter
      * This function returns true if the verbosity level equal to the level provided.
      * If this is in developer mode than it will always return true.
      *
-     * @param $level
+     * @param  $level
      * @return bool
      */
     private function canDisplayMessage($level)
     {
         //Default to verbose
-        if(true == $this->getConfig()->getIsInDeveloperMode())
-        {
+        if(true == $this->getConfig()->getIsInDeveloperMode()) {
             return true;
         }
         return ($this->output->getVerbosity() >= $level);
@@ -464,8 +450,7 @@ class Sanitizer extends Command implements TerminalPrinter
 
     public function advanceProgressBar()
     {
-        if(null != $this->progressBar)
-        {
+        if(null != $this->progressBar) {
             $this->progressBar->advance();
         }
         return $this;
@@ -473,8 +458,7 @@ class Sanitizer extends Command implements TerminalPrinter
 
     public function advanceProgressFinish()
     {
-        if(null != $this->progressBar)
-        {
+        if(null != $this->progressBar) {
             $this->progressBar->finish();
         }
         return $this;
@@ -508,8 +492,7 @@ class Sanitizer extends Command implements TerminalPrinter
             array('Engine', $this->getConfig()->getDatabase()->getEngine()),
             array('Mode', $this->getConfig()->getDatabase()->getSanitizationMode()));
 
-        if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERBOSE))
-        {
+        if(true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERBOSE)) {
             $tableData[] = array('Memory Limit', ini_get("memory_limit"));
         }
         return $tableData;
