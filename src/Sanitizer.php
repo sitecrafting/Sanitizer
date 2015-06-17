@@ -74,9 +74,9 @@ use Monolog\Handler\StreamHandler;
 class Sanitizer extends Command implements TerminalPrinter
 {
     /**
-     * Default memory limit for this application is 1024MB
+     * Default memory limit for this application is 2048M
      */
-    const DEFAULT_MEMORY = '1024M';
+    const DEFAULT_MEMORY = '2048M';
 
     /**
      * Application confiuration instance
@@ -129,7 +129,7 @@ class Sanitizer extends Command implements TerminalPrinter
 
     /**
      * Instance of Logger
-     * 
+     *
      * @var Logger
      */
     protected $log = null;
@@ -258,6 +258,9 @@ class Sanitizer extends Command implements TerminalPrinter
         $this->sanitize();
     }
 
+    /**
+     * This method sets the max memory for this PHP application
+     */
     private function setMemoryUsage()
     {
         if (false == ini_set("memory_limit", $this->input->getOption('memory'))) {
@@ -265,6 +268,11 @@ class Sanitizer extends Command implements TerminalPrinter
         }
     }
 
+    /**
+     * This method returns a singleton instance of the logger class.
+     *
+     * @return Logger
+     */
     public function getLog()
     {
         if (null == $this->log) {
@@ -274,6 +282,15 @@ class Sanitizer extends Command implements TerminalPrinter
         return $this->log;
     }
 
+    /**
+     * This method initislaised the database engine with the confured options.
+     * <ul><li>Defaults</li>
+     * <li>
+     *
+     * @throws Engine\EngineNotFoundException
+     * @throws SanitizerException
+     * @throws Tables\TableException
+     */
     private function loadDatabaseEngine()
     {
         $engine = Engine::start(

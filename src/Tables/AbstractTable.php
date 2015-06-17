@@ -302,16 +302,16 @@ abstract class AbstractTable extends Object
             if(true == $this->doTruncate())
             {
                 $this->getTerminalPrinter()->printLn("Truncating {$this->getTableName()} ", 'notice');
-                $commandExecuted = $this->engine->truncate($this->getTableName());
+                $this->engine->truncate($this->getTableName());
                 $this->getTerminalPrinter()->printLn("Truncated {$this->getTableName()} ", 'notice');
-                return $commandExecuted;
+                return true;
             }
             if(true == $this->doDelete())
             {
                 $this->getTerminalPrinter()->printLn("Deleting {$this->getTableName()} ", 'notice');
-                $commandExecuted = $this->engine->delete($this->getTableName(), null);
+                $this->engine->delete($this->getTableName(), null);
                 $this->getTerminalPrinter()->printLn("Deleted {$this->getTableName()} ", 'notice');
-                return $commandExecuted;
+                return true;
             }
         }
         return false;

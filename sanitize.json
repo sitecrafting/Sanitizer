@@ -509,6 +509,9 @@
     "log_visitor_info":{
       "command":"truncate"
     },
+    "log_visitor_online":{
+      "command":"truncate"
+    },
     "log_url":{
       "command":"truncate"
     },
