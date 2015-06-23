@@ -1,7 +1,27 @@
 ## Sanitizer
-Sanitizer is a configurable database sanitiser, built to help DBAs provide Developers etc with up to date copies of LIVE database on test environments without sensitive or personal customer data. 
+Sanitizer is a configurable database sanitiser, built to help developers copy LIVE databases to test environments with personal and sensitive information sanitised and environment specific data configured.
 
-Protecting customer data and privacy is critical all types of businesses, I work in e-commerce so the live database is riddled with personal data and given devs a copy has always been a headache, hopefully this will make the task easier. 
+For the responsible, protecting customer data and privacy is critical, I work in e-commerce, mainly using Magento which has loads of personal data within its database.
+Moving databases down to test environments has always been a headache, especially when you're dealing with Data Protection, hopefully this will make the task easier.
+
+
+##The typical workflow for Sanitiser is.
+
+###Single test environments
+1. Take a copy of the live database
+2. Install the copy of a the database onto a database server (if this is the test environments make sure no-one has access - use a nightly script)
+3. Sanitise the database "./sanitizer.phar --configuration full_sanitizer.json" initial sanitisation
+4. Once complete either dump and move to the test environments or if it was on test you're environment is ready.
+
+
+###Multiple test environments
+If you have multiple test environments. The initial sanitisation is what takes the time.
+1. Do the above.
+2. Deploy the sanitised database to all your test environments
+3. Run sanitiser again with a configuration script for that environment "./sanitizer.phar --configuration environment_specific_sanitizer.json"
+
+For instance with Magento the environment specific config is mainly in core_config_data. So you'd sanitise the whole database first, you'd then copy the sanitised database to all the test environments.
+At this point core_config_data is wrong for the test environments. You'd then run sanitiser with a config file for that particular environments core_config_data.
 
 ###Main Features
 
