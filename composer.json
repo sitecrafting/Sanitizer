@@ -1,5 +1,5 @@
 {
-  "name": "pegasus/sanitizer",
+  "name": "pegasuscommerce/sanitizer",
   "type": "Application",
   "description": "Database Sanitisation Engine",
   "homepage": "https://pegasus-commerce.com",
