@@ -76,7 +76,7 @@ class Sanitizer extends Command implements TerminalPrinter
     /**
      * Defines the version of the application
      */
-    const VERSION = '0.1.0';
+    const VERSION = '0.1.1beta';
 
     /**
      * Default memory limit for this application is 2048M

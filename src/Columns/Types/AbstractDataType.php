@@ -76,9 +76,32 @@ abstract class AbstractDataType extends Object
         if(null != $this->getMockModel())
         {
             $modelName = $this->getMockModel();
-            $model = new $modelName();
-            return $model->getRandomValue();
+            if(true == class_exists($modelName))
+            {
+                $model = new $modelName();
+                return $model->getRandomValue();
+            }
         }
         return $this->getBasicDefault();
+    }
+
+    /**
+     * This method returns a mock instance.
+     *
+     * @return string
+     */
+    public function getMockModel()
+    {
+        $className = parent::getMockModel();
+        if(true == class_exists($className))
+        {
+            return $className;
+        }
+        $className = "Pegasus\\Application\\Sanitizer\\Columns\\Mock\\".$className;
+        if(true == class_exists($className))
+        {
+            return $className;
+        }
+        return null;
     }
 }

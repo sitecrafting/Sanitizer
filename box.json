@@ -2,27 +2,16 @@
   "chmod": "0755",
   "directories": [
     "src",
-    "vendor",
-    "vendor/*"
-  ],
-  "finder": [
-    {
-      "name": "*.php",
-      "exclude":
-      [
-        "spec", "feature", "html", "bin", ".vagrant", ".idea"
-      ],
-      "in": "."
-    },
-    {
-      "name": "*.php",
-      "in": "vendor"
-    }
+    "vendor/symfony",
+    "vendor/monolog",
+    "vendor/composer",
+    "vendor/phpseclib",
+    "vendor/herrera-io",
+    "vendor/psr"
   ],
   "files": [
     "vendor/autoload.php"
   ],
-  "git-version": "0.0.1",
   "main": "src/Application.php",
   "output": "sanitize.phar",
   "stub": true
