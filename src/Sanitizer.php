@@ -84,7 +84,7 @@ class Sanitizer extends Command implements TerminalPrinter
     const DEFAULT_MEMORY = '2048M';
 
     /**
-     * Application confiuration instance
+     * Application configuration instance
      *
      * @var null
      */
