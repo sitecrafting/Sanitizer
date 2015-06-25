@@ -49,21 +49,21 @@
  *
  * http://symfony.com/doc/current/components/console/introduction.html
  */
-namespace Pegasus;
+namespace Pegasus\Application\Sanitizer;
 
-use Pegasus\Configuration\Config;
-use Pegasus\Resource\SanitizerException;
-use Pegasus\Resource\TerminalPrinter;
+use Pegasus\Application\Sanitizer\Configuration\Config;
+use Pegasus\Application\Sanitizer\Resource\SanitizerException;
+use Pegasus\Application\Sanitizer\Resource\TerminalPrinter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
-use Pegasus\Configuration\Config as SanitizerConfig;
-use Pegasus\Application;
-use Pegasus\Engine\Engine;
-use Pegasus\Tables\Collection as TableCollection;
+use Pegasus\Application\Sanitizer\Configuration\Config as SanitizerConfig;
+use Pegasus\Application\Sanitizer\Application;
+use Pegasus\Application\Sanitizer\Engine\Engine;
+use Pegasus\Application\Sanitizer\Tables\Collection as TableCollection;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -73,6 +73,11 @@ use Monolog\Handler\StreamHandler;
 
 class Sanitizer extends Command implements TerminalPrinter
 {
+    /**
+     * Defines the version of the application
+     */
+    const VERSION = '0.1.0';
+
     /**
      * Default memory limit for this application is 2048M
      */
@@ -147,16 +152,21 @@ class Sanitizer extends Command implements TerminalPrinter
         return self::$sanitizer;
     }
 
+    /**
+     * Returns the version of sanitiser
+     *
+     * @return string
+     */
     public static function getVersion()
     {
-        return '0.0.2';
+        return self::VERSION;;
     }
 
     protected function configure()
     {
         $this
             ->setName('sanitize')
-            ->setDescription('Database Sanitization')
+            ->setDescription('Sanitises a database')
             ->addArgument(
                 'engine',
                 InputArgument::OPTIONAL,

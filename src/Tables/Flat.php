@@ -26,11 +26,9 @@
  * Date: 18/05/15
  * Time: 12:42
  */
-namespace Pegasus\Tables;
+namespace Pegasus\Application\Sanitizer\Tables;
 
-use Pegasus\Sanitizer;
-use Pegasus\Engine\Engine;
-use Pegasus\Columns\Types;
+use Pegasus\Application\Sanitizer\Columns\Types;
 
 class Flat extends AbstractTable
 {

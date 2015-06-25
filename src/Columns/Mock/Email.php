@@ -26,9 +26,9 @@
  * Date: 19/05/15
  * Time: 11:37
  */
-namespace Pegasus\Columns\Mock;
+namespace Pegasus\Application\Sanitizer\Columns\Mock;
 
-use Pegasus\Columns\Mock;
+use Pegasus\Application\Sanitizer\Columns\Mock;
 
 class Email extends AbstractMockData
 {

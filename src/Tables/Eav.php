@@ -26,13 +26,11 @@
  * Date: 18/05/15
  * Time: 12:42
  */
-namespace Pegasus\Tables;
+namespace Pegasus\Application\Sanitizer\Tables;
 
-use Pegasus\Columns\Mock\MockData;
-use Pegasus\Engine\Engine;
-use Pegasus\Resource\Object;
-use Pegasus\Sanitizer;
-use Pegasus\Tables;
+use Pegasus\Application\Sanitizer\Columns\Mock\MockData;
+use Pegasus\Application\Sanitizer\Resource\Object;
+use Pegasus\Application\Sanitizer\Tables;
 
 class Eav extends AbstractTable
 {

@@ -29,9 +29,9 @@
  * Time: 19:38
  */
 
-namespace Pegasus\Tables;
+namespace Pegasus\Application\Sanitizer\Tables;
 
-use Pegasus\Resource;
+use Pegasus\Application\Sanitizer\Resource;
 
 class TableCommandFoundException extends SanitizerException
 {

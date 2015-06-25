@@ -27,9 +27,9 @@
  * Time: 16:32
  *
  */
-namespace Pegasus\Engine;
+namespace Pegasus\Application\Sanitizer\Engine;
 
-use Pegasus\Resource\SanitizerException;
+use Pegasus\Application\Sanitizer\Resource\SanitizerException;
 
 class FatalEngineException extends SanitizerException
 {

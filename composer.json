@@ -13,25 +13,29 @@
   ],
   "require":
   {
+    "symfony/yaml": "~2.8|~3.0",
+    "monolog/monolog":"~1.13.1",
     "php": ">=5.5.9"
   },
   "require-dev":
   {
-    "symfony/yaml": "~2.8|~3.0",
     "behat/behat": "2.4.*@stable",
     "kherge/box": "~2.0",
-    "monolog/monolog":"~1.13.1",
     "phpspec/phpspec": "~2.0",
-    "squizlabs/php_codesniffer": "2.*"
+    "squizlabs/php_codesniffer": "2.*",
+    "pegasuscommerce/vagrant_transient": "dev-master"
   },
   "autoload":
   {
     "psr-4":
     {
-      "Pegasus\\": "src"
+      "Pegasus\\Application\\Sanitizer\\": "src"
     }
   },
   "minimum-stability": "dev",
+  "bin": [
+    "bin/sanitizer"
+  ],
   "config":
   {
     "bin-dir": "bin/"

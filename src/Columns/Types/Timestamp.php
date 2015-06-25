@@ -26,9 +26,9 @@
  * Date: 19/05/15
  * Time: 11:37
  */
-namespace Pegasus\Columns\Types;
+namespace Pegasus\Application\Sanitizer\Columns\Types;
 
-use Pegasus\Columns\Types;
+use Pegasus\Application\Sanitizer\Columns\Types;
 
 class Timestamp extends AbstractDataType
 {

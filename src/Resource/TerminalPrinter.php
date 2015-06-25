@@ -27,7 +27,7 @@
  * Time: 11:34
  *
  */
-namespace Pegasus\Resource;
+namespace Pegasus\Application\Sanitizer\Resource;
 
 interface TerminalPrinter
 {

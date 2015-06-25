@@ -27,9 +27,9 @@
  * Date: 19/05/15
  * Time: 08:12
  */
-namespace Pegasus\Engine;
+namespace Pegasus\Application\Sanitizer\Engine;
 
-use Pegasus\Resource\SanitizerException;
+use Pegasus\Application\Sanitizer\Resource\SanitizerException;
 
 class EngineNotFoundException extends SanitizerException
 {

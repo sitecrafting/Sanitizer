@@ -26,7 +26,7 @@
  * Date: 18/05/15
  * Time: 20:51
  */
-namespace Pegasus\Resource;
+namespace Pegasus\Application\Sanitizer\Resource;
 
 class Object
 {

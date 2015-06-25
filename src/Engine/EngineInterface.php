@@ -27,7 +27,7 @@
  * Date: 18/05/15
  * Time: 12:37
  */
-namespace Pegasus\Engine;
+namespace Pegasus\Application\Sanitizer\Engine;
 
 interface EngineInterface
 {

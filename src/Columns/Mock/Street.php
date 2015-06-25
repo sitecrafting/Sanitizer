@@ -27,9 +27,9 @@
  * Time: 12:42
  *
  */
-namespace Pegasus\Columns\Mock;
+namespace Pegasus\Application\Sanitizer\Columns\Mock;
 
-use Pegasus\Columns\Mock;
+use Pegasus\Application\Sanitizer\Columns\Mock;
 
 class Street extends AbstractMockData
 {

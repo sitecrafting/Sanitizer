@@ -27,9 +27,9 @@
  * Time: 20:57
  */
 
-namespace Pegasus\Configuration;
+namespace Pegasus\Application\Sanitizer\Configuration;
 
-use Pegasus\Resource\SanitizerException;
+use Pegasus\Application\Sanitizer\Resource\SanitizerException;
 
 class ConfigException extends SanitizerException
 {

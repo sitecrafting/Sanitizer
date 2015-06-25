@@ -26,10 +26,10 @@
  * Date: 18/05/15
  * Time: 20:43
  */
-namespace Pegasus\Configuration;
+namespace Pegasus\Application\Sanitizer\Configuration;
 
-use Pegasus\Resource\Object;
-use Pegasus\Configuration;
+use Pegasus\Application\Sanitizer\Resource\Object;
+use Pegasus\Application\Sanitizer\Configuration;
 
 class Config extends Object
 {

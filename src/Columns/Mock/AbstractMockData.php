@@ -26,9 +26,9 @@
  * Date: 19/05/15
  * Time: 11:37
  */
-namespace Pegasus\Columns\Mock;
+namespace Pegasus\Application\Sanitizer\Columns\Mock;
 
-use Pegasus\Resource\Object;
+use Pegasus\Application\Sanitizer\Resource\Object;
 
 abstract class AbstractMockData extends Object
 {

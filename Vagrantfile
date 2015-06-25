@@ -43,12 +43,12 @@ Vagrant.configure("2") do |config|
   	end
 
 	#Vagrant triggers
-        config.trigger.before :up do
-           run "vagrant-transient/vagrant-transient.sh dc"
-        end
+    config.trigger.before :up do
+       run "bin/vagranttransient dc"
+    end
 
-        config.trigger.after :destroy do
-           run "vagrant-transient/vagrant-transient.sh destroy"
-        end
+    config.trigger.after :destroy do
+       run "bin/vagranttransient destroy"
+    end
 
 end

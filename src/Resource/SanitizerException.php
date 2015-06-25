@@ -26,7 +26,7 @@
  * Date: 19/05/15
  * Time: 07:13
  */
-namespace Pegasus\Resource;
+namespace Pegasus\Application\Sanitizer\Resource;
 
 class SanitizerException extends \Exception
 {

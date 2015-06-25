@@ -26,10 +26,9 @@
  * Date: 19/05/15
  * Time: 11:37
  */
-namespace Pegasus\Columns\Types;
+namespace Pegasus\Application\Sanitizer\Columns\Types;
 
-use Pegasus\Sanitizer;
-use Pegasus\Resource\Object;
+use Pegasus\Application\Sanitizer\Resource\Object;
 
 abstract class AbstractDataType extends Object
 {

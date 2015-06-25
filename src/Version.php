@@ -41,23 +41,22 @@
  *
  * http://symfony.com/doc/current/components/console/introduction.html#using-command-arguments
  */
-namespace Pegasus;
+namespace Pegasus\Application\Sanitizer;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Pegasus\Application;
-
+use Pegasus\Application\Sanitizer\Application;
 
 class Version extends Sanitizer
 {
     protected function configure()
     {
-        $this->setName('version')->setDescription('Database Sanitization Version');
+        $this->setName('version')->setDescription('Shows the sanitizer version');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln("Sanitizer version = ".self::getVersion());
+        $output->writeln("Vagrant Transient Version: ".$this->getVersion());
     }
 
     /**

@@ -41,13 +41,13 @@
  *
  * http://symfony.com/doc/current/components/console/introduction.html#using-command-arguments
  */
-namespace Pegasus;
+namespace Pegasus\Application\Sanitizer;
 
-use Pegasus\Tables\Collection;
+use Pegasus\Application\Sanitizer\Tables\Collection;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Pegasus\Application;
+use Pegasus\Application\Sanitizer\Application;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Symfony\Component\Console\Helper\Table;
@@ -73,7 +73,7 @@ class Validation extends Sanitizer
     {
         $this
             ->setName('validate')
-            ->setDescription('Sanitization Config Validation')
+            ->setDescription('Validates the sanitizer configuration')
             ->addArgument(
                 'engine',
                 InputArgument::OPTIONAL,

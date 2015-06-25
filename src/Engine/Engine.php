@@ -26,13 +26,11 @@
  * Date: 18/05/15
  * Time: 12:43
  */
-namespace Pegasus\Engine;
+namespace Pegasus\Application\Sanitizer\Engine;
 
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
-use Pegasus\Resource\SanitizerException;
-use Pegasus\Sanitizer;
-use Pegasus\Engine\medoo;
+use Pegasus\Application\Sanitizer\Resource\SanitizerException;
+use Pegasus\Application\Sanitizer\Sanitizer;
+use Pegasus\Application\Sanitizer\Engine\medoo;
 
 abstract class Engine extends medoo implements EngineInterface
 {

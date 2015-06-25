@@ -27,14 +27,13 @@
  * Time: 12:42
  *
  */
-namespace Pegasus\Tables;
+namespace Pegasus\Application\Sanitizer\Tables;
 
-use Pegasus\Engine\Engine;
-use Pegasus\Engine\FatalEngineException;
-use Pegasus\Resource\SanitizerException;
-use Pegasus\Resource\TerminalPrinter;
-use Pegasus\Sanitizer;
-use Pegasus\Tables;
+use Pegasus\Application\Sanitizer\Engine\Engine;
+use Pegasus\Application\Sanitizer\Engine\FatalEngineException;
+use Pegasus\Application\Sanitizer\Resource\SanitizerException;
+use Pegasus\Application\Sanitizer\Resource\TerminalPrinter;
+use Pegasus\Application\Sanitizer\Tables;
 
 class Collection
 {

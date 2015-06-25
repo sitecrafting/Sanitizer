@@ -7,7 +7,7 @@
  * Copyright 2015, Angel Lai
  * Released under the MIT license
  */
-namespace Pegasus\Engine;
+namespace Pegasus\Application\Sanitizer\Engine;
 
 class medoo
 {

@@ -26,13 +26,11 @@
  * Date: 18/05/15
  * Time: 12:42
  */
-namespace Pegasus\Tables;
+namespace Pegasus\Application\Sanitizer\Tables;
 
-use Pegasus\Resource\Object;
-use Pegasus\Resource\SanitizerException;
-use Pegasus\Sanitizer;
-use Pegasus\Engine\Engine;
-use Pegasus\Columns\Types;
+use Pegasus\Application\Sanitizer\Resource\Object;
+use Pegasus\Application\Sanitizer\Resource\SanitizerException;
+use Pegasus\Application\Sanitizer\Columns\Types;
 
 class Update extends AbstractTable
 {
