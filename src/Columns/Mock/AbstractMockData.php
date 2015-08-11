@@ -61,7 +61,10 @@ abstract class AbstractMockData extends Object
      */
     public function getRandom()
     {
-        $values = $this->getValues();
+        static $values = null;
+        if(null == $values || true == $this->getForceValues()) {
+            $values = $this->getValues();
+        }
         shuffle($values);
         return $values;
     }

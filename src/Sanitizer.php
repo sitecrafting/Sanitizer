@@ -318,6 +318,7 @@ class Sanitizer extends Command implements TerminalPrinter
         TableCollection::setEngine($engine);
     }
 
+
     protected function sanitize()
     {
         TableCollection::sanitizeTables();
@@ -410,6 +411,9 @@ class Sanitizer extends Command implements TerminalPrinter
         }
     }
 
+    /**
+     * This method prints the print cache, once done the print cache is purged.
+     */
     protected function purgePrintCache()
     {
         foreach($this->printCache as $item)
@@ -499,19 +503,32 @@ class Sanitizer extends Command implements TerminalPrinter
         return 'sanitize';
     }
 
-
+    /**
+     * This method sets the internal flag which states that
+     * sanitisation is running
+     */
     public function setSatitisationRunning()
     {
         $this->satitisationRunning = true;
     }
 
-
+    /**
+     * This method sets the internal flag which states that
+     * sanitisation is NOT running.
+     *
+     * This method also purges the print cache.
+     */
     public function setSatitisationNotRunning()
     {
         $this->satitisationRunning = false;
         $this->purgePrintCache();
     }
 
+    /**
+     * This method returns true if sanitisation is running.
+     *
+     * @return bool
+     */
     public function getSatitisationState()
     {
         return $this->satitisationRunning;

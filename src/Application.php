@@ -35,12 +35,10 @@ if (file_exists(__DIR__.'/../vendor/autoload.php')) {
     include_once 'phar://sanitizer.phar/vendor/autoload.php';
 }
 
-
 use Pegasus\Application\Sanitizer\Sanitizer;
 use Pegasus\Application\Sanitizer\Version;
 use Pegasus\Application\Sanitizer\Validation;
 use Symfony\Component\Console\Application as ConsoleApp;
-
 
 $application = new Symfony\Component\Console\Application();
 $application->add(Sanitizer::getInstance());

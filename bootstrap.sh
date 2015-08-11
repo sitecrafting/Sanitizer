@@ -38,6 +38,4 @@ mysql -u root -ppassword sanitizer < /vagrant/sql/sanitizer.sql
 echo "Updating the store URL's to use part 8080"
 
 #Updating the URLs
-mysql -u root -ppassword -e "USE sanitizer; UPDATE core_config_data SET value = 'http://sanitizer.dev:8080/' WHERE value = 'http://www.phoneshopbysainsburys.co.uk/'";
-mysql -u root -ppassword -e "USE sanitizer; UPDATE core_config_data SET value = 'http://sanitizer.dev:8080/' WHERE value = 'https://sainsburysadmin.2020mobile.com/'";
-mysql -u root -ppassword -e "USE sanitizer; UPDATE core_config_data SET value = 'http://sanitizer.dev:8080/' WHERE value LIKE '%sanitizer.dev%' AND path LIKE '%base_url%'";
+mysql -u root -ppassword -e "USE sanitizer; UPDATE core_config_data SET value = 'http://sanitizer.dev:8080/' WHERE path IN ('web/unsecure/base_url', 'web/secure/base_url')"
