@@ -79,6 +79,12 @@ class Update extends AbstractTable
         return true;
     }
 
+    /**
+     * This method throws a SanitizerException is the each rule does not have a
+     * WHERE clause.
+     *
+     * @throws SanitizerException
+     */
     private function validateWhereClause()
     {
         foreach($this->getRules() as $rule)
@@ -94,6 +100,12 @@ class Update extends AbstractTable
         }
     }
 
+    /**
+     * This method throws TableException if the a rules column does
+     * not exist.
+     *
+     * @throws TableException
+     */
     private function checkAllRulesHaveColumnsWhichExist()
     {
         foreach($this->getRules() as $rule)
