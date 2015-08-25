@@ -229,6 +229,16 @@ class Config extends Object
     }
 
     /**
+     * This method returns the sanitizer config as an object
+     *
+     * @return Object
+     */
+    public function getGeneralConfig()
+    {
+        return new Object(parent::getGeneralConfig());
+    }
+
+    /**
      * Returns table data
      *
      * @return Object

@@ -69,6 +69,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 
 class Sanitizer extends Command implements TerminalPrinter
@@ -79,9 +80,14 @@ class Sanitizer extends Command implements TerminalPrinter
     const VERSION = '0.1.1beta';
 
     /**
-     * Default memory limit for this application is 2048M
+     * Default memory limit for this application is 1024M
      */
-    const DEFAULT_MEMORY = '2048M';
+    const DEFAULT_MEMORY = '1024M';
+
+    /**
+     * Default memory not set value
+     */
+    const DEFAULT_MEMORY_NOT_SET = '0';
 
     /**
      * Application configuration instance
@@ -138,6 +144,13 @@ class Sanitizer extends Command implements TerminalPrinter
      * @var Logger
      */
     protected $log = null;
+
+    /**
+     * Event dispatcher
+     *
+     * @var null
+     */
+    protected $eventDispatcher = null;
 
     /**
      * Retuns a Singleton instance of the sanitizer
@@ -220,7 +233,7 @@ class Sanitizer extends Command implements TerminalPrinter
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Memory - PHP format',
-                self::DEFAULT_MEMORY
+                self::DEFAULT_MEMORY_NOT_SET
             );
     }
 
@@ -258,9 +271,10 @@ class Sanitizer extends Command implements TerminalPrinter
     {
         $this->input    = $input;
         $this->output   = $output;
-        $this->setMemoryUsage();
+        //$this->getConfig();
+        $configMemory = $this->getConfig()->getGeneralConfig()->getMemory();
+        $this->setMemoryUsage($input->getOption('memory'), $configMemory, self::DEFAULT_MEMORY);
         $this->loadOutputStyles();
-        $this->getConfig();
         $this->getLog();
         $this->outputIntro();
         $this->renderOverviewTable();
@@ -270,12 +284,36 @@ class Sanitizer extends Command implements TerminalPrinter
 
     /**
      * This method sets the max memory for this PHP application
+     *
+     * @param string $memory    This is the memory from the command line
+     * @param string $configMemory  This is the memory limit from the config file
+     * @param string $defaultMemory     This is the default memory limit
      */
-    private function setMemoryUsage()
+    private function setMemoryUsage($memory, $configMemory, $defaultMemory)
     {
-        if (false == ini_set("memory_limit", $this->input->getOption('memory'))) {
-            ini_set("memory_limit", self::DEFAULT_MEMORY);
+        //If the memory has not been overridden in the command line options
+        if(self::DEFAULT_MEMORY_NOT_SET == $memory) {
+            $memory = $configMemory;
         }
+        //If the memory has come back as zero then we revert to the default
+        if(null == $memory || 0 == $memory) {
+            $memory = $defaultMemory;
+        }
+        if (false == ini_set("memory_limit", $memory)) {
+            ini_set("memory_limit", $defaultMemory);
+        }
+    }
+
+    /**
+     * This method returns an event dispatcher instance
+     *
+     * @return EventDispatcher
+     */
+    public function getEventDispatcher() {
+        if(null == $this->eventDispatcher) {
+            $this->eventDispatcher = new EventDispatcher();
+        }
+        return $this->eventDispatcher;
     }
 
     /**
@@ -283,8 +321,7 @@ class Sanitizer extends Command implements TerminalPrinter
      *
      * @return Logger
      */
-    public function getLog()
-    {
+    public function getLog() {
         if (null == $this->log) {
             $this->log = new Logger('Sanitizer');
             $this->log->pushHandler(new StreamHandler($this->getConfig()->getLogPath(), Logger::INFO));
@@ -306,22 +343,21 @@ class Sanitizer extends Command implements TerminalPrinter
         $engine = Engine::start(
             array
             (
-            'database_type' => $this->getConfig()->getDatabase()->getEngine(),
-            'database_name' => $this->getConfig()->getDatabase()->getDatabase(),
-            'server'        => $this->getConfig()->getDatabase()->getHost(),
-            'username'      => $this->getConfig()->getDatabase()->getUsername(),
-            'password'      => $this->getConfig()->getDatabase()->getPassword(),
-            'charset'       => 'utf8'
+                'database_type' => $this->getConfig()->getDatabase()->getEngine(),
+                'database_name' => $this->getConfig()->getDatabase()->getDatabase(),
+                'server'        => $this->getConfig()->getDatabase()->getHost(),
+                'username'      => $this->getConfig()->getDatabase()->getUsername(),
+                'password'      => $this->getConfig()->getDatabase()->getPassword(),
+                'charset'       => 'utf8'
             )
         );
-        TableCollection::setTerminalPrinter($this);
         TableCollection::setEngine($engine);
     }
 
 
     protected function sanitize()
     {
-        TableCollection::sanitizeTables();
+        TableCollection::sanitizeTables($this, $this);
     }
 
     public function loadOutputStyles()

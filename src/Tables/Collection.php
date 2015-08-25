@@ -31,8 +31,10 @@ namespace Pegasus\Application\Sanitizer\Tables;
 
 use Pegasus\Application\Sanitizer\Engine\Engine;
 use Pegasus\Application\Sanitizer\Engine\FatalEngineException;
+use Pegasus\Application\Sanitizer\Resource\Object;
 use Pegasus\Application\Sanitizer\Resource\SanitizerException;
 use Pegasus\Application\Sanitizer\Resource\TerminalPrinter;
+use Pegasus\Application\Sanitizer\Sanitizer;
 use Pegasus\Application\Sanitizer\Tables;
 
 class Collection
@@ -40,29 +42,16 @@ class Collection
     const KEY_TABLE_TYPE = 'type';
 
     private static $engine = null;
-
-    private static $printer = null;
     
     public static function setEngine(Engine $engine)
     {
-        if(null == $engine)
-        {
+        if (null == $engine) {
             throw new TableException("Someone has passed this table collection a null engine");
         }
         self::$engine = $engine;
     }
 
-    public static function setTerminalPrinter(TerminalPrinter $printer)
-    {
-        self::$printer = $printer;
-    }
-
-    private static function getTerminalPrinter()
-    {
-        return self::$printer;
-    }
-
-    public static function getCollection()
+    public static function getCollection(TerminalPrinter $printer)
     {
         static $collection  = null;
         $possibleTables     = 0;
@@ -70,38 +59,38 @@ class Collection
         if(null == $collection)
         {
             $collection     = array();
-            $tables         = self::getTerminalPrinter()->getConfig()->getTables();
+            $tables         = $printer->getConfig()->getTables();
             foreach ($tables as $tableName => $tableConfig)
             {
                 $possibleTables++;
                 try
                 {
-                    $collection[] = self::getTableInstance($tableName, $tableConfig);
-                    self::getTerminalPrinter()->printLn("Added $tableName to sanitise list ", 'notice');
+                    $collection[] = self::getTableInstance($tableName, $tableConfig, $printer);
+                    $printer->printLn("Added $tableName to sanitise list ", 'notice');
                     $totalAddedTables++;
                 }
                 catch(FatalEngineException $e)
                 {
-                    self::getTerminalPrinter()->printLn('Fatal: '.$e->getMessage(), 'fatal_error');
+                    $printer->printLn('Fatal: '.$e->getMessage(), 'fatal_error');
                     exit(-200);
                 }
                 catch(TableCommentException $e)
                 {
-                    self::getTerminalPrinter()->printLn($e->getMessage(), 'notice');
+                    $printer->printLn($e->getMessage(), 'notice');
                 }
                 catch(SanitizerException $e)
                 {
-                     self::getTerminalPrinter()->printLn($e->getMessage(), 'warning');
+                    $printer->printLn($e->getMessage(), 'warning');
                 }
             }
         }
-        self::getTerminalPrinter()->printLn("All Possible Tables = {$possibleTables}", 'notice');
-        self::getTerminalPrinter()->printLn("Queued Tables = {$totalAddedTables}", 'notice');
-        self::getTerminalPrinter()->printLn("Skipped Tables = ".($possibleTables - $totalAddedTables), 'notice');
+        $printer->printLn("All Possible Tables = {$possibleTables}", 'notice');
+        $printer->printLn("Queued Tables = {$totalAddedTables}", 'notice');
+        $printer->printLn("Skipped Tables = ".($possibleTables - $totalAddedTables), 'notice');
         return $collection;
     }
 
-    private static function getTableInstance($tableName, array $tableConfig)
+    private static function getTableInstance($tableName, array $tableConfig, TerminalPrinter $printer)
     {
         /* we default the type to flat */
         $table = null;
@@ -136,7 +125,7 @@ class Collection
         {
             $table = new Flat(self::$engine);
         }
-        $table->setTerminalPrinter(self::getTerminalPrinter());
+        $table->setTerminalPrinter($printer);
         $table->setTableName($tableName);
         $valid = $table->setTableData($tableConfig);
         return (true == $valid) ? $table : $valid;
@@ -145,20 +134,20 @@ class Collection
     /**
      * This method iterates over the tables.
      */
-    public static function sanitizeTables()
+    public static function sanitizeTables(Sanitizer $sanitizer, TerminalPrinter $printer)
     {
-        if(null == self::$engine)
-        {
+        if (null == self::$engine) {
             throw new TableException("Someone has moved the Engine, I can't find it!");
         }
-        $sanitizer = self::getTerminalPrinter();
-        if(null == $sanitizer)
-        {
+        if (null == $sanitizer) {
             throw new TableException("There seems to be a glitch with the Sanitizer instance matrix!, I just can't find it!");
         }
+        if (null == $printer) {
+            $printer = new Object();
+        }
         $sanitizer->setSatitisationRunning();
-        $sanitized = array();
-        $tables = self::getCollection();
+        $sanitized  = array();
+        $tables     = self::getCollection($printer);
         if('sanitize' == $sanitizer->getMode())
         {
             $sanitizer->startProgressBar(sizeof($tables));
@@ -177,18 +166,18 @@ class Collection
             }
             $sanitizer->setSatitisationNotRunning();
             $sanitizer->advanceProgressFinish();
-            $sanitizer->printLn("\n");
+            $printer->printLn("\n");
             foreach($sanitized as $san)
             {
-                $sanitizer->printLn($san, 'notice');
+                $printer->printLn($san, 'notice');
             }
         }
         else
         {
-            $sanitizer->printLn($sanitizer->getMode().' mode selected, exiting before sanitisation', 'general');
+            $printer->printLn($sanitizer->getMode().' mode selected, exiting before sanitisation', 'general');
         }
         $sanitizer->setSatitisationNotRunning();
-        $sanitizer->printLn("Sanitizer finished!");
+        $printer->printLn("Sanitizer finished!");
     }
 
 }
