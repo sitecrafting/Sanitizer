@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -46,7 +45,7 @@ class Update extends AbstractTable
     /**
      * Method to set the table data and have each class set up its own instance based on that data.
      *
-     * @param array $tableData
+     * @param  array $tableData
      * @return mixed
      * @throws TableException when column type could not be found.
      */
@@ -62,8 +61,7 @@ class Update extends AbstractTable
         $rules = array();
         foreach ($tableData['rules'] as $rule) {
             $rule = new Object($rule);
-            if(null == $rule->getDataType())
-            {
+            if(null == $rule->getDataType()) {
                 $rule->setDataType('text');
             }
             $rule->setColumnTypeInstance($this->getInstanceFromType($rule->getDataType(), $rule->getData()));
@@ -101,12 +99,10 @@ class Update extends AbstractTable
     {
         foreach ($this->getRules() as $rule) {
             $column = $rule->getColumnTypeInstance();
-            if(null == $column)
-            {
+            if(null == $column) {
                 throw new TableException("Column instance not found in table {$this->getTableName()} for rule {$rule->getValue()}");
             }
-            if(false == $column->exists())
-            {
+            if(false == $column->exists()) {
                 throw new TableException("Column not find column {$column->getName()} for {$this->getTableName()} ");
             }
         }

@@ -44,33 +44,27 @@ use Pegasus\Application\Sanitizer\Table\Tables\Update;
 
 class Factory
 {
-    public function getInstance($tableName, array $tableConfig, TerminalPrinter $printer, EngineInterface $engine)
+    public function getInstance($tableName, array $tableConfig, TerminalPrinter $printer, EngineInterface $engine) 
     {
         /* we default the type to flat */
         $table = null;
-
         /* Type has NOT been set in the config */
-        if(true == isset($tableConfig[AbstractTable::KEY_TABLE_TYPE]))
-        {
+        if(true == isset($tableConfig[AbstractTable::KEY_TABLE_TYPE])) {
             $columnType = $tableConfig[AbstractTable::KEY_TABLE_TYPE];
-            switch($columnType)
-            {
-                case Eav::getType() :
-                {
-                    $table = new Eav($engine);
+            switch($columnType) {
+            case Eav::getType() : {
+                $table = new Eav($engine);
                     break;
                 }
 
-                case Update::getType() :
-                {
-                    $table = new Update($engine);
+            case Update::getType() : {
+                $table = new Update($engine);
                     break;
                 }
                 /*
                  * Space for different types
                  */
-                default : /* type not found */
-                {
+            default : { /* type not found */
                     throw new TableColumnTypeException("Column type '{$columnType}' not valid for table {$tableName}");
                 }
             }

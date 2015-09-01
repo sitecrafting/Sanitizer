@@ -1,7 +1,6 @@
 <?php
 
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>

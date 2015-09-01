@@ -50,7 +50,8 @@ class Basic extends Event
      *
      * @param array|null $data
      */
-    public function __construct(array $data=null) {
+    public function __construct(array $data=null) 
+    {
         if (null != $data) {
             $this->values = $data;
         }
@@ -61,15 +62,16 @@ class Basic extends Event
      *
      * @return array|null
      */
-    public function getValues() {
+    public function getValues() 
+    {
         return $this->values;
     }
 
     /**
      * This method sets a value identified by the key
      *
-     * @param $key      Is the key used to set and extract the value
-     * @param $value    Is the value to be stored
+     * @param  $key      Is the key used to set and extract the value
+     * @param  $value    Is the value to be stored
      * @return bool     If the key already exists
      * @throws \Exception If the key already exists
      */
@@ -85,7 +87,7 @@ class Basic extends Event
     /**
      * This method returns the value identified by the key
      *
-     * @param $key      Used to identify the value
+     * @param  $key      Used to identify the value
      * @return mixed    The value
      * @throws \Exception If the value could not be found
      */

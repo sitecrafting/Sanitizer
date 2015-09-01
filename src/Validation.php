@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -128,8 +127,7 @@ class Validation extends Sanitizer
                 InputOption::VALUE_OPTIONAL,
                 'Memory - PHP format',
                 '2048M'
-            )
-        ;
+            );
     }
 
     /**
@@ -151,8 +149,7 @@ class Validation extends Sanitizer
 
     public function getLog()
     {
-        if(null == $this->log)
-        {
+        if(null == $this->log) {
             $this->log = new Logger('Validation');
             $this->log->pushHandler(new StreamHandler($this->getConfig()->getLogPath(), Logger::INFO));
         }
@@ -165,8 +162,7 @@ class Validation extends Sanitizer
     protected function outputIntro()
     {
         $this->printLn("Config Validation Mode", 'notice');
-        if(true == $this->getConfig()->getIsInDeveloperMode() || $this->getConfig()->getIsInDeveloperMode() == OutputInterface::VERBOSITY_VERY_VERBOSE)
-        {
+        if(true == $this->getConfig()->getIsInDeveloperMode() || $this->getConfig()->getIsInDeveloperMode() == OutputInterface::VERBOSITY_VERY_VERBOSE) {
             $this->printLn("App is in developer mode, therefore all output will be shown!", 'warning');
             $this->printLn("Verbosity ".$this->output->getVerbosity(), 'warning');
         }
@@ -215,8 +211,7 @@ class Validation extends Sanitizer
      */
     public static function getInstance()
     {
-        if(null == self::$validator)
-        {
+        if(null == self::$validator) {
             self::$validator = new Validation();
         }
         return self::$validator;

@@ -41,7 +41,7 @@ interface EngineInterface
     /**
      * Returns true if the table name exists in the database
      *
-     * @param $tableName
+     * @param  $tableName
      * @return bool if found, false otherwise
      * @throws FatalEngineException if an error occurred
      */
@@ -50,8 +50,8 @@ interface EngineInterface
     /**
      * Returns true if the column exists in the table
      *
-     * @param $tableName
-     * @param $columnName
+     * @param  $tableName
+     * @param  $columnName
      * @return bool if found, false otherwise
      * @throws FatalEngineException if an error occurred
      */
@@ -60,7 +60,7 @@ interface EngineInterface
     /**
      * Returns the name of the primary key column
      *
-     * @param $tableName Is the name of the table to extract the primary key from
+     * @param  $tableName Is the name of the table to extract the primary key from
      * @return string primary key column name
      * @throws EngineException if the primary key was not found in the returned data.
      * @throws FatalEngineException  if an error occurred
@@ -70,7 +70,7 @@ interface EngineInterface
     /**
      *  Log the error
      *
-     * @param null $query
+     * @param  null $query
      * @return mixed
      */
     public function logError($query=null);

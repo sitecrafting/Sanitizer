@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -32,13 +31,13 @@ class MySqlEngine extends Engine
 {
     public function getEngineName()
     {
-       return 'mysql';
+        return 'mysql';
     }
 
     /**
      * Returns true if the table name exists in the database
      *
-     * @param $tableName
+     * @param  $tableName
      * @return bool if found, false otherwise
      * @throws FatalEngineException if an error occurred
      */
@@ -47,8 +46,7 @@ class MySqlEngine extends Engine
         /* @var $result PDOStatement */
         $query = "SHOW TABLES LIKE '{$tableName}'";
         $result = $this->query($query);
-        if(false == $result)
-        {
+        if(false == $result) {
             $this->logError($query);
             throw new FatalEngineException("Table exists check failed, error logged");
         }
@@ -59,8 +57,8 @@ class MySqlEngine extends Engine
     /**
      * Returns true if the column exists in the table
      *
-     * @param $tableName
-     * @param $columnName
+     * @param  $tableName
+     * @param  $columnName
      * @return bool if found, false otherwise
      * @throws FatalEngineException if an error occurred
      */
@@ -68,8 +66,7 @@ class MySqlEngine extends Engine
     {
         $query = "SHOW COLUMNS FROM `{$tableName}` LIKE '{$columnName}'";
         $result = $this->query($query);
-        if(false == $result)
-        {
+        if(false == $result) {
             $this->logError($query);
             throw new FatalEngineException("Column check failed, error logged");
         }
@@ -80,7 +77,7 @@ class MySqlEngine extends Engine
     /**
      * Returns the name of the primary key column
      *
-     * @param $tableName Is the name of the table to extract the primary key from
+     * @param  $tableName Is the name of the table to extract the primary key from
      * @return string primary key column name
      * @throws EngineException if the primary key was not found in the returned data.
      * @throws FatalEngineException  if an error occurred
@@ -89,14 +86,12 @@ class MySqlEngine extends Engine
     {
         $sql = "SHOW KEYS FROM `{$tableName}` WHERE Key_name = 'PRIMARY'";
         $result = $this->query($sql);
-        if(false == $result)
-        {
+        if(false == $result) {
             $this->logError($sql);
             throw new FatalEngineException("Primary key extraction failed error logged");
         }
         $result = $result->fetch();
-        if(false == isset($result['Column_name']))
-        {
+        if(false == isset($result['Column_name'])) {
             throw new EngineException("Primary key could not be found for table '{$tableName}'");
         }
         return $result['Column_name'];

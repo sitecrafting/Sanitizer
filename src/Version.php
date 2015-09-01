@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -67,8 +66,7 @@ class Version extends Sanitizer
     public static function getInstance()
     {
         static $version = null;
-        if(null == $version)
-        {
+        if(null == $version) {
             $version = new Version();
         }
         return $version;

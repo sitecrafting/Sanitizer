@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -61,8 +60,7 @@ class Config extends Object
 
     public function __construct($configFile)
     {
-        if(false == file_exists($configFile))
-        {
+        if(false == file_exists($configFile)) {
             throw new ConfigException("Sadly I couldn't validate the config file {$configFile} because it doesn't exist!");
         }
         $parsed = json_decode(file_get_contents($configFile), true);
@@ -72,13 +70,11 @@ class Config extends Object
     /**
      * This method overrides the default values from command line options if the options are different to the default.
      *
-     *
      * @param $data
      */
     public function setDatabaseOverride($data)
     {
-        if(false == isset($this->data['database']))
-        {
+        if(false == isset($this->data['database'])) {
             $this->data['database'] = array();
         }
 
@@ -86,74 +82,65 @@ class Config extends Object
 
         foreach($data as $configOverride)
         {
-            if(2 == sizeof($configOverride))
-            {
-                if(null != $configOverride[0] && null != $configOverride[1])
-                {
+            if(2 == sizeof($configOverride)) {
+                if(null != $configOverride[0] && null != $configOverride[1]) {
                     $key = strtolower($configOverride[0]);
                     switch($key)
                     {
-                        case 'password' :
+                    case 'password' :
                         {
-                            //If the input has been changed by the user then we should use it
-                            if($configOverride[1] != self::INPUT_PASSWORD_DEFAULT)
-                            {
-                                $this->data['database'][$key] = $configOverride[1];
-                            }
+                        //If the input has been changed by the user then we should use it
+                        if($configOverride[1] != self::INPUT_PASSWORD_DEFAULT) {
+                            $this->data['database'][$key] = $configOverride[1];
+                        }
                             break;
                         }
-                        case 'engine' :
+                    case 'engine' :
                         {
-                            //If the input has been changed by the user then we should use it
-                            if($configOverride[1] != self::INPUT_ENGINE)
-                            {
-                                $this->data['database'][$key] = $configOverride[1];
-                            }
+                        //If the input has been changed by the user then we should use it
+                        if($configOverride[1] != self::INPUT_ENGINE) {
+                            $this->data['database'][$key] = $configOverride[1];
+                        }
                             break;
                         }
-                        case 'config' :
+                    case 'config' :
                         {
-                            //If the input has been changed by the user then we should use it
-                            if($configOverride[1] != self::INPUT_CONFIGURATION_FILE)
-                            {
-                                $this->data['database'][$key] = $configOverride[1];
-                            }
+                        //If the input has been changed by the user then we should use it
+                        if($configOverride[1] != self::INPUT_CONFIGURATION_FILE) {
+                            $this->data['database'][$key] = $configOverride[1];
+                        }
                             break;
                         }
-                        case 'username' :
+                    case 'username' :
                         {
-                            //If the input has been changed by the user then we should use it
-                            if($configOverride[1] != self::INPUT_USER)
-                            {
-                                $this->data['database'][$key] = $configOverride[1];
-                            }
+                        //If the input has been changed by the user then we should use it
+                        if($configOverride[1] != self::INPUT_USER) {
+                            $this->data['database'][$key] = $configOverride[1];
+                        }
                             break;
                         }
-                        case 'host' :
+                    case 'host' :
                         {
-                            //If the input has been changed by the user then we should use it
-                            if($configOverride[1] != self::INPUT_HOST)
-                            {
-                                $this->data['database'][$key] = $configOverride[1];
-                            }
+                        //If the input has been changed by the user then we should use it
+                        if($configOverride[1] != self::INPUT_HOST) {
+                            $this->data['database'][$key] = $configOverride[1];
+                        }
                             break;
                         }
-                        case 'database' :
+                    case 'database' :
                         {
-                            //If the input has been changed by the user then we should use it
-                            if($configOverride[1] != self::INPUT_DATABASE)
-                            {
-                                $this->data['database'][$key] = $configOverride[1];
-                            }
+                        //If the input has been changed by the user then we should use it
+                        if($configOverride[1] != self::INPUT_DATABASE) {
+                            $this->data['database'][$key] = $configOverride[1];
+                        }
                             break;
                         }
-                        case 'mode' :
+                    case 'mode' :
                         {
-                            //If the input has been changed by the user then we should use it
-                            if($configOverride[1] != self::INPUT_DATABASE)
-                            {
-                                $this->data['database']['sanitization_mode'] = $configOverride[1];
-                            }
+                        //If the input has been changed by the user then we should use it
+                        if($configOverride[1] != self::INPUT_DATABASE) {
+                            $this->data['database']['sanitization_mode'] = $configOverride[1];
+                        }
                             break;
                         }
                     }
@@ -172,32 +159,25 @@ class Config extends Object
      */
     private function databaseConfigInitialise()
     {
-        if(false == isset($this->data['database']['engine']))
-        {
+        if(false == isset($this->data['database']['engine'])) {
             $this->data['database']['engine'] = self::INPUT_ENGINE;
         }
-        if(false == isset($this->data['database']['password']))
-        {
+        if(false == isset($this->data['database']['password'])) {
             $this->data['database']['password'] = self::INPUT_PASSWORD_DEFAULT;
         }
-        if(false == isset($this->data['database']['config']))
-        {
+        if(false == isset($this->data['database']['config'])) {
             $this->data['database']['config'] = self::INPUT_CONFIGURATION_FILE;
         }
-        if(false == isset($this->data['database']['database']))
-        {
+        if(false == isset($this->data['database']['database'])) {
             $this->data['database']['database'] = self::INPUT_DATABASE;
         }
-        if(false == isset($this->data['database']['host']))
-        {
+        if(false == isset($this->data['database']['host'])) {
             $this->data['database']['host'] = self::INPUT_HOST;
         }
-        if(false == isset($this->data['database']['username']))
-        {
+        if(false == isset($this->data['database']['username'])) {
             $this->data['database']['username'] = self::INPUT_USER;
         }
-        if(false == isset($this->data['database']['sanitization_mode']))
-        {
+        if(false == isset($this->data['database']['sanitization_mode'])) {
             $this->data['database']['sanitization_mode'] = self::INPUT_MODE;
         }
     }
@@ -208,12 +188,10 @@ class Config extends Object
      */
     public function getIsInDeveloperMode()
     {
-        if(false == isset($this->data['developer_mode']))
-        {
+        if(false == isset($this->data['developer_mode'])) {
             return false;
         }
-        if('yes' == $this->data['developer_mode'])
-        {
+        if('yes' == $this->data['developer_mode']) {
             return true;
         }
         return false;
@@ -226,12 +204,10 @@ class Config extends Object
      */
     public function getDatabase()
     {
-        if(null == $this->database)
-        {
+        if(null == $this->database) {
             $this->database = new Object($this->data['database']);
             $this->database->setDatabaseName($this->database->getDatabase());
-            if(null == $this->database->getSanitizationMode())
-            {
+            if(null == $this->database->getSanitizationMode()) {
                 $this->database->setSanitizationMode('full');
             }
         }
@@ -264,8 +240,7 @@ class Config extends Object
      */
     public function getLogPath()
     {
-        if(null == parent::getLogPath())
-        {
+        if(null == parent::getLogPath()) {
             parent::setLogPath('sanitizer.log');
         }
         return parent::getLogPath();

@@ -41,11 +41,11 @@
  * Date: 18/05/15
  * Time: 12:50
  *
- * @category    Pegasus_Utilities
- * @package     Sanitizer
- * @license     MIT
- * @link        http://pegasus-commerce.com
- * @author      Philip Elson <phil@pegasus-commerce.com>
+ * @category Pegasus_Utilities
+ * @package  Sanitizer
+ * @license  MIT
+ * @link     http://pegasus-commerce.com
+ * @author   Philip Elson <phil@pegasus-commerce.com>
  *
  * http://symfony.com/doc/current/components/console/introduction.html
  */
@@ -287,9 +287,9 @@ class Sanitizer extends Command implements TerminalPrinter
     /**
      * This method sets the max memory for this PHP application
      *
-     * @param string $memory    This is the memory from the command line
+     * @param string $memory        This is the memory from the command line
      * @param string $configMemory  This is the memory limit from the config file
-     * @param string $defaultMemory     This is the default memory limit
+     * @param string $defaultMemory This is the default memory limit
      */
     private function setMemoryUsage($memory, $configMemory, $defaultMemory)
     {
@@ -311,7 +311,8 @@ class Sanitizer extends Command implements TerminalPrinter
      *
      * @return EventDispatcher
      */
-    public function getEventDispatcher() {
+    public function getEventDispatcher() 
+    {
         if(null == $this->eventDispatcher) {
             $this->eventDispatcher = new EventDispatcher();
         }
@@ -323,7 +324,8 @@ class Sanitizer extends Command implements TerminalPrinter
      *
      * @return Logger
      */
-    public function getLog() {
+    public function getLog() 
+    {
         if (null == $this->log) {
             $this->log = new Logger('Sanitizer');
             $this->log->pushHandler(new StreamHandler($this->getConfig()->getLogPath(), Logger::INFO));
@@ -342,17 +344,19 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     private function loadDatabaseEngine()
     {
-        $this->setEngine(Engine::start(
-            array
-            (
+        $this->setEngine(
+            Engine::start(
+                array
+                (
                 'database_type' => $this->getConfig()->getDatabase()->getEngine(),
                 'database_name' => $this->getConfig()->getDatabase()->getDatabase(),
                 'server'        => $this->getConfig()->getDatabase()->getHost(),
                 'username'      => $this->getConfig()->getDatabase()->getUsername(),
                 'password'      => $this->getConfig()->getDatabase()->getPassword(),
                 'charset'       => 'utf8'
+                )
             )
-        ));
+        );
     }
 
     public function loadOutputStyles()
@@ -457,40 +461,40 @@ class Sanitizer extends Command implements TerminalPrinter
                 {
                 $this->output->writeLn($message);
                     break;
-                }
+            }
             case 'general' :
                 {
                 if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERY_VERBOSE)) {
                     $this->output->writeLn($this->formatMessage($type, $message));
                 }
                     break;
-                }
+            }
             case 'warning' :
                 {
                 if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERBOSE)) {
                     $this->output->writeLn($this->formatMessage($type, $message));
                 }
                     break;
-                }
+            }
             case 'notice' :
                 {
                 if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERY_VERBOSE)) {
                     $this->output->writeLn($this->formatMessage($type, $message));
                 }
                     break;
-                }
+            }
             case 'normal' :
                 {
                 if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_NORMAL)) {
                     $this->output->writeLn($message);
                 }
                     break;
-                }
+            }
             case 'fatal_error' :
                 {
                 $this->output->writeLn($this->formatMessage($type, $message), 'warning');
                     break;
-                }
+            }
             }
         }
         $this->printCache = array();
@@ -568,8 +572,8 @@ class Sanitizer extends Command implements TerminalPrinter
     /**
      * Starts the progress bar and sets its width to $width
      *
-     * @param $count is the count so far.
-     * @param $width is the width of the bar.
+     * @param  $count is the count so far.
+     * @param  $width is the width of the bar.
      * @return $this
      */
     public function startProgressBar($count, $width=100)
@@ -646,14 +650,16 @@ class Sanitizer extends Command implements TerminalPrinter
         return $tableData;
     }
 
-    public function getEngine() {
+    public function getEngine() 
+    {
         if (null == $this->_engine) {
             throw new TableException("Someone has moved the Engine, I can't find it!");
         }
         return $this->_engine;
     }
 
-    public function setEngine(EngineInterface $engine) {
+    public function setEngine(EngineInterface $engine) 
+    {
         $this->_engine = $engine;
     }
 
@@ -675,15 +681,13 @@ class Sanitizer extends Command implements TerminalPrinter
             $this->setSatitisationNotRunning();
             return;
         }
-        if('sanitize' == $this->getMode())
-        {
+        if('sanitize' == $this->getMode()) {
             $this->startProgressBar($collection->getSize());
             foreach($tables as $table)
             {
                 $table->setIsQuickSanitisation($quick);
                 $rows = $table->sanitize($quick);
-                if(true == $table->doCommand())
-                {
+                if(true == $table->doCommand()) {
                     $sanitized[] = "{$table->getCommand()} applied to {$table->getTableName()} and effected {$rows} rows";
                 }
                 else

@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -25,7 +24,6 @@
  *
  * Date: 18/05/15
  * Time: 12:42
- *
  */
 namespace Pegasus\Application\Sanitizer\Table;
 
@@ -41,19 +39,18 @@ class Collection
 {
     private $_engine                = null;
 
-    private $_sanitizer             = null;
-
     private $_possibleTableCount    = 0;
 
     private $_addedTableCount       = 0;
 
     private $_collection            = null;
 
-    public function __construct(EngineInterface $engine) {
+    public function __construct(EngineInterface $engine) 
+    {
         $this->setEngine($engine);
     }
 
-    public function setEngine(EngineInterface $engine)
+    public function setEngine(EngineInterface $engine) 
     {
         if (null == $engine) {
             throw new TableException("Someone has passed this table collection a null engine");
@@ -61,7 +58,7 @@ class Collection
         $this->_engine = $engine;
     }
 
-    public function getEngine()
+    public function getEngine() 
     {
         if (null == $this->_engine) {
             throw new TableException("Engine can't be found!..");
@@ -69,39 +66,31 @@ class Collection
         return $this->_engine;
     }
 
-    public function getSize() {
-        if(null == $this->_collection) {
+    public function getSize() 
+    {
+        if (null == $this->_collection) {
             return 0;
         }
         return sizeof($this->_collection);
     }
 
-    public function getCollection(TerminalPrinter $printer)
+    public function getCollection(TerminalPrinter $printer) 
     {
-        if(null == $this->_collection)
-        {
+        if (null == $this->_collection) {
             $this->_collection      = array();
             $tables                 = $printer->getConfig()->getTables();
-            foreach ($tables as $tableName => $tableConfig)
-            {
+            foreach ($tables as $tableName => $tableConfig) {
                 $this->_possibleTableCount++;
-                try
-                {
+                try {
                     $this->_collection[] = Factory::getInstance($tableName, $tableConfig, $printer, $this->getEngine());
                     $printer->printLn("Added $tableName to sanitise list ", 'notice');
                     $this->_addedTableCount++;
-                }
-                catch(FatalEngineException $e)
-                {
+                } catch(FatalEngineException $e) {
                     $printer->printLn('Fatal: '.$e->getMessage(), 'fatal_error');
                     exit(-200);
-                }
-                catch(TableCommentException $e)
-                {
+                } catch(TableCommentException $e) {
                     $printer->printLn($e->getMessage(), 'notice');
-                }
-                catch(SanitizerException $e)
-                {
+                } catch(SanitizerException $e) {
                     $printer->printLn($e->getMessage(), 'warning');
                 }
             }
@@ -112,15 +101,18 @@ class Collection
         return $this->_collection;
     }
 
-    public function getPossibleTableCount() {
+    public function getPossibleTableCount() 
+    {
         return $this->_possibleTableCount;
     }
 
-    public function getAddedTableCount() {
+    public function getAddedTableCount() 
+    {
         return $this->_addedTableCount;
     }
 
-    public function getSomeTablesAreBeingSkipped() {
+    public function getSomeTablesAreBeingSkipped() 
+    {
         return $this->getAddedTableCount() != $this->getPossibleTableCount();
     }
 }

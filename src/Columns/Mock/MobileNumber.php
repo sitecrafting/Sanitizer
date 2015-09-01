@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -40,8 +39,7 @@ class MobileNumber extends AbstractMockData
     public function getValues()
     {
         static $numbers = null;
-        if(null === $numbers)
-        {
+        if(null === $numbers) {
             $numbers = array();
             for($ii = 0; $ii < 10; $ii++)
             {

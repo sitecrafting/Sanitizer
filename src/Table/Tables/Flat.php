@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -44,27 +43,24 @@ class Flat extends AbstractTable
     /**
      * Method to set the table data and have each class set up its own instance based on that data.
      *
-     * @param array $tableData
+     * @param  array $tableData
      * @return mixed
      * @throws TableException when column type could not be found.
      */
     function setTableData(array $tableData)
     {
         parent::setTableData($tableData);
-        if(true == $this->doCommand())
-        {
+        if(true == $this->doCommand()) {
             return true;
         }
 
-        if(true == $this->skip($tableData))
-        {
+        if(true == $this->skip($tableData)) {
             return false;
         }
         $this->loadColumnInstances($tableData);
         foreach($this->getColumns() as $column)
         {
-            if(false == $column->exists())
-            {
+            if(false == $column->exists()) {
                 $db = $this->getTerminalPrinter()->getConfig()->getDatabase()->getDatabaseName();
                 throw new TableException("Column '{$column->getName()}' in table '{$this->getTableName()}' not found in database '{$db}'");
             }
@@ -76,17 +72,14 @@ class Flat extends AbstractTable
     {
         foreach($tableData as $columnData)
         {
-            if(false == isset($columnData[self::FIELD_COLUMN]))
-            {
+            if(false == isset($columnData[self::FIELD_COLUMN])) {
                 $data = $columnData;
-                if(true == is_array($columnData))
-                {
+                if(true == is_array($columnData)) {
                     $data = implode(',', $columnData);
                 }
                 throw new TableException("No column name could be found by on table '{$this->getTableName()}' for data ".$data);
             }
-            if(true == isset($columnData[self::FIELD_DATA_TYPE]))
-            {
+            if(true == isset($columnData[self::FIELD_DATA_TYPE])) {
                 $configDataType = $columnData[self::FIELD_DATA_TYPE];
                 $this->addColumn($this->getInstanceFromType($configDataType, $columnData));
             }
@@ -96,7 +89,7 @@ class Flat extends AbstractTable
     /**
      * Returns true to skip.
      *
-     * @param $tableData
+     * @param  $tableData
      * @return bool
      */
     private function skip($tableData)
@@ -122,8 +115,7 @@ class Flat extends AbstractTable
             return $rowsEffected;
         }
         $columns = $this->getColumnsForEngineQuery();
-        if(true == $this->getIsQuickSanitisation())
-        {
+        if(true == $this->getIsQuickSanitisation()) {
             $printer->printLn("Sanitizing Flat {$this->getTableName()}", 'notice');
             $rows = $this->getEngine()->update($this->getTableName(), $columns);
             $printer->printLn("Sanitized Flat {$this->getTableName()}", 'notice');

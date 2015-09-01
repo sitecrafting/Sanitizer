@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -40,8 +39,7 @@ class Email extends AbstractMockData
     public function getValues()
     {
         static $emails = null;
-        if(null == $emails)
-        {
+        if(null == $emails) {
             $firstNames     = new FirstName();
             $lastNames      = new LastName();
             $tlds           = array('gmail.com', 'gotmail.com', 'woosa.com', 'notanaddress.com');

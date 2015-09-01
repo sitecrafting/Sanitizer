@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -25,7 +24,6 @@
  *
  * Date: 18/05/15
  * Time: 12:42
- *
  */
 namespace Pegasus\Application\Sanitizer\Columns\Mock;
 

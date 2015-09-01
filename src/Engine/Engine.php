@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -39,28 +38,26 @@ abstract class Engine extends medoo implements EngineInterface
     /**
      * Start your engines,  method is used to initialise the object
      *
-     * @param $config
+     * @param  $config
      * @return EngineInterface
      * @throws EngineNotFoundException
      * @throws \Exception
      */
     public static function start($config)
     {
-        if(null == self::$engine)
-        {
-            if (false == isset($config['database_type']))
-            {
+        if(null == self::$engine) {
+            if (false == isset($config['database_type'])) {
                 throw new SanitizerException("Engine Type/Name not found in Engine start parameters");
             }
             $engineName = $config['database_type'];
             switch ($engineName)
             {
-                case 'mysql' :
+            case 'mysql' :
                 {
-                    self::$engine = new MySqlEngine($config);
+                self::$engine = new MySqlEngine($config);
                     break;
                 }
-                default :
+            default :
                 {
                     throw new EngineNotFoundException("Engine {$engineName} has done a runner!");
                     break;
@@ -73,13 +70,11 @@ abstract class Engine extends medoo implements EngineInterface
     public function logError($query=null)
     {
         $error = $this->error();
-        if(false == is_array($error))
-        {
+        if(false == is_array($error)) {
             $error = array($error);
         }
         Sanitizer::getInstance()->getLog()->addInfo('Fetch Error', $error);
-        if(null != $query)
-        {
+        if(null != $query) {
             Sanitizer::getInstance()->getLog()->log->addInfo('Fetch Error Additional Info', array('info' => $query));
         }
     }

@@ -1,6 +1,5 @@
 <?php
  /**
- *  
  * The MIT License (MIT)
  * 
  * Copyright (c) 2015  Philip Elson <phil@pegasus-commerce.com>
@@ -25,7 +24,6 @@
  *
  * Date: 21/05/15
  * Time: 11:34
- *
  */
 namespace Pegasus\Application\Sanitizer\IO;
 

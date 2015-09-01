@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -42,14 +41,13 @@ class Eav extends AbstractTable
     /**
      * Method to set the table data and have each class set up its own instance based on that data.
      *
-     * @param array $tableData
+     * @param  array $tableData
      * @return mixed
      */
     function setTableData(array $tableData)
     {
         parent::setTableData($tableData);
-        if(true == $this->doCommand())
-        {
+        if(true == $this->doCommand()) {
             return true;
         }
         $this->setColumn($this->getColumnFromTableData($tableData));
@@ -63,8 +61,7 @@ class Eav extends AbstractTable
 
     public function getDataTypeFromTableData($tableData)
     {
-        if(true == isset($tableData['data_type']))
-        {
+        if(true == isset($tableData['data_type'])) {
             return $tableData['data_type'];
         }
         return 'text';
@@ -72,8 +69,7 @@ class Eav extends AbstractTable
 
     public function getColumnFromTableData($tableData)
     {
-        if(false == isset($tableData['column']))
-        {
+        if(false == isset($tableData['column'])) {
             throw new TableException('Column name not defined for EAV table '.$this->getTableName());
         }
         return $tableData['column'];
@@ -81,8 +77,7 @@ class Eav extends AbstractTable
 
     private function configureEavColumn($column, $tableData)
     {
-        if(false == isset($tableData['control_column']))
-        {
+        if(false == isset($tableData['control_column'])) {
             throw new TableException("Control column undefined for column '{$column->getName()}' on table '{$this->getTableName()}'");
         }
         $controlColumn = new Object($tableData['control_column']);
@@ -93,8 +88,7 @@ class Eav extends AbstractTable
     {
         $rows = 0;
         $rowsEffected = $this->hasExecutedCommand();
-        if(false !== $rowsEffected)
-        {
+        if(false !== $rowsEffected) {
             return $rowsEffected;
         }
         foreach($this->getColumns() as $column)
@@ -104,11 +98,9 @@ class Eav extends AbstractTable
             foreach($controlColumn->getValues() as $subsetIndex => $source)
             {
                 $source = new MockData($source);
-                if(null != $source->getMockModel())
-                {
+                if(null != $source->getMockModel()) {
                     $modelName      = $source->getMockModel();
-                    if(false == class_exists($modelName))
-                    {
+                    if(false == class_exists($modelName)) {
                         throw new TableException("Unable to find Mock Model with the name '{$modelName}' in table '{$this->getTableName()}' with row id '{$subsetIndex}' ");
                     }
                     $model          = new $modelName();
@@ -118,8 +110,7 @@ class Eav extends AbstractTable
                 {
                     $this->getTerminalPrinter()->printLn("No Mock Model configuration found for EAV column '{$controlColumn->getName()}'  with row id '{$subsetIndex}' in table '{$this->getTableName()}'", 'notice');
                 }
-                if(null != $source->getComment())
-                {
+                if(null != $source->getComment()) {
                     $this->getTerminalPrinter()->printLn("Comment[{$this->getTableName()}][{$controlColumn->getName()}]: {$source->getComment()}", 'general');
                 }
             }
@@ -131,8 +122,7 @@ class Eav extends AbstractTable
 
     private function sanitizeSubset($tableName, $controlColumnName, $subsetIndex, $columnName, $mockModel)
     {
-        if(true == $this->getIsQuickSanitisation())
-        {
+        if(true == $this->getIsQuickSanitisation()) {
             return $this->getEngine()->update($tableName, array($columnName => $mockModel->getRandomValue()), array($controlColumnName => $subsetIndex));
         }
         else
