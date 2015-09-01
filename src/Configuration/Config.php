@@ -47,6 +47,16 @@ class Config extends Object
 
     const INPUT_MODE                    = 'full';
 
+    /**
+     * Full sanitisation mode
+     */
+    const SANITIZATION_MODE_FULL        = 'full';
+
+    /**
+     * Quick sanitisation mode
+     */
+    const SANITIZATION_MODE_QUICK        = 'quick';
+
     private $database = null;
 
     public function __construct($configFile)

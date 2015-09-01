@@ -26,7 +26,7 @@
  * Date: 18/05/15
  * Time: 12:42
  */
-namespace Pegasus\Application\Sanitizer\Tables;
+namespace Pegasus\Application\Sanitizer\Table\Tables;
 
 use Pegasus\Application\Sanitizer\Columns\Types;
 
@@ -101,8 +101,7 @@ class Flat extends AbstractTable
      */
     private function skip($tableData)
     {
-        if (0 == sizeof($tableData)) /* Flat tables are simple, if the array has now data then we are screwed. */
-        {
+        if (0 == sizeof($tableData)) /* Flat tables are simple, if the array has now data then we are screwed. */ {
             $this->getTerminalPrinter()->printLn("No columns to manipulate could be found for table '{$this->getTableName()}', skipping", 'general');
             return true;
         }
@@ -116,31 +115,31 @@ class Flat extends AbstractTable
      */
     public function sanitize()
     {
-        $rowsEffected = $this->hasExecutedCommand();
-        if(false !== $rowsEffected)
-        {
+        $engine         = $this->getEngine();
+        $printer        = $this->getTerminalPrinter();
+        $rowsEffected   = $this->hasExecutedCommand();
+        if (false !== $rowsEffected) {
             return $rowsEffected;
         }
-        $quick = ('quick' == $this->getTerminalPrinter()->getConfig()->getDatabase()->getSanitizationMode());
         $columns = $this->getColumnsForEngineQuery();
-        if(true == $quick)
+        if(true == $this->getIsQuickSanitisation())
         {
-            $this->getTerminalPrinter()->printLn("Sanitizing Flat {$this->getTableName()}", 'notice');
-            $rows = $this->engine->update($this->getTableName(), $columns);
-            $this->getTerminalPrinter()->printLn("Sanitized Flat {$this->getTableName()}", 'notice');
+            $printer->printLn("Sanitizing Flat {$this->getTableName()}", 'notice');
+            $rows = $this->getEngine()->update($this->getTableName(), $columns);
+            $printer->printLn("Sanitized Flat {$this->getTableName()}", 'notice');
             return $rows;
         }
         else
         {
-            $this->getTerminalPrinter()->printLn("Sanitizing Flat {$this->getTableName()} ", 'notice');
+            $printer->printLn("Sanitizing Flat {$this->getTableName()} ", 'notice');
             $rowsUpdated = 0;
-            $rows = $this->engine->select($this->getTableName(), $this->getSelectColumns());
+            $rows = $this->getEngine()->select($this->getTableName(), $this->getSelectColumns());
             foreach($rows as $row)
             {
                 $rowSubset = $this->getColumnsForEngineQuery();
-                $rowsUpdated += $this->engine->update($this->getTableName(), $rowSubset, $this->getPrimaryKeyData($row));
+                $rowsUpdated += $this->getEngine()->update($this->getTableName(), $rowSubset, $this->getPrimaryKeyData($row));
             }
-            $this->getTerminalPrinter()->printLn("Sanitized Flat {$this->getTableName()} ", 'notice');
+            $printer->printLn("Sanitized Flat {$this->getTableName()} ", 'notice');
             return $rowsUpdated;
         }
         return 0;

@@ -26,16 +26,21 @@
  * Date: 18/05/15
  * Time: 12:42
  */
-namespace Pegasus\Application\Sanitizer\Tables;
+namespace Pegasus\Application\Sanitizer\Table\Tables;
 
 use Pegasus\Application\Sanitizer\Columns\Types\AbstractDataType;
-use Pegasus\Application\Sanitizer\Engine\Engine;
 use Pegasus\Application\Sanitizer\Resource\Object;
-use Pegasus\Application\Sanitizer\Tables;
+use Pegasus\Application\Sanitizer\Table;
+use Pegasus\Application\Sanitizer\Table\Exceptions\TableException;
+use Pegasus\Application\Sanitizer\Table\Exceptions\TableCommandFoundException;
+use Pegasus\Application\Sanitizer\Table\Exceptions\TableCommentException;
 use Pegasus\Application\Sanitizer\Columns\Types;
+use Pegasus\Application\Sanitizer\Engine\EngineInterface;
 
 abstract class AbstractTable extends Object
 {
+    const KEY_TABLE_TYPE        = 'type';
+
     protected $truncate         = false;
 
     protected $delete           = false;
@@ -44,13 +49,29 @@ abstract class AbstractTable extends Object
 
     protected $primaryKeyName   = null;
 
-    public function __construct(Engine $engine)
+    protected $isQuick          = false;
+
+    public function __construct(EngineInterface $engine)
     {
-        if(null == $engine)
-        {
+        if(null == $engine) {
             throw new TableException("Someone has passed this table a null engine");
         }
         $this->engine = $engine;
+    }
+
+    public function getEngine() {
+        if(null == $this->engine) {
+            throw new TableException("No engine found!");
+        }
+        return $this->engine;
+    }
+
+    protected function getIsQuickSanitisation() {
+        return $this->isQuick;
+    }
+
+    public function setIsQuickSanitisation($isQuick) {
+        return $this->isQuick = $isQuick;
     }
 
     public function addColumn(AbstractDataType $column)

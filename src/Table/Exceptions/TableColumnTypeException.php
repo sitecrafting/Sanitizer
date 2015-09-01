@@ -1,9 +1,8 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
- * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
+ * Copyright (c) 2015  Philip Elson <phil@pegasus-commerce.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -14,7 +13,6 @@
  *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
-
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,15 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * Date: 19/05/15
- * Time: 19:38
+ * Date: 01/09/15
+ * Time: 19:47
+ *
+ * PHP version 5.3+
+ *
+ * @category Pegasus_Tools
+ * @package  Pegasus_sanitizer
+ * @author   Philip Elson <phil@pegasus-commerce.com>
+ * @license  MIT http://opensource.org/licenses/MIT
+ * @link     http://pegasus-commerce.com
  */
-
-namespace Pegasus\Application\Sanitizer\Tables;
+namespace Pegasus\Application\Sanitizer\Table\Exceptions;
 
 use Pegasus\Application\Sanitizer\Resource\SanitizerException;
 
-class TableCommentException extends SanitizerException
+class TableColumnTypeException extends SanitizerException
 {
 
 }

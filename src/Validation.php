@@ -65,7 +65,8 @@ class Validation extends Sanitizer
 
     protected function sanitize()
     {
-        Collection::getCollection(); /* we just want to parse the config */
+        Collection::setSanitizer($this);
+        Collection::getCollection($this); /* we just want to parse the config */
         $this->setValidationNotRunning();
     }
 

@@ -12,7 +12,7 @@
   },
   "general_config":
   {
-    "memory":"4096M"
+    "memory":"512M"
   },
   "tables":
   {

@@ -26,7 +26,7 @@
  * Date: 18/05/15
  * Time: 12:42
  */
-namespace Pegasus\Application\Sanitizer\Tables;
+namespace Pegasus\Application\Sanitizer\Table\Tables;
 
 use Pegasus\Application\Sanitizer\Resource\Object;
 use Pegasus\Application\Sanitizer\Resource\SanitizerException;
@@ -53,17 +53,14 @@ class Update extends AbstractTable
     function setTableData(array $tableData)
     {
         parent::setTableData($tableData);
-        if(true == $this->doCommand())
-        {
+        if (true == $this->doCommand()) {
             return true;
         }
-        if(false == isset($tableData['rules']))
-        {
+        if (false == isset($tableData['rules'])) {
             throw new TableException("Update type needs a set of rules so it knows what to do for table {$this->getTableName()}!");
         }
         $rules = array();
-        foreach($tableData['rules'] as $rule)
-        {
+        foreach ($tableData['rules'] as $rule) {
             $rule = new Object($rule);
             if(null == $rule->getDataType())
             {
@@ -71,7 +68,7 @@ class Update extends AbstractTable
             }
             $rule->setColumnTypeInstance($this->getInstanceFromType($rule->getDataType(), $rule->getData()));
             $rules[] = $rule;
-            $this->getTerminalPrinter()->println("Another update to column '{$rule->getColumn()}' in {$this->getTableName()} marked for update to '{$rule->getTo()}'", 'notice');
+            $this->getTerminalPrinter()->println("Another update to column '{$rule->getColumn()}' in {$this->getTableName()} marked for update to '{$rule->getTo()}' where '{$rule->getWhere()}'", 'notice');
         }
         $this->setRules($rules);
         $this->validateWhereClause();
@@ -87,14 +84,8 @@ class Update extends AbstractTable
      */
     private function validateWhereClause()
     {
-        foreach($this->getRules() as $rule)
-        {
-            if(null == $rule->getWhere())
-            {
-                throw new SanitizerException('Each update rule needs a where clause');
-            }
-            if(false == is_array($rule->getWhere()))
-            {
+        foreach ($this->getRules() as $rule) {
+            if (false == is_array($rule->getWhere()) && null != $rule->getWhere()) {
                 $rule->setWhere(array($rule->getWhere()));
             }
         }
@@ -108,8 +99,7 @@ class Update extends AbstractTable
      */
     private function checkAllRulesHaveColumnsWhichExist()
     {
-        foreach($this->getRules() as $rule)
-        {
+        foreach ($this->getRules() as $rule) {
             $column = $rule->getColumnTypeInstance();
             if(null == $column)
             {
@@ -128,13 +118,15 @@ class Update extends AbstractTable
      */
     public function sanitize()
     {
-        $rows = 0;
+        $engine     = $this->getEngine();
+        $printer    = $this->getTerminalPrinter();
+        $rows       = 0;
         foreach($this->getRules() as $rule)
         {
-            $this->getTerminalPrinter()->printLn("Updating rows in {$this->getTableName()}' for column '{$rule->getColumn()}' to '{$rule->getTo()}'", 'notice');
+            $printer->printLn("Updating rows in {$this->getTableName()}' for column '{$rule->getColumn()}' to '{$rule->getTo()}'", 'notice');
             $dataToChange = array($rule->getColumnTypeInstance()->getName() => $rule->getTo());
-            $rowsUpdated  = $this->engine->update($this->getTableName(), $dataToChange, $rule->getWhere());
-            $this->getTerminalPrinter()->printLn("Updated '$rowsUpdated' rows in {$this->getTableName()}' for column '{$rule->getColumn()}' to '{$rule->getTo()}'", 'notice');
+            $rowsUpdated  = $engine->update($this->getTableName(), $dataToChange, $rule->getWhere());
+            $printer->printLn("Updated '$rowsUpdated' rows in {$this->getTableName()}' for column '{$rule->getColumn()}' to '{$rule->getTo()}'", 'notice');
             $rows += $rowsUpdated;
         }
         return $rows;

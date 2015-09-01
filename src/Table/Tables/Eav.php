@@ -26,11 +26,11 @@
  * Date: 18/05/15
  * Time: 12:42
  */
-namespace Pegasus\Application\Sanitizer\Tables;
+namespace Pegasus\Application\Sanitizer\Table\Tables;
 
 use Pegasus\Application\Sanitizer\Columns\Mock\MockData;
 use Pegasus\Application\Sanitizer\Resource\Object;
-use Pegasus\Application\Sanitizer\Tables;
+use Pegasus\Application\Sanitizer\Table;
 
 class Eav extends AbstractTable
 {
@@ -131,20 +131,19 @@ class Eav extends AbstractTable
 
     private function sanitizeSubset($tableName, $controlColumnName, $subsetIndex, $columnName, $mockModel)
     {
-        $quick = ('quick' == $this->getTerminalPrinter()->getConfig()->getDatabase()->getSanitizationMode());
-        if(true == $quick)
+        if(true == $this->getIsQuickSanitisation())
         {
-            return $this->engine->update($tableName, array($columnName => $mockModel->getRandomValue()), array($controlColumnName => $subsetIndex));
+            return $this->getEngine()->update($tableName, array($columnName => $mockModel->getRandomValue()), array($controlColumnName => $subsetIndex));
         }
         else
         {
             $rowsUpdated = 0;
-            $rows = $this->engine->select($tableName, $this->getSelectColumns(), array($controlColumnName => $subsetIndex));
+            $rows = $this->getEngine()->select($tableName, $this->getSelectColumns(), array($controlColumnName => $subsetIndex));
             foreach($rows as $row)
             {
                 $newData = array();
                 $newData[$columnName] = $mockModel->getRandomValue();
-                $rowsUpdated += $this->engine->update($tableName, $newData, $this->getPrimaryKeyData($row));
+                $rowsUpdated += $this->getEngine()->update($tableName, $newData, $this->getPrimaryKeyData($row));
             }
             return $rowsUpdated;
         }

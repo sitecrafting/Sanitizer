@@ -40,7 +40,7 @@ abstract class Engine extends medoo implements EngineInterface
      * Start your engines,  method is used to initialise the object
      *
      * @param $config
-     * @return mixed
+     * @return EngineInterface
      * @throws EngineNotFoundException
      * @throws \Exception
      */

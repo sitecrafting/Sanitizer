@@ -27,11 +27,11 @@
  * Time: 19:38
  */
 
-namespace Pegasus\Application\Sanitizer\Tables;
+namespace Pegasus\Application\Sanitizer\Table\Exceptions;
 
 use Pegasus\Application\Sanitizer\Resource\SanitizerException;
 
-class TableException extends SanitizerException
+class TableCommentException extends SanitizerException
 {
 
 }

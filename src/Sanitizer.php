@@ -53,7 +53,8 @@ namespace Pegasus\Application\Sanitizer;
 
 use Pegasus\Application\Sanitizer\Configuration\Config;
 use Pegasus\Application\Sanitizer\Resource\SanitizerException;
-use Pegasus\Application\Sanitizer\Resource\TerminalPrinter;
+use Pegasus\Application\Sanitizer\IO\TerminalPrinter;
+use Pegasus\Application\Sanitizer\Engine\EngineInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -63,7 +64,7 @@ use Symfony\Component\Console\Helper\Table;
 use Pegasus\Application\Sanitizer\Configuration\Config as SanitizerConfig;
 use Pegasus\Application\Sanitizer\Application;
 use Pegasus\Application\Sanitizer\Engine\Engine;
-use Pegasus\Application\Sanitizer\Tables\Collection as TableCollection;
+use Pegasus\Application\Sanitizer\Table\Collection as TableCollection;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -151,6 +152,8 @@ class Sanitizer extends Command implements TerminalPrinter
      * @var null
      */
     protected $eventDispatcher = null;
+
+    private $_engine = null;
 
     /**
      * Retuns a Singleton instance of the sanitizer
@@ -271,8 +274,7 @@ class Sanitizer extends Command implements TerminalPrinter
     {
         $this->input    = $input;
         $this->output   = $output;
-        //$this->getConfig();
-        $configMemory = $this->getConfig()->getGeneralConfig()->getMemory();
+        $configMemory   = $this->getConfig()->getGeneralConfig()->getMemory();
         $this->setMemoryUsage($input->getOption('memory'), $configMemory, self::DEFAULT_MEMORY);
         $this->loadOutputStyles();
         $this->getLog();
@@ -340,7 +342,7 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     private function loadDatabaseEngine()
     {
-        $engine = Engine::start(
+        $this->setEngine(Engine::start(
             array
             (
                 'database_type' => $this->getConfig()->getDatabase()->getEngine(),
@@ -350,14 +352,7 @@ class Sanitizer extends Command implements TerminalPrinter
                 'password'      => $this->getConfig()->getDatabase()->getPassword(),
                 'charset'       => 'utf8'
             )
-        );
-        TableCollection::setEngine($engine);
-    }
-
-
-    protected function sanitize()
-    {
-        TableCollection::sanitizeTables($this, $this);
+        ));
     }
 
     public function loadOutputStyles()
@@ -649,5 +644,67 @@ class Sanitizer extends Command implements TerminalPrinter
             $tableData[] = array('Memory Limit', ini_get("memory_limit"));
         }
         return $tableData;
+    }
+
+    public function getEngine() {
+        if (null == $this->_engine) {
+            throw new TableException("Someone has moved the Engine, I can't find it!");
+        }
+        return $this->_engine;
+    }
+
+    public function setEngine(EngineInterface $engine) {
+        $this->_engine = $engine;
+    }
+
+    /**
+     * This method iterates over the tables.
+     */
+    protected function sanitize()
+    {
+        $this->setSatitisationRunning();
+        $collection = new TableCollection($this->getEngine());
+        $sanitized  = array();
+        $tables     = $collection->getCollection($this);
+        $quick      = (Config::SANITIZATION_MODE_QUICK == $this->getConfig()->getDatabase()->getSanitizationMode());
+        if(true == $collection->getSomeTablesAreBeingSkipped()) {
+            $this->printLn("Some tables are being skipped", 'warning');
+        }
+        if(0 == $collection->getAddedTableCount()) {
+            $this->printLn("No tables from config found, nothing to process", 'fatal_error');
+            $this->setSatitisationNotRunning();
+            return;
+        }
+        if('sanitize' == $this->getMode())
+        {
+            $this->startProgressBar($collection->getSize());
+            foreach($tables as $table)
+            {
+                $table->setIsQuickSanitisation($quick);
+                $rows = $table->sanitize($quick);
+                if(true == $table->doCommand())
+                {
+                    $sanitized[] = "{$table->getCommand()} applied to {$table->getTableName()} and effected {$rows} rows";
+                }
+                else
+                {
+                    $sanitized[] = "Sanitized {$table->getTableName()} and updated {$rows} rows";
+                }
+                $this->advanceProgressBar();
+            }
+            $this->setSatitisationNotRunning();
+            $this->advanceProgressFinish();
+            $this->printLn("\n");
+            foreach($sanitized as $san)
+            {
+                $this->printLn($san, 'notice');
+            }
+        }
+        else
+        {
+            $this->printLn($this->getMode().' mode selected, exiting before sanitisation', 'general');
+        }
+        $this->setSatitisationNotRunning();
+        $this->printLn("Sanitizer finished!");
     }
 }
