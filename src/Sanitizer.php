@@ -606,6 +606,7 @@ class Sanitizer extends Command implements TerminalPrinter
         if (null != $this->progressBar) {
             $this->progressBar->finish();
         }
+        $this->printLn("\n");
         return $this;
     }
 
@@ -698,7 +699,6 @@ class Sanitizer extends Command implements TerminalPrinter
             }
             $this->setSatitisationNotRunning();
             $this->advanceProgressFinish();
-            $this->printLn("\n");
             foreach($sanitized as $san)
             {
                 $this->printLn($san, 'notice');

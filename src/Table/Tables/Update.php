@@ -66,12 +66,34 @@ class Update extends AbstractTable
             }
             $rule->setColumnTypeInstance($this->getInstanceFromType($rule->getDataType(), $rule->getData()));
             $rules[] = $rule;
-            $this->getTerminalPrinter()->println("Another update to column '{$rule->getColumn()}' in {$this->getTableName()} marked for update to '{$rule->getTo()}' where '{$rule->getWhere()}'", 'notice');
+            $this->getTerminalPrinter()->println($this->_getMessage($rule), 'notice');
         }
         $this->setRules($rules);
         $this->validateWhereClause();
         $this->checkAllRulesHaveColumnsWhichExist();
         return true;
+    }
+
+    /**
+     * This function returns the formatted message
+     *
+     * @param $rule
+     * @return string
+     */
+    private function _getMessage($rule) {
+        $message = "Another update to column '";
+        $message .= $rule->getColumn();
+        $message .= "' in '";
+        $message .= $this->getTableName();
+        $message .= "' marked for update to '";
+        $message .= $rule->getTo();
+        $message .= "'";
+        if(null != $rule->getWhere()) {
+            $message .= " where '";
+            $message .= implode(',', $rule->getWhere());
+            $message .= "'";
+        }
+        return $message;
     }
 
     /**
