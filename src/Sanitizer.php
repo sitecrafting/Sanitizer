@@ -674,7 +674,7 @@ class Sanitizer extends Command implements TerminalPrinter
         $tables     = $collection->getCollection($this);
         $quick      = (Config::SANITIZATION_MODE_QUICK == $this->getConfig()->getDatabase()->getSanitizationMode());
         if(true == $collection->getSomeTablesAreBeingSkipped()) {
-            $this->printLn("Some tables are being skipped", 'warning');
+            $this->printLn("Some tables are being skipped", 'notice');
         }
         if(0 == $collection->getAddedTableCount()) {
             $this->printLn("No tables from config found, nothing to process", 'fatal_error');
