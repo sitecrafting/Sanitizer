@@ -34,6 +34,7 @@
  */
 namespace Pegasus\Application\Sanitizer\Events;
 
+use Pegasus\Application\Sanitizer\Resource\Object;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -41,7 +42,7 @@ use Symfony\Component\EventDispatcher\Event;
  *
  * Class Basic
  */
-class Basic extends Event
+class SimpleEvent extends Event
 {
     protected $values = array();
 
@@ -58,13 +59,17 @@ class Basic extends Event
     }
 
     /**
-     * This method returns all the values (array)
+     * This method returns all the values (array) or as an object
+     * if the $asObject is true, default object
      *
-     * @return array|null
+     * @return array|null|Object
      */
-    public function getValues() 
+    public function getValues($asObject=true)
     {
-        return $this->values;
+        if(false == $asObject) {
+            return $this->values;
+        }
+        return new Object($this->values);
     }
 
     /**

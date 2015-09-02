@@ -27,11 +27,10 @@
  */
 namespace Pegasus\Application\Sanitizer\Engine;
 
+use Pegasus\Application\Sanitizer\Engine\Exceptions\EngineNotFoundException;
 use Pegasus\Application\Sanitizer\Resource\SanitizerException;
-use Pegasus\Application\Sanitizer\Sanitizer;
-use Pegasus\Application\Sanitizer\Engine\medoo;
 
-abstract class Engine extends medoo implements EngineInterface
+abstract class Engine
 {
     private static $engine = null;
 
@@ -65,17 +64,5 @@ abstract class Engine extends medoo implements EngineInterface
             }
         }
         return self::$engine;
-    }
-
-    public function logError($query=null)
-    {
-        $error = $this->error();
-        if(false == is_array($error)) {
-            $error = array($error);
-        }
-        Sanitizer::getInstance()->getLog()->addInfo('Fetch Error', $error);
-        if(null != $query) {
-            Sanitizer::getInstance()->getLog()->log->addInfo('Fetch Error Additional Info', array('info' => $query));
-        }
     }
 }

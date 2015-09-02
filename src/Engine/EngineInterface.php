@@ -74,4 +74,14 @@ interface EngineInterface
      * @return mixed
      */
     public function logError($query=null);
+
+    public function drop();
+
+    public function create();
+
+    public function useDb();
+
+    public function source($fileName);
+
+    public function dump($fileName);
 }

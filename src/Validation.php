@@ -42,14 +42,14 @@
  */
 namespace Pegasus\Application\Sanitizer;
 
-use Pegasus\Application\Sanitizer\Tables\Collection;
+use Pegasus\Application\Sanitizer\Table\Collection;
+use Pegasus\Application\Sanitizer\Application;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Pegasus\Application\Sanitizer\Application;
+use Symfony\Component\Console\Helper\Table;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
-use Symfony\Component\Console\Helper\Table;
 
 
 class Validation extends Sanitizer

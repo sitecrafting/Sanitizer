@@ -27,11 +27,27 @@
  */
 namespace Pegasus\Application\Sanitizer\Engine;
 
-class MySqlEngine extends Engine
+use Pegasus\Application\Sanitizer\Engine\Exceptions\EngineException;
+use Pegasus\Application\Sanitizer\Engine\Exceptions\FatalEngineException;
+use Pegasus\Application\Sanitizer\Sanitizer;
+
+class MySqlEngine extends medoo implements EngineInterface
 {
     public function getEngineName()
     {
         return 'mysql';
+    }
+
+    public function logError($query=null)
+    {
+        $error = $this->error();
+        if(false == is_array($error)) {
+            $error = array($error);
+        }
+        Sanitizer::getInstance()->getLog()->addInfo('Fetch Error', $error);
+        if(null != $query) {
+            Sanitizer::getInstance()->getLog()->addInfo('Fetch Error Additional Info', array('info' => $query));
+        }
     }
 
     /**
@@ -95,5 +111,52 @@ class MySqlEngine extends Engine
             throw new EngineException("Primary key could not be found for table '{$tableName}'");
         }
         return $result['Column_name'];
+    }
+
+
+    public function drop() {
+        $sql = "DROP DATABASE `{$this->database_name}`";
+        $result = $this->query($sql);
+        if(false == $result) {
+            $this->logError($sql);
+            throw new FatalEngineException("Unable to drop database");
+        }
+        return true;
+    }
+
+    public function create() {
+        $sql = "CREATE DATABASE `{$this->database_name}`";
+        $result = $this->query($sql);
+        if(false == $result) {
+            $this->logError($sql);
+            throw new FatalEngineException("Unable to create database");
+        }
+        return true;
+    }
+
+    public function useDb() {
+        $sql = "USE `{$this->database_name}`";
+        $result = $this->query($sql);
+        if(false == $result) {
+            $this->logError($sql);
+            throw new FatalEngineException("Unable to select database");
+        }
+        return true;
+    }
+
+    public function source($fileName) {
+        $sql = file_get_contents($fileName);
+        $result = $this->query($sql);
+        if(false == $result) {
+            $this->logError($sql);
+            throw new FatalEngineException("Unable to import from source file, {$sql}");
+        }
+        return true;
+    }
+
+    public function dump($fileName) {
+        $command = "mysqldump -u {$this->username} -p{$this->password} -h {$this->server} {$this->database_name} > '{$fileName}'";
+        exec($command, $output=array(), $worked);
+        return (0 == $worked) ? true : false;
     }
 }

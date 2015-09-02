@@ -42,9 +42,9 @@
  */
 namespace Pegasus\Application\Sanitizer;
 
+use Pegasus\Application\Sanitizer\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Pegasus\Application\Sanitizer\Application;
 
 class Version extends Sanitizer
 {
@@ -55,7 +55,7 @@ class Version extends Sanitizer
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln("Vagrant Transient Version: ".$this->getVersion());
+        $output->writeln("Sanitizer Version: ".$this->getVersion());
     }
 
     /**
