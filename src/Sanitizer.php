@@ -60,7 +60,7 @@ use Pegasus\Application\Sanitizer\IO\TerminalPrinter;
 use Pegasus\Application\Sanitizer\Engine\EngineInterface;
 use Pegasus\Application\Sanitizer\Configuration\Config as SanitizerConfig;
 use Pegasus\Application\Sanitizer\Application;
-use Pegasus\Application\Sanitizer\Engine\Engine;
+use Pegasus\Application\Sanitizer\Engine\EngineFactory;
 use Pegasus\Application\Sanitizer\Table\Collection as TableCollection;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -373,19 +373,19 @@ class Sanitizer extends Command implements TerminalPrinter
     private function loadDatabaseEngine()
     {
         $this->setEngine(
-            Engine::start(
+            EngineFactory::getInstance(
                 array
                 (
-                'database_type' => $this->getConfig()->getDatabase()->getEngine(),
-                'database_name' => $this->getConfig()->getDatabase()->getDatabase(),
-                'server'        => $this->getConfig()->getDatabase()->getHost(),
-                'username'      => $this->getConfig()->getDatabase()->getUsername(),
-                'password'      => $this->getConfig()->getDatabase()->getPassword(),
-                'charset'       => 'utf8'
+                    'database_type' => $this->getConfig()->getDatabase()->getEngine(),
+                    'database_name' => $this->getConfig()->getDatabase()->getDatabase(),
+                    'server'        => $this->getConfig()->getDatabase()->getHost(),
+                    'username'      => $this->getConfig()->getDatabase()->getUsername(),
+                    'password'      => $this->getConfig()->getDatabase()->getPassword(),
+                    'charset'       => 'utf8'
                 )
             )
         );
-        $this->dispatch('sanitizer.engine.loaded', array('engine' => $this->_engine));
+        $this->dispatch('sanitizer.engine.loaded', array('engine' => $this->getEngine()));
     }
 
     public function loadOutputStyles()
@@ -413,11 +413,8 @@ class Sanitizer extends Command implements TerminalPrinter
     }
 
     /**
-     * THis method renders the DB config data as a table allowing the user to confirm the data is accurate and they're
+     * This method renders the DB config data as a table allowing the user to confirm the data is accurate and they're
      * happy to continue.
-     *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
      */
     private function renderOverviewTable()
     {

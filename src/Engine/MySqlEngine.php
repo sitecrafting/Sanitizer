@@ -31,7 +31,7 @@ use Pegasus\Application\Sanitizer\Engine\Exceptions\EngineException;
 use Pegasus\Application\Sanitizer\Engine\Exceptions\FatalEngineException;
 use Pegasus\Application\Sanitizer\Sanitizer;
 
-class MySqlEngine extends medoo implements EngineInterface
+class MySqlEngine extends AbstractEngine implements EngineInterface
 {
     public function getEngineName()
     {
@@ -157,6 +157,6 @@ class MySqlEngine extends medoo implements EngineInterface
     public function dump($fileName) {
         $command = "mysqldump -u {$this->username} -p{$this->password} -h {$this->server} {$this->database_name} > '{$fileName}'";
         exec($command, $output=array(), $worked);
-        return (0 == $worked) ? true : false;
+        return (0 == $worked) ? true : $output;
     }
 }

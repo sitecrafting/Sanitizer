@@ -9,7 +9,14 @@
  */
 namespace Pegasus\Application\Sanitizer\Engine;
 
-class medoo
+/**
+ * Previously medoo, renamed to fit in with the project, copyright notice in place.
+ * This also includes a couple of minor midifications.
+ *
+ * Class AbstractEngine
+ * @package Pegasus\Application\Sanitizer\Engine
+ */
+abstract class AbstractEngine
 {
     // General
     protected $database_type;

@@ -39,12 +39,13 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class AbstractObserver
 {
-    public abstract function trigger(SimpleEvent $event);
+    public abstract function trigger(SimpleEvent $event, $eventName=null);
 
-    public abstract function getEventArray();
+    public abstract function getEventsToListenForArray();
 
-    public function registerEvents(EventDispatcher $dispatcher) {
-        $events = $this->getEventArray();
+    public function registerEvents(EventDispatcher $dispatcher)
+    {
+        $events = $this->getEventsToListenForArray();
         foreach($events as $eventName) {
             $dispatcher->addListener($eventName, array($this, 'trigger'));
         }

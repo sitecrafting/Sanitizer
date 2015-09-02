@@ -47,7 +47,17 @@ class LastName extends AbstractMockData
             "Oliver",
             "Williams",
             "Carpenter",
-            "Harris"
+            "Harris",
+            "Teller",
+            "Mitchell",
+            "Payton",
+            "Darling",
+            "Tucker",
+            "Dyson",
+            "Hewlett",
+            "Packard",
+            "Dell",
+            "Lane"
         );
     }
 }

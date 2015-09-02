@@ -35,6 +35,7 @@
 namespace Pegasus\Application\Sanitizer\Events\Observer;
 
 use Pegasus\Application\Sanitizer\Events\SimpleEvent;
+use Pegasus\Application\Sanitizer\IO\DatabaseHelper;
 use Pegasus\Application\Sanitizer\Resource\Object;
 use Pegasus\Application\Sanitizer\Sanitizer;
 
@@ -50,7 +51,7 @@ class PreConditions extends AbstractObserver
         return $this->_sanitizer;
     }
 
-    public function trigger(SimpleEvent $event) {
+    public function trigger(SimpleEvent $event, $eventName=null) {
         $eventData = $event->getValues();
         if(null == $eventData) {
             return;
@@ -64,7 +65,13 @@ class PreConditions extends AbstractObserver
         if(null == $config) {
             return;
         }
-        $this->_processEvent($config->getPreConditions());
+
+        switch($eventName) {
+            case 'sanitizer.sanitize.before' : {
+                $this->_processEvent($config->getPreConditions());
+                break;
+            }
+        }
     }
 
     private function _processEvent($configData) {
@@ -74,31 +81,17 @@ class PreConditions extends AbstractObserver
         foreach($configData as $key => $data) {
             switch ($key) {
                 case "import_database" : {
-                    $this->_importDatabase($key, $data);
+                    $this->_getSanitizer()->getTerminalPrinter()->printLn("Importing database...");
+                    $helper = new DatabaseHelper();
+                    $helper->importDatabase($data, $this->_getSanitizer());
+                    $this->_getSanitizer()->getTerminalPrinter()->printLn("Database imported \n");
                     break;
                 }
             }
         }
     }
 
-    private function _importDatabase($key, $data) {
-        $this->_getSanitizer()->getTerminalPrinter()->printLn("Importing database...");
-        $importData = new Object($data);
-        if(null == $importData->getSource()) {
-            return;
-        }
-        if(false == file_exists($importData->getSource())) {
-            throw new FileNotFoundException("File not found, {$importData->getSource()}");
-        }
-        $engine = $this->_getSanitizer()->getEngine();
-        $engine->drop();
-        $engine->create();
-        $engine->useDb();
-        $engine->source($importData->getSource());
-        $this->_getSanitizer()->getTerminalPrinter()->printLn("Database imported \n");
-    }
-
-    public function getEventArray() {
+    public function getEventsToListenForArray() {
         return array('sanitizer.sanitize.before');
     }
 }

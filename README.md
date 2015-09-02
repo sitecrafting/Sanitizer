@@ -180,6 +180,7 @@ name of the file. Sanitizer also provides a couple of patterns whihc get switche
 
 1. '{date}' which gets replace with 'date_format'
 2. '{time}' which gets replace with 'time_format'
+3. '{database_name}' which gets replace with the name of the database
 
 The format of 'time_format', and 'date_format' uses the [PHP date format](http://php.net/manual/en/function.date.php)
 

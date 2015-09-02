@@ -45,6 +45,8 @@ class MiddleName extends AbstractMockData
             "Lesley",
             "Mason",
             "Marley",
+            "Charles",
+            "ELizabeth",
         );
     }
 }

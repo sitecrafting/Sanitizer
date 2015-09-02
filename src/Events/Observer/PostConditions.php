@@ -35,9 +35,8 @@
 namespace Pegasus\Application\Sanitizer\Events\Observer;
 
 use Pegasus\Application\Sanitizer\Events\SimpleEvent;
-use Pegasus\Application\Sanitizer\Resource\Object;
+use Pegasus\Application\Sanitizer\IO\DatabaseHelper;
 use Pegasus\Application\Sanitizer\Sanitizer;
-use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 class PostConditions extends AbstractObserver
 {
@@ -51,7 +50,7 @@ class PostConditions extends AbstractObserver
         return $this->_sanitizer;
     }
 
-    public function trigger(SimpleEvent $event) {
+    public function trigger(SimpleEvent $event, $eventName=null) {
         $eventData = $event->getValues();
         if(null == $eventData) {
             return;
@@ -65,41 +64,33 @@ class PostConditions extends AbstractObserver
         if(null == $config) {
             return;
         }
-        $this->_processEvent($config->getPostConditions());
+        switch($eventName) {
+            case 'sanitizer.sanitize.after' : {
+                $this->_processEvent($config->getPostConditions());
+                break;
+            }
+        }
     }
 
     private function _processEvent($configData) {
+        $sanitizer = $this->_getSanitizer();
         if(null == $configData || false == is_array($configData)) {
             return;
         }
         foreach($configData as $key => $data) {
             switch ($key) {
                 case "export_database" : {
-                    $this->_importDatabase($key, $data);
+                    $sanitizer->getTerminalPrinter()->printLn("Exporting database...");
+                    $helper     = new DatabaseHelper();
+                    $ok         = $helper->exportDatabase($data, $sanitizer);
+                    $sanitizer->getTerminalPrinter()->printLn((true == $ok) ? "Exporting finished" : "Exporting finished with errors");
                     break;
                 }
             }
         }
     }
 
-    private function _importDatabase($key, $data) {
-        $importData = new Object($data);
-        if(null == $importData->getDestination()) {
-            return;
-        }
-        $engine = $this->_getSanitizer()->getEngine();
-        $fileName = str_replace('{date}', date($importData->getDateFormat()), $importData->getDestination());
-        $fileName = str_replace('{time}', date($importData->getTimeFormat()), $fileName);
-        $this->_getSanitizer()->getTerminalPrinter()->printLn("Exporting database to {$fileName}...");
-        $ok = $engine->dump($fileName);
-        if(true == $importData->getDrop()) {
-            $engine->drop();
-            $engine->create();
-        }
-        $this->_getSanitizer()->getTerminalPrinter()->printLn("Exporting finished", (true == $ok) ? null : 'error');
-    }
-
-    public function getEventArray() {
+    public function getEventsToListenForArray() {
         return array('sanitizer.sanitize.after');
     }
 }

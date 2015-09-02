@@ -47,7 +47,25 @@ class FirstName extends AbstractMockData
             "Skylar",
             "Wesley",
             "Zane",
-            "Francis"
+            "Francis",
+            "Philip",
+            "David",
+            "Mark",
+            "Debbie",
+            "Elizabeth",
+            "Olivia",
+            "Luke",
+            "James",
+            "Pegasus",
+            "Bart",
+            "Sigourney",
+            "Jax",
+            "Opie",
+            "Akio",
+            "Cho",
+            "Chin",
+            "Hiro",
+            "Miles"
         );
     }
 }

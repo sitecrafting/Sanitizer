@@ -30,7 +30,7 @@ namespace Pegasus\Application\Sanitizer\Engine;
 use Pegasus\Application\Sanitizer\Engine\Exceptions\EngineNotFoundException;
 use Pegasus\Application\Sanitizer\Resource\SanitizerException;
 
-abstract class Engine
+class EngineFactory
 {
     private static $engine = null;
 
@@ -42,11 +42,11 @@ abstract class Engine
      * @throws EngineNotFoundException
      * @throws \Exception
      */
-    public static function start($config)
+    public static function getInstance($config)
     {
         if(null == self::$engine) {
             if (false == isset($config['database_type'])) {
-                throw new SanitizerException("Engine Type/Name not found in Engine start parameters");
+                throw new SanitizerException("Engine Type/Name not found in Engine getInstance parameters");
             }
             $engineName = $config['database_type'];
             switch ($engineName)

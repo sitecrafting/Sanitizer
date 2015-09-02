@@ -46,7 +46,7 @@ class Company extends AbstractMockData
             "Apple's and Pears",
             "Debbie's Amazing Designs LTD",
             "DullStar",
-            "Dark Solar Systems LTD"
+            "Dark Solar Systems LTD",
         );
     }
 }

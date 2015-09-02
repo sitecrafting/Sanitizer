@@ -108,7 +108,6 @@ class Flat extends AbstractTable
      */
     public function sanitize()
     {
-        $engine         = $this->getEngine();
         $printer        = $this->getTerminalPrinter();
         $rowsEffected   = $this->hasExecutedCommand();
         if (false !== $rowsEffected) {
@@ -120,9 +119,7 @@ class Flat extends AbstractTable
             $rows = $this->getEngine()->update($this->getTableName(), $columns);
             $printer->printLn("Sanitized Flat {$this->getTableName()}", 'notice');
             return $rows;
-        }
-        else
-        {
+        } else {
             $printer->printLn("Sanitizing Flat {$this->getTableName()} ", 'notice');
             $rowsUpdated = 0;
             $rows = $this->getEngine()->select($this->getTableName(), $this->getSelectColumns());
