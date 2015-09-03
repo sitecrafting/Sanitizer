@@ -12,8 +12,8 @@ setup:
         - "CREATE DATABASE sanitizer;"
         - "USE sanitizer;"
     shell:
-        - echo "Create your own test SQL script call /var/sql/sanitizer.sql "
-        - "mysql -u root -ppassword < /var/sql/sanitizer.sql"
+        - "echo 'Create your own test SQL script call /var/sql/sanitizer.sql' "
+        - "mysql -u root -ppassword sanitizer < /var/sql/sanitizer.sql"
     composer:
         action: "install"
 
