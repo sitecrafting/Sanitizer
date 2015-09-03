@@ -55,6 +55,7 @@ use Pegasus\Application\Sanitizer\Configuration\Config;
 use Pegasus\Application\Sanitizer\Events\Observer\PostConditions;
 use Pegasus\Application\Sanitizer\Events\Observer\PreConditions;
 use Pegasus\Application\Sanitizer\Events\SimpleEvent;
+use Pegasus\Application\Sanitizer\IO\DatabaseHelper;
 use Pegasus\Application\Sanitizer\Resource\SanitizerException;
 use Pegasus\Application\Sanitizer\IO\TerminalPrinter;
 use Pegasus\Application\Sanitizer\Engine\EngineInterface;
@@ -231,7 +232,7 @@ class Sanitizer extends Command implements TerminalPrinter
                 'mode',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Sanitisation Mode (full|quiet)',
+                'Sanitisation Mode ('.Config::SANITIZATION_MODE_FULL.'|'.Config::SANITIZATION_MODE_QUICK.')',
                 Config::INPUT_MODE
             )
             ->addOption(
@@ -240,6 +241,20 @@ class Sanitizer extends Command implements TerminalPrinter
                 InputOption::VALUE_OPTIONAL,
                 'Memory - PHP format',
                 self::DEFAULT_MEMORY_NOT_SET
+            )
+            ->addOption(
+                'export',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Export SQL file',
+                null
+            )
+            ->addOption(
+                'import',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Import SQL file',
+                null
             );
     }
 
@@ -255,13 +270,28 @@ class Sanitizer extends Command implements TerminalPrinter
                 }
                 $this->config->setDatabaseOverride(
                     array(
-                    array('Host', $this->input->getOption('host')),
-                    array('Password', $this->input->getOption('password')),
-                    array('Username', $this->input->getOption('username')),
-                    array('Database', $this->input->getOption('database')),
-                    array('Config', $this->input->getOption('configuration')),
-                    array('Engine', $this->input->getArgument('engine')),
-                    array('Mode', $this->input->getOption('mode')))
+                        array('Host', $this->input->getOption('host')),
+                        array('Password', $this->input->getOption('password')),
+                        array('Username', $this->input->getOption('username')),
+                        array('Database', $this->input->getOption('database')),
+                        array('Config', $this->input->getOption('configuration')),
+                        array('Engine', $this->input->getArgument('engine')),
+                        array('Mode', $this->input->getOption('mode'))
+                    )
+                );
+                $this->config->setAdditionalOverrides(
+                    array(
+                        'pre_conditions'    => array(
+                            'import_database' => array(
+                                'source' => $this->input->getOption('import')
+                            )
+                        ),
+                        'post_conditions'   => array(
+                            'export_database' => array(
+                                'destination' => $this->input->getOption('export')
+                            )
+                        ),
+                    )
                 );
             }
             catch (SanitizerException $exception)
@@ -296,6 +326,11 @@ class Sanitizer extends Command implements TerminalPrinter
         }
     }
 
+    /**
+     * This method returns the terminal printer instance
+     *
+     * @return $this
+     */
     public function getTerminalPrinter() {
         return $this;
     }

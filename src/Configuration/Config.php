@@ -153,6 +153,41 @@ class Config extends Object
     }
 
     /**
+     * This method overrides config nodes by providing an array which indexes directory into the config data
+     * If the config data exists then it is overridden with the override.
+     *
+     * @param array $overrides Is the override data structure
+     */
+    public function setAdditionalOverrides(array $overrides) {
+        if(null == $overrides || 0 == sizeof($overrides)) {
+            return;
+        }
+        foreach($overrides as $configNode => $childNodes) {
+            if (true == isset($this->data[$configNode])) {
+                if (true == is_array($childNodes)) {
+                    foreach ($childNodes as $childNodLevel2Key => $childNodesLevel2) {
+                        if (true == is_array($childNodesLevel2)) {
+                            foreach ($childNodesLevel2 as $childNodesLevel3key => $childNodesLevel3) {
+                                if (true == isset($this->data[$configNode][$childNodLevel2Key][$childNodesLevel3key]) && null != $childNodesLevel3) {
+                                    $this->data[$configNode][$childNodLevel2Key][$childNodesLevel3key] = $childNodesLevel3;
+                                }
+                            }
+                        } else {
+                            if (true == isset($this->data[$configNode][$childNodLevel2Key]) && null != $childNodesLevel2) {
+                                $this->data[$configNode][$childNodLevel2Key] = $childNodesLevel2;
+                            }
+                        }
+                    }
+                } else {
+                    if (true == isset($this->data[$configNode]) && null != $childNodes) {
+                        $this->data[$configNode] = $childNodes;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * This method initialises the database info to the defaults.
      *
      * I'm sure there is a nicer way to do this based on the Options fields but right now ....
