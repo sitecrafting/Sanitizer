@@ -12,6 +12,8 @@ setup:
         - "CREATE DATABASE sanitizer;"
         - "USE sanitizer;"
         - "SOURCE \"sql/sanitizer.sql\";"
+    shell:
+        command: "mysql -u root -ppassword < %BUILD_PATH%/sql/sanitizer.sql"
     composer:
         action: "install"
 
