@@ -171,6 +171,8 @@ source and this can be a relative or an absolute path.
   },
 ```
 
+You can also specify the import file as a command line option '--import {file_name}'
+
 #### Post Conditions
 
 After sanitizer has finished you can instruct it to export the database to a dump file
@@ -196,3 +198,5 @@ The format of 'time_format', and 'date_format' uses the [PHP date format](http:/
     }
   },
 ```
+
+You can also specify the export file as a command line option '--export {file_name}'
