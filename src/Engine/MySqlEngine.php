@@ -159,4 +159,8 @@ class MySqlEngine extends AbstractEngine implements EngineInterface
         exec($command, $output=array(), $worked);
         return (0 == $worked) ? true : $output;
     }
+
+    public function getDatabaseName() {
+        return $this->database_name;
+    }
 }

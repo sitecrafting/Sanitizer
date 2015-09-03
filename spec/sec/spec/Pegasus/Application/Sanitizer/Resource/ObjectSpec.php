@@ -1,8 +1,8 @@
 <?php
 
-namespace spec\Pegasus\Resource;
+namespace spec\Pegasus\Application\Sanitizer\Resource;
 
-use Pegasus\Resource\Object;
+use Pegasus\Application\Sanitizer\Resource\Object;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -10,7 +10,7 @@ class ObjectSpec extends ObjectBehavior
 {
     function it_is_initializable()
     {
-        $this->shouldHaveType('Pegasus\Resource\Object');
+        $this->shouldHaveType('Pegasus\Application\Sanitizer\Resource\Object');
     }
 
     function it_should_return_the_set_value_when_i_call_get()
@@ -28,6 +28,6 @@ class ObjectSpec extends ObjectBehavior
         $this->beConstructedWith(array('example' => 'woosa', 'null' => null, 'object' => new Object()));
         $this->getExample()->shouldEqual('woosa');
         $this->getNull()->shouldEqual(null);
-        $this->getObject()->shouldReturnAnInstanceOf('Pegasus\Resource\Object');
+        $this->getObject()->shouldReturnAnInstanceOf('Pegasus\Application\Sanitizer\Resource\Object');
     }
 }

@@ -52,7 +52,7 @@ class Factory
         if(true == isset($tableConfig[AbstractTable::KEY_TABLE_TYPE])) {
             $columnType = $tableConfig[AbstractTable::KEY_TABLE_TYPE];
             switch($columnType) {
-            case Eav::getType() : {
+             case Eav::getType() : {
                 $table = new Eav($engine);
                     break;
                 }
@@ -65,7 +65,7 @@ class Factory
                  * Space for different types
                  */
             default : { /* type not found */
-                    throw new TableColumnTypeException("Column type '{$columnType}' not valid for table {$tableName}");
+                    //throw new TableColumnTypeException("Column type '{$columnType}' not valid for table {$tableName}");
                 }
             }
         }

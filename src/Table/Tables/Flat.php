@@ -28,6 +28,7 @@
 namespace Pegasus\Application\Sanitizer\Table\Tables;
 
 use Pegasus\Application\Sanitizer\Columns\Types;
+use Pegasus\Application\Sanitizer\Table\Exceptions\TableException;
 
 class Flat extends AbstractTable
 {
@@ -77,7 +78,7 @@ class Flat extends AbstractTable
                 if(true == is_array($columnData)) {
                     $data = implode(',', $columnData);
                 }
-                throw new TableException("No column name could be found by on table '{$this->getTableName()}' for data ".$data);
+                throw new TableException("No column name could be found on table '{$this->getTableName()}' for data ".$data);
             }
             if(true == isset($columnData[self::FIELD_DATA_TYPE])) {
                 $configDataType = $columnData[self::FIELD_DATA_TYPE];

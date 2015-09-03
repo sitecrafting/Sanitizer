@@ -180,7 +180,7 @@ abstract class AbstractTable extends Object
         }
 
         if(false == $this->exists()) {
-            throw new TableException("Table '{$this->getTableName()}' not found in database");
+            throw new TableException("Table '{$this->getTableName()}' not found in database '{$this->getDatabaseName()}'");
         }
         return true;
     }
@@ -267,6 +267,16 @@ abstract class AbstractTable extends Object
     public function exists()
     {
         return $this->engine->tableExists($this->getTableName());
+    }
+
+    /**
+     * This method returns the name of the database
+     *
+     * @return mixed
+     */
+    public function getDatabaseName()
+    {
+        return $this->engine->getDatabaseName();
     }
 
     /**

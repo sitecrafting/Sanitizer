@@ -84,4 +84,6 @@ interface EngineInterface
     public function source($fileName);
 
     public function dump($fileName);
+
+    public function getDatabaseName();
 }
