@@ -61,7 +61,7 @@ class Factory
                 $table = new Update($engine);
                     break;
                 }
-                
+
                 /*
                  * Space for different types
                  */

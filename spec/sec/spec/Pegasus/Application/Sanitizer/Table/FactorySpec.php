@@ -3,10 +3,7 @@
 namespace spec\Pegasus\Application\Sanitizer\Table;
 
 use Pegasus\Application\Sanitizer\Engine\EngineFactory;
-use Pegasus\Application\Sanitizer\Engine\EngineInterface;
 use Pegasus\Application\Sanitizer\IO\TerminalPrinter;
-use Pegasus\Application\Sanitizer\Table\Tables\AbstractTable;
-use Pegasus\Application\Sanitizer\Table\Tables\Flat;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -18,21 +15,17 @@ class FactorySpec extends ObjectBehavior
     }
 
     private function _getEngine() {
-        static $engine = null;
-        if(null == $engine) {
-            $engine = EngineFactory::getInstance(
-                array
-                (
-                    'database_type'     => 'mysql',
-                    'database_name'     => 'sanitizer',
-                    'server'            => 'localhost',
-                    'username'          => 'root',
-                    'password'          => 'password',
-                    'charset'           => 'utf8'
-                )
-            );
-        }
-        return $engine;
+        return EngineFactory::getInstance(
+            array
+            (
+                'database_type'     => 'mysql',
+                'database_name'     => 'sanitizer',
+                'server'            => 'localhost',
+                'username'          => 'root',
+                'password'          => 'password',
+                'charset'           => 'utf8'
+            )
+        );
     }
 
     private function getUpdateData() {
