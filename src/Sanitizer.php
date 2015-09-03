@@ -706,6 +706,15 @@ class Sanitizer extends Command implements TerminalPrinter
             array('Engine',         $this->getConfig()->getDatabase()->getEngine()),
             array('Mode',           $this->getConfig()->getDatabase()->getSanitizationMode()));
 
+        $preConditions = $this->getConfig()->getPreConditions();
+        if(null != $preConditions && true == isset($preConditions['import_database']['source'])) {
+            $tableData[] = array('Import SQL', $preConditions['import_database']['source']);
+        }
+        $postConditions = $this->getConfig()->getPostConditions();
+        if(null != $postConditions && true == isset($postConditions['export_database']['destination'])) {
+            $tableData[] = array('Export SQL', $postConditions['export_database']['destination']);
+        }
+
         if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERBOSE)) {
             $tableData[] = array('Memory Limit', ini_get("memory_limit"));
         }
