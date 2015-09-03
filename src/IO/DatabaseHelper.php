@@ -34,6 +34,12 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 class DatabaseHelper
 {
+    const DEFAULT_EXPORT_FILE_NAME = '{database_name}_export_{date}_{time}.sql';
+
+    const DEFAULT_EXPORT_DATE_FORMAT = "d-m-Y";
+
+    const DEFAULT_EXPORT_TIME_FORMAT = "G-i-s-e";
+
     public function exportDatabase($data, $sanitizer)
     {
         $importData = new Object($data);
@@ -42,8 +48,10 @@ class DatabaseHelper
         }
         $engine         = $sanitizer->getEngine();
         $databaseName   = $sanitizer->getConfig()->getDatabase()->getDatabase();
-        $fileName       = str_replace('{date}', date($importData->getDateFormat()), $importData->getDestination());
-        $fileName       = str_replace('{time}', date($importData->getTimeFormat()), $fileName);
+        $dateFormat     = (null == $importData->getDateFormat()) ? self::DEFAULT_EXPORT_DATE_FORMAT : $importData->getDateFormat();
+        $timeFormat     = (null == $importData->getTimeFormat()) ? self::DEFAULT_EXPORT_TIME_FORMAT : $importData->getTimeFormat();
+        $fileName       = str_replace('{date}', date($dateFormat), $importData->getDestination());
+        $fileName       = str_replace('{time}', date($timeFormat), $fileName);
         $fileName       = str_replace('{database_name}', $databaseName, $fileName);
         $ok             = $engine->dump($fileName);
         if(true == $importData->getDrop()) {
