@@ -35,10 +35,40 @@ class FactorySpec extends ObjectBehavior
         return $engine;
     }
 
-//    function it_should_return_a_valid_table_instance(TerminalPrinter $printer) {
-//
-//        $return = 'Pegasus\Application\Sanitizer\Table\Tables\AbstractTable';
-//        $data = array('type' => 'flat', Flat::FIELD_COLUMN => 'value');
-//        self::getInstance('core_config_data', $data, $printer, $this->_getEngine())->shouldReturnAnInstanceOf($return);
-//    }
+    private function getUpdateData() {
+        return Array
+        (
+            'data_type' => 'text',
+            'type' => 'update',
+            'rules' => array(
+                array(
+                    'data_type' => 'text',
+                    'comment'   => 'Base Un-secure URL',
+                    'column'    => 'value',
+                    'where'     => Array(
+                        'path'      => 'web/unsecure/base_url'
+                    ),
+                    'to'        => 'http://test-url.dev:8080/',
+                )
+            ),
+        );
+
+    }
+
+    private function getFlatData() {
+        return Array
+        (
+            Array (
+                'column' => 'value',
+                'data_type' => 'text',
+            ),
+        );
+    }
+
+    function it_should_return_a_valid_table_instance(TerminalPrinter $printer) {
+
+        $return = 'Pegasus\Application\Sanitizer\Table\Tables\AbstractTable';
+       // $data = array('type' => 'flat', Flat::FIELD_COLUMN => 'value');
+        self::getInstance('core_config_data', $this->getFlatData(), $printer, $this->_getEngine())->shouldReturnAnInstanceOf($return);
+    }
 }
