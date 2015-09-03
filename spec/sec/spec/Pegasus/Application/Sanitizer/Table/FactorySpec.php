@@ -58,10 +58,10 @@ class FactorySpec extends ObjectBehavior
         );
     }
 
-//    function it_should_return_a_valid_table_instance(TerminalPrinter $printer) {
-//
-//        $return = 'Pegasus\Application\Sanitizer\Table\Tables\AbstractTable';
-//       // $data = array('type' => 'flat', Flat::FIELD_COLUMN => 'value');
-//        self::getInstance('core_config_data', $this->getFlatData(), $printer, $this->_getEngine())->shouldReturnAnInstanceOf($return);
-//    }
+    function it_should_return_a_valid_table_instance(TerminalPrinter $printer) {
+
+        $return = 'Pegasus\Application\Sanitizer\Table\Tables\AbstractTable';
+       // $data = array('type' => 'flat', Flat::FIELD_COLUMN => 'value');
+        self::getInstance('core_config_data', $this->getFlatData(), $printer, $this->_getEngine())->shouldReturnAnInstanceOf($return);
+    }
 }
