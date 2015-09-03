@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -39,8 +38,7 @@ class Object
     public function __construct()
     {
         $arguments = func_get_args();
-        if(true == empty($arguments[0]))
-        {
+        if(true == empty($arguments[0])) {
             $arguments[0] = array();
         }
         $this->data = $arguments[0];
@@ -57,16 +55,14 @@ class Object
 
     public function setData($key, $value=null)
     {
-        if(true == is_array($key))
-        {
+        if(true == is_array($key)) {
             $this->data = $key;
             $this->addFullNames();
         }
         else
         {
             $this->data[$key] = $value;
-            if (true == isset($this->_syncFieldsMap[$key]))
-            {
+            if (true == isset($this->_syncFieldsMap[$key])) {
                 $this->data[$this->_syncFieldsMap[$key]] = $value;
             }
         }
@@ -75,38 +71,30 @@ class Object
 
     public function getData($key='', $index=null)
     {
-        if (''===$key)
-        {
+        if (''===$key) {
             return $this->data;
         }
         $default = null;
-        if (true == isset($this->data[$key]))
-        {
-            if (true == is_null($index))
-            {
+        if (true == isset($this->data[$key])) {
+            if (true == is_null($index)) {
                 return $this->data[$key];
             }
 
             $value = $this->data[$key];
-            if (true == is_array($value))
-            {
-                if (true == isset($value[$index]))
-                {
+            if (true == is_array($value)) {
+                if (true == isset($value[$index])) {
                     return $value[$index];
                 }
                 return null;
             }
-            elseif (true == is_string($value))
-            {
+            elseif (true == is_string($value)) {
                 $arr = explode("\n", $value);
-                if((isset($arr[$index]) && (!empty($arr[$index]) || strlen($arr[$index]) > 0)))
-                {
+                if((isset($arr[$index]) && (!empty($arr[$index]) || strlen($arr[$index]) > 0))) {
                     return $arr[$index];
                 }
                 return null;
             }
-            elseif ($value instanceof Varien_Object)
-            {
+            elseif ($value instanceof Varien_Object) {
                 return $value->getData($index);
             }
             return $default;
@@ -116,8 +104,7 @@ class Object
 
     public function hasData($key='')
     {
-        if (true == empty($key) || false == is_string($key))
-        {
+        if (true == empty($key) || false == is_string($key)) {
             return !empty($this->data);
         }
         return array_key_exists($key, $this->data);
@@ -127,14 +114,14 @@ class Object
     {
         switch (substr($method, 0, 3))
         {
-            case 'get' :
+        case 'get' :
             {
-                $key        = $this->getUnderScoredValue(substr($method, 3));
+            $key        = $this->getUnderScoredValue(substr($method, 3));
                 return      $this->getData($key, isset($args[0]) ? $args[0] : null);
             }
-            case 'set' :
+        case 'set' :
             {
-                $key        = $this->getUnderScoredValue(substr($method, 3));
+            $key        = $this->getUnderScoredValue(substr($method, 3));
                 return $this->setData($key, isset($args[0]) ? $args[0] : null);
             }
         }
@@ -149,8 +136,7 @@ class Object
 
     protected function getUnderScoredValue($name)
     {
-        if(true == isset(self::$underScoreCache[$name]))
-        {
+        if(true == isset(self::$underScoreCache[$name])) {
             return self::$underScoreCache[$name];
         }
         $result = strtolower(preg_replace('/(.)([A-Z])/', "$1_$2", $name));

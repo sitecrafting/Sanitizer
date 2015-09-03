@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -40,8 +39,7 @@ class Vat extends AbstractMockData
     public function getValues()
     {
         static $vat = null;
-        if(null == $vat)
-        {
+        if(null == $vat) {
             $vat = array();
             $start = 'GB2054';
             $finish = '464';

@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -44,8 +43,7 @@ class TransactionId extends AbstractMockData
         {
             $id = array();
             $tempId = rand(1000000, 9999999).'-txn';
-            if(false == in_array($tempId, $id))
-            {
+            if(false == in_array($tempId, $id)) {
                 $id[] = $tempId;
             }
         }

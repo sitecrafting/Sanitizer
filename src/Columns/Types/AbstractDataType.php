@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -69,15 +68,12 @@ abstract class AbstractDataType extends Object
      */
     public function getDefault()
     {
-        if(null != parent::getDefault())
-        {
+        if(null != parent::getDefault()) {
             return parent::getDefault();
         }
-        if(null != $this->getMockModel())
-        {
+        if(null != $this->getMockModel()) {
             $modelName = $this->getMockModel();
-            if(true == class_exists($modelName))
-            {
+            if(true == class_exists($modelName)) {
                 $model = new $modelName();
                 return $model->getRandomValue();
             }
@@ -93,13 +89,11 @@ abstract class AbstractDataType extends Object
     public function getMockModel()
     {
         $className = parent::getMockModel();
-        if(true == class_exists($className))
-        {
+        if(true == class_exists($className)) {
             return $className;
         }
         $className = "Pegasus\\Application\\Sanitizer\\Columns\\Mock\\".$className;
-        if(true == class_exists($className))
-        {
+        if(true == class_exists($className)) {
             return $className;
         }
         return null;

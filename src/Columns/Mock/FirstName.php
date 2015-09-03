@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -48,7 +47,25 @@ class FirstName extends AbstractMockData
             "Skylar",
             "Wesley",
             "Zane",
-            "Francis"
+            "Francis",
+            "Philip",
+            "David",
+            "Mark",
+            "Debbie",
+            "Elizabeth",
+            "Olivia",
+            "Luke",
+            "James",
+            "Pegasus",
+            "Bart",
+            "Sigourney",
+            "Jax",
+            "Opie",
+            "Akio",
+            "Cho",
+            "Chin",
+            "Hiro",
+            "Miles"
         );
     }
 }

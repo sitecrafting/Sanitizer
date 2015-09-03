@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -47,7 +46,7 @@ class Company extends AbstractMockData
             "Apple's and Pears",
             "Debbie's Amazing Designs LTD",
             "DullStar",
-            "Dark Solar Systems LTD"
+            "Dark Solar Systems LTD",
         );
     }
 }

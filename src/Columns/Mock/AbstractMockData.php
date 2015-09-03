@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -62,7 +61,7 @@ abstract class AbstractMockData extends Object
     public function getRandom()
     {
         static $values = null;
-        if(null == $values || true == $this->getForceValues()) {
+        if (null == $values || true == $this->getForceValues()) {
             $values = $this->getValues();
         }
         shuffle($values);
@@ -88,13 +87,11 @@ abstract class AbstractMockData extends Object
     public function getMockModel()
     {
         $className = parent::getMockModel();
-        if(true == class_exists($className))
-        {
+        if (true == class_exists($className)) {
             return $className;
         }
         $className = "Pegasus\\Application\\Sanitizer\\Columns\\Mock\\".$className;
-        if(true == class_exists($className))
-        {
+        if (true == class_exists($className)) {
             return $className;
         }
         return null;

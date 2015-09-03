@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -40,18 +39,14 @@ class Email extends AbstractMockData
     public function getValues()
     {
         static $emails = null;
-        if(null == $emails)
-        {
+        if (null == $emails) {
             $firstNames     = new FirstName();
             $lastNames      = new LastName();
-            $tlds           = array('gmail.com', 'gotmail.com', 'woosa.com', 'notanaddress.com');
+            $tlds           = array('gmail.com', 'gotmail.com', 'woosa.com', 'notanaddress.com', 'sanitizer.com');
             $names = array_merge($firstNames->getValues(), $lastNames->getValues());
-            foreach($names as $name)
-            {
-                foreach ($tlds as $tld)
-                {
+            foreach ($names as $name) {
+                foreach ($tlds as $tld) {
                     $emails[] = $name.rand(0, 100000).'@'.$tld;
-
                 }
             }
         }
@@ -60,6 +55,7 @@ class Email extends AbstractMockData
 
     /**
      * All E-mails must be different!
+     *
      * @return bool
      */
     public function supportsMassUpdate()

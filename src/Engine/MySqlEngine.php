@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -28,17 +27,33 @@
  */
 namespace Pegasus\Application\Sanitizer\Engine;
 
-class MySqlEngine extends Engine
+use Pegasus\Application\Sanitizer\Engine\Exceptions\EngineException;
+use Pegasus\Application\Sanitizer\Engine\Exceptions\FatalEngineException;
+use Pegasus\Application\Sanitizer\Sanitizer;
+
+class MySqlEngine extends AbstractEngine implements EngineInterface
 {
     public function getEngineName()
     {
-       return 'mysql';
+        return 'mysql';
+    }
+
+    public function logError($query=null)
+    {
+        $error = $this->error();
+        if(false == is_array($error)) {
+            $error = array($error);
+        }
+        Sanitizer::getInstance()->getLog()->addInfo('Fetch Error', $error);
+        if(null != $query) {
+            Sanitizer::getInstance()->getLog()->addInfo('Fetch Error Additional Info', array('info' => $query));
+        }
     }
 
     /**
      * Returns true if the table name exists in the database
      *
-     * @param $tableName
+     * @param  $tableName
      * @return bool if found, false otherwise
      * @throws FatalEngineException if an error occurred
      */
@@ -47,8 +62,7 @@ class MySqlEngine extends Engine
         /* @var $result PDOStatement */
         $query = "SHOW TABLES LIKE '{$tableName}'";
         $result = $this->query($query);
-        if(false == $result)
-        {
+        if(false == $result) {
             $this->logError($query);
             throw new FatalEngineException("Table exists check failed, error logged");
         }
@@ -59,8 +73,8 @@ class MySqlEngine extends Engine
     /**
      * Returns true if the column exists in the table
      *
-     * @param $tableName
-     * @param $columnName
+     * @param  $tableName
+     * @param  $columnName
      * @return bool if found, false otherwise
      * @throws FatalEngineException if an error occurred
      */
@@ -68,8 +82,7 @@ class MySqlEngine extends Engine
     {
         $query = "SHOW COLUMNS FROM `{$tableName}` LIKE '{$columnName}'";
         $result = $this->query($query);
-        if(false == $result)
-        {
+        if(false == $result) {
             $this->logError($query);
             throw new FatalEngineException("Column check failed, error logged");
         }
@@ -80,7 +93,7 @@ class MySqlEngine extends Engine
     /**
      * Returns the name of the primary key column
      *
-     * @param $tableName Is the name of the table to extract the primary key from
+     * @param  $tableName Is the name of the table to extract the primary key from
      * @return string primary key column name
      * @throws EngineException if the primary key was not found in the returned data.
      * @throws FatalEngineException  if an error occurred
@@ -89,16 +102,61 @@ class MySqlEngine extends Engine
     {
         $sql = "SHOW KEYS FROM `{$tableName}` WHERE Key_name = 'PRIMARY'";
         $result = $this->query($sql);
-        if(false == $result)
-        {
+        if(false == $result) {
             $this->logError($sql);
             throw new FatalEngineException("Primary key extraction failed error logged");
         }
         $result = $result->fetch();
-        if(false == isset($result['Column_name']))
-        {
+        if(false == isset($result['Column_name'])) {
             throw new EngineException("Primary key could not be found for table '{$tableName}'");
         }
         return $result['Column_name'];
+    }
+
+
+    public function drop() {
+        $sql = "DROP DATABASE `{$this->database_name}`";
+        $result = $this->query($sql);
+        if(false == $result) {
+            $this->logError($sql);
+            throw new FatalEngineException("Unable to drop database");
+        }
+        return true;
+    }
+
+    public function create() {
+        $sql = "CREATE DATABASE `{$this->database_name}`";
+        $result = $this->query($sql);
+        if(false == $result) {
+            $this->logError($sql);
+            throw new FatalEngineException("Unable to create database");
+        }
+        return true;
+    }
+
+    public function useDb() {
+        $sql = "USE `{$this->database_name}`";
+        $result = $this->query($sql);
+        if(false == $result) {
+            $this->logError($sql);
+            throw new FatalEngineException("Unable to select database");
+        }
+        return true;
+    }
+
+    public function source($fileName) {
+        $sql = file_get_contents($fileName);
+        $result = $this->query($sql);
+        if(false == $result) {
+            $this->logError($sql);
+            throw new FatalEngineException("Unable to import from source file, {$sql}");
+        }
+        return true;
+    }
+
+    public function dump($fileName) {
+        $command = "mysqldump -u {$this->username} -p{$this->password} -h {$this->server} {$this->database_name} > '{$fileName}'";
+        exec($command, $output=array(), $worked);
+        return (0 == $worked) ? true : $output;
     }
 }

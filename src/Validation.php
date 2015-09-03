@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -43,14 +42,14 @@
  */
 namespace Pegasus\Application\Sanitizer;
 
-use Pegasus\Application\Sanitizer\Tables\Collection;
+use Pegasus\Application\Sanitizer\Table\Collection;
+use Pegasus\Application\Sanitizer\Application;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Pegasus\Application\Sanitizer\Application;
+use Symfony\Component\Console\Helper\Table;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
-use Symfony\Component\Console\Helper\Table;
 
 
 class Validation extends Sanitizer
@@ -65,7 +64,8 @@ class Validation extends Sanitizer
 
     protected function sanitize()
     {
-        Collection::getCollection(); /* we just want to parse the config */
+        Collection::setSanitizer($this);
+        Collection::getCollection($this); /* we just want to parse the config */
         $this->setValidationNotRunning();
     }
 
@@ -127,8 +127,7 @@ class Validation extends Sanitizer
                 InputOption::VALUE_OPTIONAL,
                 'Memory - PHP format',
                 '2048M'
-            )
-        ;
+            );
     }
 
     /**
@@ -150,8 +149,7 @@ class Validation extends Sanitizer
 
     public function getLog()
     {
-        if(null == $this->log)
-        {
+        if(null == $this->log) {
             $this->log = new Logger('Validation');
             $this->log->pushHandler(new StreamHandler($this->getConfig()->getLogPath(), Logger::INFO));
         }
@@ -164,8 +162,7 @@ class Validation extends Sanitizer
     protected function outputIntro()
     {
         $this->printLn("Config Validation Mode", 'notice');
-        if(true == $this->getConfig()->getIsInDeveloperMode() || $this->getConfig()->getIsInDeveloperMode() == OutputInterface::VERBOSITY_VERY_VERBOSE)
-        {
+        if(true == $this->getConfig()->getIsInDeveloperMode() || $this->getConfig()->getIsInDeveloperMode() == OutputInterface::VERBOSITY_VERY_VERBOSE) {
             $this->printLn("App is in developer mode, therefore all output will be shown!", 'warning');
             $this->printLn("Verbosity ".$this->output->getVerbosity(), 'warning');
         }
@@ -214,8 +211,7 @@ class Validation extends Sanitizer
      */
     public static function getInstance()
     {
-        if(null == self::$validator)
-        {
+        if(null == self::$validator) {
             self::$validator = new Validation();
         }
         return self::$validator;

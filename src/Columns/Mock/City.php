@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -53,6 +52,27 @@ class City extends AbstractMockData
             "Poole",
             "Brighton",
             "Glasgow",
+            "New York City",
+            "Hong Kong",
+            "Paris",
+            "Singapore",
+            "Shanghai",
+            "Tokyo",
+            "Beijing",
+            "Sydney",
+            "Dubai",
+	        "Chicago",
+            "Mumbai",
+            "Milan",
+            "Moscow",
+            "São Paulo",
+            "Frankfurt",
+            "Toronto",
+            "Los Angeles",
+            "Madrid",
+            "Amsterdam",
+            "Kuala Lumpur",
+            "Brussels",
         );
     }
 }

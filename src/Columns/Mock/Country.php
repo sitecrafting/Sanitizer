@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -39,6 +38,7 @@ class Country extends AbstractMockData
      */
     public function getValues()
     {
+        /* Keeping it simple for not */
         return array
         (
             "GB",

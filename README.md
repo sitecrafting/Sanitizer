@@ -153,3 +153,46 @@ Within the tables element you specify the table name, in this case *customer_add
    3. text
    4. integer
    5. varchar
+
+###Pre and Post Conditions
+
+#### Pre Conditions
+
+Before sanitizer starts you can instruct it via the config to import a database. It must contain the
+source and this can be a relative or an absolute path.
+
+```json
+"pre_conditions":
+  {
+    "import_database":
+    {
+      "source":"sql/sanitizer.sql"
+    }
+  },
+```
+
+#### Post Conditions
+
+After sanitizer has finished you can instruct it to export the database to a dump file
+
+The only required attribute here is the destination which specifies the location and
+name of the file. Sanitizer also provides a couple of patterns whihc get switched out
+
+1. '{date}' which gets replace with 'date_format'
+2. '{time}' which gets replace with 'time_format'
+3. '{database_name}' which gets replace with the name of the database
+
+The format of 'time_format', and 'date_format' uses the [PHP date format](http://php.net/manual/en/function.date.php)
+
+```json
+  "post_conditions":
+  {
+    "export_database":
+    {
+      "date_format":"d-m-Y",
+      "time_format":"G-i-s-e",
+      "destination":"sql/sanitizer_sanitized_{date}-{time}.sql",
+      "drop":"true"
+    }
+  },
+```

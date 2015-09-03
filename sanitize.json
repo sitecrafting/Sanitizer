@@ -10,6 +10,27 @@
     "database":"sanitizer",
     "sanitization_mode":"full"
   },
+  "general_config":
+  {
+    "memory":"512M"
+  },
+  "pre_conditions":
+  {
+    "import_database":
+    {
+      "source":"sql/sanitizer.sql"
+    }
+  },
+  "post_conditions":
+  {
+    "export_database":
+    {
+      "date_format":"d-m-Y",
+      "time_format":"G-i-s-e",
+      "destination":"sql/sanitizer_sanitized_{date}-{time}.sql",
+      "drop":"true"
+    }
+  },
   "tables":
   {
     "core_config_data":{

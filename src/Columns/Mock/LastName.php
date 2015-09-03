@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Philip Elson <phil@pegasus-commerce.com>
@@ -48,7 +47,17 @@ class LastName extends AbstractMockData
             "Oliver",
             "Williams",
             "Carpenter",
-            "Harris"
+            "Harris",
+            "Teller",
+            "Mitchell",
+            "Payton",
+            "Darling",
+            "Tucker",
+            "Dyson",
+            "Hewlett",
+            "Packard",
+            "Dell",
+            "Lane"
         );
     }
 }
