@@ -11,7 +11,7 @@ setup:
         - "DROP DATABASE IF EXISTS sanitizer;"
         - "CREATE DATABASE sanitizer;"
         - "USE sanitizer;"
-        - "SOURCE sql/sanitizer.sql;"
+        - "SOURCE 'sql/sanitizer.sql';"
     composer:
         action: "install"
 
