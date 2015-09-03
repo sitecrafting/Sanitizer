@@ -10,7 +10,8 @@ setup:
     mysql:
         - "DROP DATABASE IF EXISTS sanitizer;"
         - "CREATE DATABASE sanitizer;"
-        - "SOURCE sql/sanitizer.sql"
+        - "USE sanitizer;"
+        - "SOURCE sql/sanitizer.sql;"
     composer:
         action: "install"
 
