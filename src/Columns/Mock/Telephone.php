@@ -39,10 +39,11 @@ class Telephone extends AbstractMockData
     public function getValues()
     {
         static $numbers = null;
-        if(null == $numbers) {
+
+        if (null == $numbers) {
             $numbers = array();
-            for($ii = 10; $ii < 20; $ii++)
-            {
+
+            for ($ii = 10; $ii < 20; $ii++) {
                 $numbers[] = "01234 6789".$ii;
             }
         }

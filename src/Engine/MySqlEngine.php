@@ -41,11 +41,14 @@ class MySqlEngine extends AbstractEngine implements EngineInterface
     public function logError($query=null)
     {
         $error = $this->error();
-        if(false == is_array($error)) {
+
+        if (false == is_array($error)) {
             $error = array($error);
         }
+
         Sanitizer::getInstance()->getLog()->addInfo('Fetch Error', $error);
-        if(null != $query) {
+
+        if (null != $query) {
             Sanitizer::getInstance()->getLog()->addInfo('Fetch Error Additional Info', array('info' => $query));
         }
     }
@@ -62,11 +65,14 @@ class MySqlEngine extends AbstractEngine implements EngineInterface
         /* @var $result PDOStatement */
         $query = "SHOW TABLES LIKE '{$tableName}'";
         $result = $this->query($query);
-        if(false == $result) {
+
+        if (false == $result) {
             $this->logError($query);
             throw new FatalEngineException("Table exists check failed, error logged");
         }
+
         $result = $result->fetchAll();
+
         return 1 == sizeof($result);
     }
 
@@ -82,11 +88,14 @@ class MySqlEngine extends AbstractEngine implements EngineInterface
     {
         $query = "SHOW COLUMNS FROM `{$tableName}` LIKE '{$columnName}'";
         $result = $this->query($query);
-        if(false == $result) {
+
+        if (false == $result) {
             $this->logError($query);
             throw new FatalEngineException("Column check failed, error logged");
         }
+
         $result = $result->fetchAll();
+
         return 1 == sizeof($result);
     }
 
@@ -102,65 +111,85 @@ class MySqlEngine extends AbstractEngine implements EngineInterface
     {
         $sql = "SHOW KEYS FROM `{$tableName}` WHERE Key_name = 'PRIMARY'";
         $result = $this->query($sql);
-        if(false == $result) {
+
+        if (false == $result) {
             $this->logError($sql);
             throw new FatalEngineException("Primary key extraction failed error logged");
         }
+
         $result = $result->fetch();
-        if(false == isset($result['Column_name'])) {
+
+        if (false == isset($result['Column_name'])) {
             throw new EngineException("Primary key could not be found for table '{$tableName}'");
         }
+
         return $result['Column_name'];
     }
 
 
-    public function drop() {
-        $sql = "DROP DATABASE `{$this->database_name}`";
+    public function drop()
+    {
+        $sql = "DROP DATABASE `{$this->_databaseName}`";
         $result = $this->query($sql);
-        if(false == $result) {
+
+        if (false == $result) {
             $this->logError($sql);
             throw new FatalEngineException("Unable to drop database");
         }
+
         return true;
     }
 
-    public function create() {
-        $sql = "CREATE DATABASE `{$this->database_name}`";
+    public function create()
+    {
+        $sql = "CREATE DATABASE `{$this->_databaseName}`";
         $result = $this->query($sql);
-        if(false == $result) {
+
+        if (false == $result) {
             $this->logError($sql);
             throw new FatalEngineException("Unable to create database");
         }
+
         return true;
     }
 
-    public function useDb() {
-        $sql = "USE `{$this->database_name}`";
+    public function useDb()
+    {
+        $sql = "USE `{$this->_databaseName}`";
         $result = $this->query($sql);
-        if(false == $result) {
+
+        if (false == $result) {
             $this->logError($sql);
             throw new FatalEngineException("Unable to select database");
         }
+
         return true;
     }
 
-    public function source($fileName) {
+    public function source($fileName)
+    {
         $sql = file_get_contents($fileName);
         $result = $this->query($sql);
-        if(false == $result) {
+
+        if (false == $result) {
             $this->logError($sql);
             throw new FatalEngineException("Unable to import from source file, {$sql}");
         }
+
         return true;
     }
 
-    public function dump($fileName) {
-        $command = "mysqldump -u {$this->username} -p{$this->password} -h {$this->server} {$this->database_name} > '{$fileName}'";
-        exec($command, $output=array(), $worked);
+    public function dump($fileName)
+    {
+        $command = "mysqldump -u {$this->_userName} -p{$this->_password} ";
+        $command .= "-h {$this->_server} {$this->_databaseName} > '{$fileName}'";
+        exec($command, $output = array(), $worked);
+
         return (0 == $worked) ? true : $output;
     }
 
-    public function getDatabaseName() {
-        return $this->database_name;
+    public function getDatabaseName()
+    {
+        return $this->_databaseName;
     }
 }

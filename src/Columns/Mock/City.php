@@ -61,7 +61,7 @@ class City extends AbstractMockData
             "Beijing",
             "Sydney",
             "Dubai",
-	        "Chicago",
+            "Chicago",
             "Mumbai",
             "Milan",
             "Moscow",

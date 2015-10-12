@@ -43,42 +43,51 @@ class PreConditions extends AbstractObserver
 {
     private $_sanitizer = null;
 
-    private function _setSanitizer(Sanitizer $sanitizer) {
+    private function _setSanitizer(Sanitizer $sanitizer)
+    {
         $this->_sanitizer = $sanitizer;
     }
 
-    private function _getSanitizer() {
+    private function _getSanitizer()
+    {
         return $this->_sanitizer;
     }
 
-    public function trigger(SimpleEvent $event, $eventName=null) {
+    public function trigger(SimpleEvent $event, $eventName=null)
+    {
         $eventData = $event->getValues();
-        if(null == $eventData) {
-            return;
-        }
-        $sanitizer = $eventData->getSanitizer();
-        if(null == $sanitizer) {
-            return;
-        }
-        $this->_setSanitizer($sanitizer);
-        $config = $sanitizer->getConfig();
-        if(null == $config) {
+
+        if (null == $eventData) {
             return;
         }
 
-        switch($eventName) {
-            case 'sanitizer.sanitize.before' : {
+        $sanitizer = $eventData->getSanitizer();
+
+        if (null == $sanitizer) {
+            return;
+        }
+
+        $this->_setSanitizer($sanitizer);
+        $config = $sanitizer->getConfig();
+
+        if (null == $config) {
+            return;
+        }
+
+        switch ($eventName) {
+            case 'sanitizer.sanitize.before' :
                 $this->_processEvent($config->getPreConditions());
                 break;
-            }
         }
     }
 
-    private function _processEvent($configData) {
-        if(null == $configData || false == is_array($configData)) {
+    private function _processEvent($configData) 
+    {
+        if (null == $configData || false == is_array($configData)) {
             return;
         }
-        foreach($configData as $key => $data) {
+
+        foreach ($configData as $key => $data) {
             switch ($key) {
                 case "import_database" : {
                     $this->_getSanitizer()->getTerminalPrinter()->printLn("Importing database...");
@@ -86,12 +95,13 @@ class PreConditions extends AbstractObserver
                     $helper->importDatabase($data, $this->_getSanitizer());
                     $this->_getSanitizer()->getTerminalPrinter()->printLn("Database imported \n");
                     break;
-                }
+                    }
             }
         }
     }
 
-    public function getEventsToListenForArray() {
+    public function getEventsToListenForArray() 
+    {
         return array('sanitizer.sanitize.before');
     }
 }

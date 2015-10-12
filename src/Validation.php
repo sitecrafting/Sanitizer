@@ -64,8 +64,8 @@ class Validation extends Sanitizer
 
     protected function sanitize()
     {
-        Collection::setSanitizer($this);
-        Collection::getCollection($this); /* we just want to parse the config */
+        $collection = new Collection($this->getEngine());
+        $collection->getCollection($this); /* we just want to parse the config */
         $this->setValidationNotRunning();
     }
 
@@ -135,7 +135,7 @@ class Validation extends Sanitizer
      */
     protected function setValidationRunning()
     {
-        $this->satitisationRunning = true;
+        $this->_satitisationRunning = true;
     }
 
     /**
@@ -143,17 +143,18 @@ class Validation extends Sanitizer
      */
     protected function setValidationNotRunning()
     {
-        $this->satitisationRunning = false;
+        $this->_satitisationRunning = false;
         $this->purgePrintCache();
     }
 
     public function getLog()
     {
-        if(null == $this->log) {
-            $this->log = new Logger('Validation');
-            $this->log->pushHandler(new StreamHandler($this->getConfig()->getLogPath(), Logger::INFO));
+        if (null == $this->_log) {
+            $this->_log = new Logger('Validation');
+            $this->_log->pushHandler(new StreamHandler($this->getConfig()->getLogPath(), Logger::INFO));
         }
-        return $this->log;
+
+        return $this->_log;
     }
 
     /**
@@ -162,9 +163,11 @@ class Validation extends Sanitizer
     protected function outputIntro()
     {
         $this->printLn("Config Validation Mode", 'notice');
-        if(true == $this->getConfig()->getIsInDeveloperMode() || $this->getConfig()->getIsInDeveloperMode() == OutputInterface::VERBOSITY_VERY_VERBOSE) {
+
+        if (true == $this->getConfig()->getIsInDeveloperMode()
+            || $this->getConfig()->getIsInDeveloperMode() == OutputInterface::VERBOSITY_VERY_VERBOSE) {
             $this->printLn("App is in developer mode, therefore all output will be shown!", 'warning');
-            $this->printLn("Verbosity ".$this->output->getVerbosity(), 'warning');
+            $this->printLn("Verbosity ".$this->_output->getVerbosity(), 'warning');
         }
     }
 
@@ -178,19 +181,19 @@ class Validation extends Sanitizer
 
     protected function purgePrintCache()
     {
-        $table = new Table($this->output);
+        $table = new Table($this->_output);
         $table->setHeaders(array('Message', 'Level'));
         $rows = array();
 
-        foreach ($this->printCache as $item)
-        {
+        foreach ($this->_printCache as $item) {
             $message = $item['message'];
             $type = $item['type'];
             $rows[] = array($message, $type);
         }
+
         $table->setRows($rows);
         $table->render();
-        $this->printCache = array();
+        $this->_printCache = array();
     }
 
     /**
@@ -211,9 +214,10 @@ class Validation extends Sanitizer
      */
     public static function getInstance()
     {
-        if(null == self::$validator) {
+        if (null == self::$validator) {
             self::$validator = new Validation();
         }
+
         return self::$validator;
     }
 }

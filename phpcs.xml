@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<ruleset name="Custom Standard">
+    <description>A custom coding standard</description>
+    <exclude-pattern>*/code/community/*</exclude-pattern>
+    <exclude-pattern>*/code/core/*</exclude-pattern>
+    <exclude-pattern>*/code/local/AdjustWare/*</exclude-pattern>
+    <exclude-pattern>*/code/local/AW/*</exclude-pattern>
+    <exclude-pattern>*/code/local/Aitoc/*</exclude-pattern>
+    <exclude-pattern>*/code/local/Cargo/*</exclude-pattern>
+    <exclude-pattern>*/code/local/Ebizmarts/*</exclude-pattern>
+    <exclude-pattern>*/code/local/Webshopapps/*</exclude-pattern>
+    <exclude-pattern>*/code/local/Mage/*</exclude-pattern>
+    <exclude-pattern>*/code/local/Varien/*</exclude-pattern>
+    <exclude-pattern>*/code/local/Zend/*</exclude-pattern>
+    <exclude-pattern>*/tests/*</exclude-pattern>
+    <exclude-pattern>*/data/*</exclude-pattern>
+    <rule ref="Zend"/>
+    <rule ref="Generic.Commenting.Todo.CommentFound">
+        <message>Please review this TODO comment: %s</message>
+        <severity>5</severity>
+    </rule>
+    <rule ref="Generic.Files.LineLength.MaxExceeded">
+        <message>Line longer than %s chars, contains %s characters</message>
+    </rule>
+    <rule ref="Generic.Files.LineLength.TooLong">
+        <message>Line longer than %s characters; contains %s characters</message>
+    </rule>
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="120"/>
+            <property name="absoluteLineLimit" value="120"/>
+        </properties>
+    </rule>
+</ruleset>

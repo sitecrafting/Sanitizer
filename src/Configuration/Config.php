@@ -32,19 +32,40 @@ use Pegasus\Application\Sanitizer\Configuration;
 
 class Config extends Object
 {
+    /**
+     * Default password
+     */
     const INPUT_PASSWORD_DEFAULT        = '';
 
+    /**
+     * Default config file name
+     */
     const INPUT_CONFIGURATION_FILE      ='sanitize.json';
 
+    /**
+     * Default log name
+     */
+    const DEFAULT_LOG_NAME              = 'sanitizer.log';
+
+    /**
+     * Default database engine
+     */
     const INPUT_ENGINE                  = 'mysql';
 
+    /**
+     * Default database host
+     */
     const INPUT_HOST                    = 'localhost';
 
+    /**
+     * Default database user
+     */
     const INPUT_USER                    = 'root';
 
+    /**
+     * Default database name
+     */
     const INPUT_DATABASE                = 'sanitizer';
-
-    const INPUT_MODE                    = 'full';
 
     /**
      * Full sanitisation mode
@@ -56,13 +77,26 @@ class Config extends Object
      */
     const SANITIZATION_MODE_QUICK        = 'quick';
 
-    private $database = null;
+    /**
+     * Contains the database config
+     *
+     * @var null
+     */
+    private $_databaseName = null;
 
+    /**
+     * Initialise the config with the config file
+     *
+     * @param $configFile
+     * @throws ConfigException
+     */
     public function __construct($configFile)
     {
-        if(false == file_exists($configFile)) {
-            throw new ConfigException("Sadly I couldn't validate the config file {$configFile} because it doesn't exist!");
+        if (false == file_exists($configFile)) {
+            $msg = "Sadly I couldn't validate the config file {$configFile} because it doesn't exist!";
+            throw new ConfigException($msg);
         }
+
         $parsed = json_decode(file_get_contents($configFile), true);
         $this->setData($parsed);
     }
@@ -74,82 +108,69 @@ class Config extends Object
      */
     public function setDatabaseOverride($data)
     {
-        if(false == isset($this->data['database'])) {
-            $this->data['database'] = array();
+        if (false == isset($this->_data['database'])) {
+            $this->_data['database'] = array();
         }
 
         $this->databaseConfigInitialise();
 
-        foreach($data as $configOverride)
-        {
-            if(2 == sizeof($configOverride)) {
-                if(null != $configOverride[0] && null != $configOverride[1]) {
+        foreach ($data as $configOverride) {
+
+            if (2 == sizeof($configOverride)) {
+
+                if (null != $configOverride[0] && null != $configOverride[1]) {
                     $key = strtolower($configOverride[0]);
-                    switch($key)
-                    {
-                    case 'password' :
-                        {
-                        //If the input has been changed by the user then we should use it
-                        if($configOverride[1] != self::INPUT_PASSWORD_DEFAULT) {
-                            $this->data['database'][$key] = $configOverride[1];
-                        }
+
+                    switch($key) {
+                        case 'password' :
+                            //If the input has been changed by the user then we should use it
+                            if ($configOverride[1] != self::INPUT_PASSWORD_DEFAULT) {
+                                $this->_data['database'][$key] = $configOverride[1];
+                            }
                             break;
-                        }
-                    case 'engine' :
-                        {
-                        //If the input has been changed by the user then we should use it
-                        if($configOverride[1] != self::INPUT_ENGINE) {
-                            $this->data['database'][$key] = $configOverride[1];
-                        }
+                        case 'engine' :
+                            //If the input has been changed by the user then we should use it
+                            if ($configOverride[1] != self::INPUT_ENGINE) {
+                                $this->_data['database'][$key] = $configOverride[1];
+                            }
                             break;
-                        }
-                    case 'config' :
-                        {
-                        //If the input has been changed by the user then we should use it
-                        if($configOverride[1] != self::INPUT_CONFIGURATION_FILE) {
-                            $this->data['database'][$key] = $configOverride[1];
-                        }
+                        case 'config' :
+                            //If the input has been changed by the user then we should use it
+                            if ($configOverride[1] != self::INPUT_CONFIGURATION_FILE) {
+                                $this->_data['database'][$key] = $configOverride[1];
+                            }
                             break;
-                        }
-                    case 'username' :
-                        {
-                        //If the input has been changed by the user then we should use it
-                        if($configOverride[1] != self::INPUT_USER) {
-                            $this->data['database'][$key] = $configOverride[1];
-                        }
+                        case 'username' :
+                            //If the input has been changed by the user then we should use it
+                            if ($configOverride[1] != self::INPUT_USER) {
+                                $this->_data['database'][$key] = $configOverride[1];
+                            }
                             break;
-                        }
-                    case 'host' :
-                        {
-                        //If the input has been changed by the user then we should use it
-                        if($configOverride[1] != self::INPUT_HOST) {
-                            $this->data['database'][$key] = $configOverride[1];
-                        }
+                        case 'host' :
+                            //If the input has been changed by the user then we should use it
+                            if ($configOverride[1] != self::INPUT_HOST) {
+                                $this->_data['database'][$key] = $configOverride[1];
+                            }
                             break;
-                        }
-                    case 'database' :
-                        {
-                        //If the input has been changed by the user then we should use it
-                        if($configOverride[1] != self::INPUT_DATABASE) {
-                            $this->data['database'][$key] = $configOverride[1];
-                        }
+                        case 'database' :
+                            //If the input has been changed by the user then we should use it
+                            if ($configOverride[1] != self::INPUT_DATABASE) {
+                                $this->_data['database'][$key] = $configOverride[1];
+                            }
                             break;
-                        }
-                    case 'mode' :
-                        {
-                        //If the input has been changed by the user then we should use it
-                        if($configOverride[1] != self::INPUT_DATABASE) {
-                            $this->data['database']['sanitization_mode'] = $configOverride[1];
-                        }
+                        case 'mode' :
+                            //If the input has been changed by the user then we should use it
+                            if ($configOverride[1] != self::INPUT_DATABASE) {
+                                $this->_data['database']['sanitization_mode'] = $configOverride[1];
+                            }
                             break;
-                        }
                     }
                 }
             }
         }
 
         /* set it back to null so the next call re-initialises the database config object */
-        $this->database = null;
+        $this->_databaseName = null;
     }
 
     /**
@@ -158,29 +179,37 @@ class Config extends Object
      *
      * @param array $overrides Is the override data structure
      */
-    public function setAdditionalOverrides(array $overrides) {
-        if(null == $overrides || 0 == sizeof($overrides)) {
+    public function setAdditionalOverrides(array $overrides) 
+    {
+        if (null == $overrides || 0 == sizeof($overrides)) {
             return;
         }
-        foreach($overrides as $configNode => $childNodes) {
-            if (true == isset($this->data[$configNode])) {
+
+        foreach ($overrides as $configNode => $childNodes) {
+            if (true == isset($this->_data[$configNode])) {
                 if (true == is_array($childNodes)) {
-                    foreach ($childNodes as $childNodLevel2Key => $childNodesLevel2) {
-                        if (true == is_array($childNodesLevel2)) {
-                            foreach ($childNodesLevel2 as $childNodesLevel3key => $childNodesLevel3) {
-                                if (true == isset($this->data[$configNode][$childNodLevel2Key][$childNodesLevel3key]) && null != $childNodesLevel3) {
-                                    $this->data[$configNode][$childNodLevel2Key][$childNodesLevel3key] = $childNodesLevel3;
+                    foreach ($childNodes as $childNodLevelTwoKey => $childNodesLevelTwo) {
+                        if (true == is_array($childNodesLevelTwo)) {
+                            foreach ($childNodesLevelTwo as $childNodesLevelThreekey => $childNodesLevelThree) {
+                                if (true == isset(
+                                    $this->_data[$configNode]
+                                    [$childNodLevelTwoKey][$childNodesLevelThreekey]
+                                )
+                                    && null != $childNodesLevelThree) {
+                                    $this->_data[$configNode][$childNodLevelTwoKey][$childNodesLevelThreekey]
+                                        = $childNodesLevelThree;
                                 }
                             }
                         } else {
-                            if (true == isset($this->data[$configNode][$childNodLevel2Key]) && null != $childNodesLevel2) {
-                                $this->data[$configNode][$childNodLevel2Key] = $childNodesLevel2;
+                            if (true == isset($this->_data[$configNode][$childNodLevelTwoKey])
+                                && null != $childNodesLevelTwo) {
+                                $this->_data[$configNode][$childNodLevelTwoKey] = $childNodesLevelTwo;
                             }
                         }
                     }
                 } else {
-                    if (true == isset($this->data[$configNode]) && null != $childNodes) {
-                        $this->data[$configNode] = $childNodes;
+                    if (true == isset($this->_data[$configNode]) && null != $childNodes) {
+                        $this->_data[$configNode] = $childNodes;
                     }
                 }
             }
@@ -194,26 +223,32 @@ class Config extends Object
      */
     private function databaseConfigInitialise()
     {
-        if(false == isset($this->data['database']['engine'])) {
-            $this->data['database']['engine'] = self::INPUT_ENGINE;
+        if (false == isset($this->_data['database']['engine'])) {
+            $this->_data['database']['engine'] = self::INPUT_ENGINE;
         }
-        if(false == isset($this->data['database']['password'])) {
-            $this->data['database']['password'] = self::INPUT_PASSWORD_DEFAULT;
+
+        if (false == isset($this->_data['database']['password'])) {
+            $this->_data['database']['password'] = self::INPUT_PASSWORD_DEFAULT;
         }
-        if(false == isset($this->data['database']['config'])) {
-            $this->data['database']['config'] = self::INPUT_CONFIGURATION_FILE;
+
+        if (false == isset($this->_data['database']['config'])) {
+            $this->_data['database']['config'] = self::INPUT_CONFIGURATION_FILE;
         }
-        if(false == isset($this->data['database']['database'])) {
-            $this->data['database']['database'] = self::INPUT_DATABASE;
+
+        if (false == isset($this->_data['database']['database'])) {
+            $this->_data['database']['database'] = self::INPUT_DATABASE;
         }
-        if(false == isset($this->data['database']['host'])) {
-            $this->data['database']['host'] = self::INPUT_HOST;
+
+        if (false == isset($this->_data['database']['host'])) {
+            $this->_data['database']['host'] = self::INPUT_HOST;
         }
-        if(false == isset($this->data['database']['username'])) {
-            $this->data['database']['username'] = self::INPUT_USER;
+
+        if (false == isset($this->_data['database']['username'])) {
+            $this->_data['database']['username'] = self::INPUT_USER;
         }
-        if(false == isset($this->data['database']['sanitization_mode'])) {
-            $this->data['database']['sanitization_mode'] = self::INPUT_MODE;
+
+        if (false == isset($this->_data['database']['sanitization_mode'])) {
+            $this->_data['database']['sanitization_mode'] = self::SANITIZATION_MODE_FULL;
         }
     }
 
@@ -223,12 +258,14 @@ class Config extends Object
      */
     public function getIsInDeveloperMode()
     {
-        if(false == isset($this->data['developer_mode'])) {
+        if (false == isset($this->_data['developer_mode'])) {
             return false;
         }
-        if('yes' == $this->data['developer_mode']) {
+
+        if ('yes' == $this->_data['developer_mode']) {
             return true;
         }
+
         return false;
     }
 
@@ -239,14 +276,16 @@ class Config extends Object
      */
     public function getDatabase()
     {
-        if(null == $this->database) {
-            $this->database = new Object($this->data['database']);
-            $this->database->setDatabaseName($this->database->getDatabase());
-            if(null == $this->database->getSanitizationMode()) {
-                $this->database->setSanitizationMode('full');
+        if (null == $this->_databaseName) {
+            $this->_databaseName = new Object($this->_data['database']);
+            $this->_databaseName->setDatabaseName($this->_databaseName->getDatabase());
+
+            if (null == $this->_databaseName->getSanitizationMode()) {
+                $this->_databaseName->setSanitizationMode('full');
             }
         }
-        return $this->database;
+
+        return $this->_databaseName;
     }
 
     /**
@@ -266,7 +305,7 @@ class Config extends Object
      */
     public function getTables()
     {
-        return $this->data['tables'];
+        return $this->_data['tables'];
     }
 
     /**
@@ -275,9 +314,10 @@ class Config extends Object
      */
     public function getLogPath()
     {
-        if(null == parent::getLogPath()) {
-            parent::setLogPath('sanitizer.log');
+        if (null == parent::getLogPath()) {
+            parent::setLogPath(self::DEFAULT_LOG_NAME);
         }
+
         return parent::getLogPath();
     }
 }

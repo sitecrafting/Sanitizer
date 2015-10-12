@@ -47,9 +47,11 @@ class Eav extends AbstractTable
     function setTableData(array $tableData)
     {
         parent::setTableData($tableData);
-        if(true == $this->doCommand()) {
+
+        if (true == $this->doCommand()) {
             return true;
         }
+
         $this->setColumn($this->getColumnFromTableData($tableData));
         $this->setDataType($this->getDataTypeFromTableData($tableData));
         $column = $this->getInstanceFromType($this->getDataType(), $tableData);
@@ -61,25 +63,29 @@ class Eav extends AbstractTable
 
     public function getDataTypeFromTableData($tableData)
     {
-        if(true == isset($tableData['data_type'])) {
+        if (true == isset($tableData['data_type'])) {
             return $tableData['data_type'];
         }
+
         return 'text';
     }
 
     public function getColumnFromTableData($tableData)
     {
-        if(false == isset($tableData['column'])) {
+        if (false == isset($tableData['column'])) {
             throw new TableException('Column name not defined for EAV table '.$this->getTableName());
         }
+
         return $tableData['column'];
     }
 
     private function configureEavColumn($column, $tableData)
     {
-        if(false == isset($tableData['control_column'])) {
-            throw new TableException("Control column undefined for column '{$column->getName()}' on table '{$this->getTableName()}'");
+        if (false == isset($tableData['control_column'])) {
+            $msg = "Control column undefined for column '{$column->getName()}' on table '{$this->getTableName()}'";
+            throw new TableException($msg);
         }
+
         $controlColumn = new Object($tableData['control_column']);
         $column->setControlColumn($controlColumn);
     }
@@ -88,33 +94,51 @@ class Eav extends AbstractTable
     {
         $rows = 0;
         $rowsEffected = $this->hasExecutedCommand();
-        if(false !== $rowsEffected) {
+
+        if (false !== $rowsEffected) {
             return $rowsEffected;
         }
-        foreach($this->getColumns() as $column)
-        {
+
+        foreach ($this->getColumns() as $column) {
             $controlColumn = $column->getControlColumn();
-            $this->getTerminalPrinter()->printLn("Sanitizing Eav '{$this->getTableName()}' subset of column '{$column->getColumn()}' with '{$controlColumn->getName()}' ", 'notice');
-            foreach($controlColumn->getValues() as $subsetIndex => $source)
-            {
+            $msg = "Sanitizing Eav '{$this->getTableName()}' subset of ";
+            $msg .= "column '{$column->getColumn()}' with '{$controlColumn->getName()}'";
+            $this->getTerminalPrinter()->printLn($msg, 'notice');
+
+            foreach ($controlColumn->getValues() as $subsetIndex => $source) {
                 $source = new MockData($source);
-                if(null != $source->getMockModel()) {
+
+                if (null != $source->getMockModel()) {
                     $modelName      = $source->getMockModel();
-                    if(false == class_exists($modelName)) {
-                        throw new TableException("Unable to find Mock Model with the name '{$modelName}' in table '{$this->getTableName()}' with row id '{$subsetIndex}' ");
+
+                    if (false == class_exists($modelName)) {
+                        $msg = "Unable to find Mock Model with the name '{$modelName}' in ";
+                        $msg .= "table '{$this->getTableName()}' with row id '{$subsetIndex}' ";
+                        throw new TableException($msg);
                     }
+
                     $model          = new $modelName();
-                    $rows += $this->sanitizeSubset($this->getTableName(), $controlColumn->getName(), $subsetIndex, $column->getColumn(), $model);
+                    $rows += $this->sanitizeSubset(
+                        $this->getTableName(),
+                        $controlColumn->getName(),
+                        $subsetIndex,
+                        $column->getColumn(),
+                        $model
+                    );
+                } else {
+                    $msg = "No Mock Model configuration found for EAV column '{$controlColumn->getName()}' ";
+                    $msg .= "with row id '{$subsetIndex}' in table '{$this->getTableName()}'";
+                    $this->getTerminalPrinter()->printLn($msg, 'notice');
                 }
-                else
-                {
-                    $this->getTerminalPrinter()->printLn("No Mock Model configuration found for EAV column '{$controlColumn->getName()}'  with row id '{$subsetIndex}' in table '{$this->getTableName()}'", 'notice');
-                }
-                if(null != $source->getComment()) {
-                    $this->getTerminalPrinter()->printLn("Comment[{$this->getTableName()}][{$controlColumn->getName()}]: {$source->getComment()}", 'general');
+
+                if (null != $source->getComment()) {
+                    $msg = "Comment[{$this->getTableName()}][{$controlColumn->getName()}]: {$source->getComment()}";
+                    $this->getTerminalPrinter()->printLn($msg, 'general');
                 }
             }
-            $this->getTerminalPrinter()->printLn("Sanitized Eav '{$this->getTableName()}' subset of column '{$column->getColumn()}' with '{$controlColumn->getName()}' equal to '{$subsetIndex}' ", 'notice');
+            $msg = "Sanitized Eav '{$this->getTableName()}' subset of column '{$column->getColumn()}' with ";
+            $msg .= "'{$controlColumn->getName()}' equal to '{$subsetIndex}' ";
+            $this->getTerminalPrinter()->printLn($msg, 'notice');
 
         }
         return $rows;
@@ -122,19 +146,26 @@ class Eav extends AbstractTable
 
     private function sanitizeSubset($tableName, $controlColumnName, $subsetIndex, $columnName, $mockModel)
     {
-        if(true == $this->getIsQuickSanitisation()) {
-            return $this->getEngine()->update($tableName, array($columnName => $mockModel->getRandomValue()), array($controlColumnName => $subsetIndex));
-        }
-        else
-        {
+        if (true == $this->getIsQuickSanitisation()) {
+            return $this->getEngine()->update(
+                $tableName,
+                array($columnName => $mockModel->getRandomValue()),
+                array($controlColumnName => $subsetIndex)
+            );
+        } else {
             $rowsUpdated = 0;
-            $rows = $this->getEngine()->select($tableName, $this->getSelectColumns(), array($controlColumnName => $subsetIndex));
-            foreach($rows as $row)
-            {
+            $rows = $this->getEngine()->select(
+                $tableName,
+                $this->getSelectColumns(),
+                array($controlColumnName => $subsetIndex)
+            );
+
+            foreach ($rows as $row) {
                 $newData = array();
                 $newData[$columnName] = $mockModel->getRandomValue();
                 $rowsUpdated += $this->getEngine()->update($tableName, $newData, $this->getPrimaryKeyData($row));
             }
+
             return $rowsUpdated;
         }
     }

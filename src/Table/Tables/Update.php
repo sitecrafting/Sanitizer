@@ -52,25 +52,34 @@ class Update extends AbstractTable
     function setTableData(array $tableData)
     {
         parent::setTableData($tableData);
+
         if (true == $this->doCommand()) {
             return true;
         }
+
         if (false == isset($tableData['rules'])) {
-            throw new TableException("Update type needs a set of rules so it knows what to do for table {$this->getTableName()}!");
+            $msg = "Update type needs a set of rules so it knows what to do for table {$this->getTableName()}!";
+            throw new TableException($msg);
         }
+
         $rules = array();
+
         foreach ($tableData['rules'] as $rule) {
             $rule = new Object($rule);
-            if(null == $rule->getDataType()) {
+
+            if (null == $rule->getDataType()) {
                 $rule->setDataType('text');
             }
+
             $rule->setColumnTypeInstance($this->getInstanceFromType($rule->getDataType(), $rule->getData()));
             $rules[] = $rule;
             $this->getTerminalPrinter()->println($this->_getMessage($rule), 'notice');
         }
+
         $this->setRules($rules);
         $this->validateWhereClause();
         $this->checkAllRulesHaveColumnsWhichExist();
+
         return true;
     }
 
@@ -80,7 +89,8 @@ class Update extends AbstractTable
      * @param $rule
      * @return string
      */
-    private function _getMessage($rule) {
+    private function _getMessage($rule) 
+    {
         $message = "Another update to column '";
         $message .= $rule->getColumn();
         $message .= "' in '";
@@ -88,11 +98,13 @@ class Update extends AbstractTable
         $message .= "' marked for update to '";
         $message .= $rule->getTo();
         $message .= "'";
-        if(null != $rule->getWhere()) {
+
+        if (null != $rule->getWhere()) {
             $message .= " where '";
             $message .= implode(',', $rule->getWhere());
             $message .= "'";
         }
+
         return $message;
     }
 
@@ -105,6 +117,7 @@ class Update extends AbstractTable
     private function validateWhereClause()
     {
         foreach ($this->getRules() as $rule) {
+
             if (false == is_array($rule->getWhere()) && null != $rule->getWhere()) {
                 $rule->setWhere(array($rule->getWhere()));
             }
@@ -121,10 +134,13 @@ class Update extends AbstractTable
     {
         foreach ($this->getRules() as $rule) {
             $column = $rule->getColumnTypeInstance();
-            if(null == $column) {
-                throw new TableException("Column instance not found in table {$this->getTableName()} for rule {$rule->getValue()}");
+
+            if (null == $column) {
+                $msg = "Column instance not found in table {$this->getTableName()} for rule {$rule->getValue()}";
+                throw new TableException($msg);
             }
-            if(false == $column->exists()) {
+
+            if (false == $column->exists()) {
                 throw new TableException("Column not find column {$column->getName()} for {$this->getTableName()} ");
             }
         }
@@ -139,14 +155,18 @@ class Update extends AbstractTable
         $engine     = $this->getEngine();
         $printer    = $this->getTerminalPrinter();
         $rows       = 0;
-        foreach($this->getRules() as $rule)
-        {
-            $printer->printLn("Updating rows in {$this->getTableName()}' for column '{$rule->getColumn()}' to '{$rule->getTo()}'", 'notice');
-            $dataToChange = array($rule->getColumnTypeInstance()->getName() => $rule->getTo());
-            $rowsUpdated  = $engine->update($this->getTableName(), $dataToChange, $rule->getWhere());
-            $printer->printLn("Updated '$rowsUpdated' rows in {$this->getTableName()}' for column '{$rule->getColumn()}' to '{$rule->getTo()}'", 'notice');
+
+        foreach ($this->getRules() as $rule) {
+            $msg = "Updating rows in {$this->getTableName()}' for column '{$rule->getColumn()}' to '{$rule->getTo()}'";
+            $printer->printLn($msg, 'notice');
+            $dataToChange   = array($rule->getColumnTypeInstance()->getName() => $rule->getTo());
+            $rowsUpdated    = $engine->update($this->getTableName(), $dataToChange, $rule->getWhere());
+            $msg            = "Updated '$rowsUpdated' rows in {$this->getTableName()}' for ";
+            $msg            .= "column '{$rule->getColumn()}' to '{$rule->getTo()}'";
+            $printer->printLn($msg, 'notice');
             $rows += $rowsUpdated;
         }
+
         return $rows;
     }
 }

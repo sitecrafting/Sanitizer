@@ -39,14 +39,16 @@ class TransactionId extends AbstractMockData
     public function getValues()
     {
         $id = null;
-        for($ii = 0; $ii < 10; $ii++)
-        {
+
+        for ($ii = 0; $ii < 10; $ii++) {
             $id = array();
             $tempId = rand(1000000, 9999999).'-txn';
-            if(false == in_array($tempId, $id)) {
+
+            if (false == in_array($tempId, $id)) {
                 $id[] = $tempId;
             }
         }
+
         return $id;
     }
 }

@@ -39,15 +39,17 @@ class Vat extends AbstractMockData
     public function getValues()
     {
         static $vat = null;
-        if(null == $vat) {
+
+        if (null == $vat) {
             $vat = array();
             $start = 'GB2054';
             $finish = '464';
-            for($ii = 10; $ii < 50; $ii++)
-            {
+
+            for ($ii = 10; $ii < 50; $ii++) {
                 $vat[] = $start.$ii.$finish;
             }
         }
+
         return $vat;
     }
 }

@@ -51,19 +51,23 @@ class Flat extends AbstractTable
     function setTableData(array $tableData)
     {
         parent::setTableData($tableData);
-        if(true == $this->doCommand()) {
+
+        if (true == $this->doCommand()) {
             return true;
         }
 
-        if(true == $this->skip($tableData)) {
+        if (true == $this->skip($tableData)) {
             return false;
         }
+
         $this->loadColumnInstances($tableData);
-        foreach($this->getColumns() as $column)
-        {
-            if(false == $column->exists()) {
+
+        foreach ($this->getColumns() as $column) {
+
+            if (false == $column->exists()) {
                 $db = $this->getTerminalPrinter()->getConfig()->getDatabase()->getDatabaseName();
-                throw new TableException("Column '{$column->getName()}' in table '{$this->getTableName()}' not found in database '{$db}'");
+                $msg = "Column '{$column->getName()}' in table '{$this->getTableName()}' not found in database '{$db}'";
+                throw new TableException($msg);
             }
         }
         return true;
@@ -71,16 +75,20 @@ class Flat extends AbstractTable
 
     private function loadColumnInstances($tableData)
     {
-        foreach($tableData as $columnData)
-        {
-            if(false == isset($columnData[self::FIELD_COLUMN])) {
+        foreach ($tableData as $columnData) {
+
+            if (false == isset($columnData[self::FIELD_COLUMN])) {
                 $data = $columnData;
-                if(true == is_array($columnData)) {
+
+                if (true == is_array($columnData)) {
                     $data = implode(',', $columnData);
                 }
-                throw new TableException("No column name could be found on table '{$this->getTableName()}' for data ".$data);
+
+                $msg = "No column name could be found on table '{$this->getTableName()}' for data ".$data;
+                throw new TableException($msg);
             }
-            if(true == isset($columnData[self::FIELD_DATA_TYPE])) {
+
+            if (true == isset($columnData[self::FIELD_DATA_TYPE])) {
                 $configDataType = $columnData[self::FIELD_DATA_TYPE];
                 $this->addColumn($this->getInstanceFromType($configDataType, $columnData));
             }
@@ -95,10 +103,14 @@ class Flat extends AbstractTable
      */
     private function skip($tableData)
     {
-        if (0 == sizeof($tableData)) /* Flat tables are simple, if the array has now data then we are screwed. */ {
-            $this->getTerminalPrinter()->printLn("No columns to manipulate could be found for table '{$this->getTableName()}', skipping", 'general');
+        /* Flat tables are simple, if the array has now data then we are screwed. */
+        if (0 == sizeof($tableData)) {
+            $msg = "No columns to manipulate could be found for table '{$this->getTableName()}', skipping";
+            $this->getTerminalPrinter()->printLn($msg, 'general');
+
             return true;
         }
+
         return false;
     }
 
@@ -111,37 +123,50 @@ class Flat extends AbstractTable
     {
         $printer        = $this->getTerminalPrinter();
         $rowsEffected   = $this->hasExecutedCommand();
+
         if (false !== $rowsEffected) {
             return $rowsEffected;
         }
+
         $columns = $this->getColumnsForEngineQuery();
-        if(true == $this->getIsQuickSanitisation()) {
+
+        if (true == $this->getIsQuickSanitisation()) {
             $printer->printLn("Sanitizing Flat {$this->getTableName()}", 'notice');
             $rows = $this->getEngine()->update($this->getTableName(), $columns);
             $printer->printLn("Sanitized Flat {$this->getTableName()}", 'notice');
+
             return $rows;
+
         } else {
             $printer->printLn("Sanitizing Flat {$this->getTableName()} ", 'notice');
             $rowsUpdated = 0;
             $rows = $this->getEngine()->select($this->getTableName(), $this->getSelectColumns());
-            foreach($rows as $row)
-            {
+
+            foreach ($rows as $row) {
                 $rowSubset = $this->getColumnsForEngineQuery();
-                $rowsUpdated += $this->getEngine()->update($this->getTableName(), $rowSubset, $this->getPrimaryKeyData($row));
+                $rowsUpdated += $this->getEngine()->update(
+                    $this->getTableName(),
+                    $rowSubset,
+                    $this->getPrimaryKeyData($row)
+                );
             }
+
             $printer->printLn("Sanitized Flat {$this->getTableName()} ", 'notice');
+
             return $rowsUpdated;
         }
+
         return 0;
     }
 
     private function getColumnsForEngineQuery()
     {
         $columns = array();
-        foreach ($this->getColumns() as $column)
-        {
+
+        foreach ($this->getColumns() as $column) {
             $columns[$column->getName()] = $column->getDefault();
         }
+
         return $columns;
     }
 }

@@ -44,7 +44,7 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class SimpleEvent extends Event
 {
-    protected $values = array();
+    protected $_values = array();
 
     /**
      * This method allows for initialising of the data.
@@ -54,7 +54,7 @@ class SimpleEvent extends Event
     public function __construct(array $data=null) 
     {
         if (null != $data) {
-            $this->values = $data;
+            $this->_values = $data;
         }
     }
 
@@ -66,10 +66,11 @@ class SimpleEvent extends Event
      */
     public function getValues($asObject=true)
     {
-        if(false == $asObject) {
-            return $this->values;
+        if (false == $asObject) {
+            return $this->_values;
         }
-        return new Object($this->values);
+
+        return new Object($this->_values);
     }
 
     /**
@@ -85,7 +86,9 @@ class SimpleEvent extends Event
         if (true == array_key_exists($key)) {
             throw new \Exception("key '{$key}' already exists");
         }
-        $this->values[$key] = $value;
+
+        $this->_values[$key] = $value;
+
         return true;
     }
 
@@ -99,8 +102,9 @@ class SimpleEvent extends Event
     public function getValue($key)
     {
         if (true == array_key_exists($key)) {
-            return $this->values[$key];
+            return $this->_values[$key];
         }
+
         throw new \Exception("Values with the key '{$key}' not found");
     }
 }

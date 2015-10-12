@@ -55,6 +55,7 @@ class Collection
         if (null == $engine) {
             throw new TableException("Someone has passed this table collection a null engine");
         }
+
         $this->_engine = $engine;
     }
 
@@ -63,6 +64,7 @@ class Collection
         if (null == $this->_engine) {
             throw new TableException("Engine can't be found!..");
         }
+
         return $this->_engine;
     }
 
@@ -71,6 +73,7 @@ class Collection
         if (null == $this->_collection) {
             return 0;
         }
+
         return sizeof($this->_collection);
     }
 
@@ -79,6 +82,7 @@ class Collection
         if (null == $this->_collection) {
             $this->_collection      = array();
             $tables                 = $printer->getConfig()->getTables();
+
             foreach ($tables as $tableName => $tableConfig) {
                 $this->_possibleTableCount++;
                 try {
@@ -94,10 +98,15 @@ class Collection
                     $printer->printLn($e->getMessage(), 'warning');
                 }
             }
+
             $printer->printLn("All Possible Tables = \"".$this->getPossibleTableCount()."\"", 'notice');
             $printer->printLn("Queued Tables = \"".$this->getAddedTableCount()."\"", 'notice');
-            $printer->printLn("Skipped Tables = ".($this->getPossibleTableCount() - $this->getAddedTableCount()), 'notice');
+            $printer->printLn(
+                "Skipped Tables = ".($this->getPossibleTableCount() - $this->getAddedTableCount()),
+                'notice'
+            );
         }
+
         return $this->_collection;
     }
 

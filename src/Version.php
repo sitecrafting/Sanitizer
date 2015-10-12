@@ -66,9 +66,11 @@ class Version extends Sanitizer
     public static function getInstance()
     {
         static $version = null;
-        if(null == $version) {
+
+        if (null == $version) {
             $version = new Version();
         }
+
         return $version;
     }
 }

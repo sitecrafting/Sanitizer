@@ -42,55 +42,70 @@ class PostConditions extends AbstractObserver
 {
     private $_sanitizer = null;
 
-    private function _setSanitizer(Sanitizer $sanitizer) {
+    private function _setSanitizer(Sanitizer $sanitizer)
+    {
         $this->_sanitizer = $sanitizer;
     }
 
-    private function _getSanitizer() {
+    private function _getSanitizer()
+    {
         return $this->_sanitizer;
     }
 
-    public function trigger(SimpleEvent $event, $eventName=null) {
+    public function trigger(SimpleEvent $event, $eventName=null)
+    {
         $eventData = $event->getValues();
-        if(null == $eventData) {
+
+        if (null == $eventData) {
             return;
         }
+
         $sanitizer = $eventData->getSanitizer();
-        if(null == $sanitizer) {
+
+        if (null == $sanitizer) {
             return;
         }
+
         $this->_setSanitizer($sanitizer);
         $config = $sanitizer->getConfig();
-        if(null == $config) {
+
+        if (null == $config) {
             return;
         }
-        switch($eventName) {
-            case 'sanitizer.sanitize.after' : {
+
+        switch ($eventName) {
+            case 'sanitizer.sanitize.after' :
                 $this->_processEvent($config->getPostConditions());
                 break;
-            }
         }
     }
 
-    private function _processEvent($configData) {
+    private function _processEvent($configData)
+    {
         $sanitizer = $this->_getSanitizer();
-        if(null == $configData || false == is_array($configData)) {
+
+        if (null == $configData || false == is_array($configData)) {
             return;
         }
-        foreach($configData as $key => $data) {
+
+        foreach ($configData as $key => $data) {
             switch ($key) {
-                case "export_database" : {
+                case "export_database" :
                     $sanitizer->getTerminalPrinter()->printLn("Exporting database...");
                     $helper     = new DatabaseHelper();
                     $ok         = $helper->exportDatabase($data, $sanitizer);
-                    $sanitizer->getTerminalPrinter()->printLn((true == $ok) ? "Exporting finished" : "Exporting finished with errors");
+                    $sanitizer->getTerminalPrinter()->printLn(
+                        (true == $ok)
+                        ? "Exporting finished"
+                        : "Exporting finished with errors"
+                    );
                     break;
-                }
             }
         }
     }
 
-    public function getEventsToListenForArray() {
+    public function getEventsToListenForArray()
+    {
         return array('sanitizer.sanitize.after');
     }
 }

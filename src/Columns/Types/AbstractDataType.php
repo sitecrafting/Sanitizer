@@ -48,11 +48,21 @@ abstract class AbstractDataType extends Object
         return array();
     }
 
+    /**
+     * Returns the column name
+     *
+     * @return string
+     */
     public function getName()
     {
         return $this->getColumn();
     }
 
+    /**
+     * Returns true if the column exists in the table
+     *
+     * @return bool
+     */
     public function exists()
     {
         return $this->getEngine()->columnExists($this->getTableName(), $this->getName());
@@ -68,16 +78,19 @@ abstract class AbstractDataType extends Object
      */
     public function getDefault()
     {
-        if(null != parent::getDefault()) {
+        if (null != parent::getDefault()) {
             return parent::getDefault();
         }
-        if(null != $this->getMockModel()) {
+
+        if (null != $this->getMockModel()) {
             $modelName = $this->getMockModel();
-            if(true == class_exists($modelName)) {
+
+            if (true == class_exists($modelName)) {
                 $model = new $modelName();
                 return $model->getRandomValue();
             }
         }
+
         return $this->getBasicDefault();
     }
 
@@ -89,13 +102,17 @@ abstract class AbstractDataType extends Object
     public function getMockModel()
     {
         $className = parent::getMockModel();
-        if(true == class_exists($className)) {
+
+        if (true == class_exists($className)) {
             return $className;
         }
+
         $className = "Pegasus\\Application\\Sanitizer\\Columns\\Mock\\".$className;
-        if(true == class_exists($className)) {
+
+        if (true == class_exists($className)) {
             return $className;
         }
+
         return null;
     }
 }

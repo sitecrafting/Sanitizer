@@ -106,57 +106,62 @@ class Sanitizer extends Command implements TerminalPrinter
      *
      * @var OutputInterface
      */
-    protected $output = null;
+    protected $_output = null;
 
     /**
      * Console input instance
      *
      * @var InputInterface
      */
-    protected $input = null;
+    protected $_input = null;
 
     /**
      * Flag which identifies if the sanitisation is running. true if running.
      *
      * @var bool
      */
-    protected $satitisationRunning = false;
+    protected $_satitisationRunning = false;
 
     /**
      * Print cache used mainly when the sanitisation is running.
      *
      * @var array
      */
-    protected $printCache = array();
+    protected $_printCache = array();
 
     /**
      * Progress bar used to display the progress of sanitisation.
      *
      * @var ProgressBar
      */
-    protected $progressBar = null;
+    protected $_progressBar = null;
 
     /**
      * Singleton instance of Sanitizer
      *
      * @var Sanitizer
      */
-    protected static $sanitizer = null;
+    protected static $_sanitizer = null;
 
     /**
      * Instance of Logger
      *
      * @var Logger
      */
-    protected $log = null;
+    protected $_log = null;
 
     /**
      * Event dispatcher
      *
      * @var null
      */
-    protected $eventDispatcher = null;
+    protected $_eventDispatcher = null;
 
+    /**
+     * Instance of the database engine
+     *
+     * @var null
+     */
     private $_engine = null;
 
     /**
@@ -166,10 +171,11 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     public static function getInstance()
     {
-        if (null == self::$sanitizer) {
-            self::$sanitizer = new Sanitizer();
+        if (null == self::$_sanitizer) {
+            self::$_sanitizer = new Sanitizer();
         }
-        return self::$sanitizer;
+
+        return self::$_sanitizer;
     }
 
     /**
@@ -233,7 +239,7 @@ class Sanitizer extends Command implements TerminalPrinter
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Sanitisation Mode ('.Config::SANITIZATION_MODE_FULL.'|'.Config::SANITIZATION_MODE_QUICK.')',
-                Config::INPUT_MODE
+                Config::SANITIZATION_MODE_FULL
             )
             ->addOption(
                 'memory',
@@ -261,52 +267,57 @@ class Sanitizer extends Command implements TerminalPrinter
     public function getConfig()
     {
         if (null == $this->config) {
+
             try
             {
-                $this->config = new SanitizerConfig($this->input->getOption('configuration'));
+                $this->config = new SanitizerConfig($this->_input->getOption('configuration'));
+
                 if (true == $this->config->getIsInDeveloperMode()) {
                     error_reporting(E_ALL);
                     ini_set('display_errors', 1);
                 }
+
                 $this->config->setDatabaseOverride(
                     array(
-                        array('Host', $this->input->getOption('host')),
-                        array('Password', $this->input->getOption('password')),
-                        array('Username', $this->input->getOption('username')),
-                        array('Database', $this->input->getOption('database')),
-                        array('Config', $this->input->getOption('configuration')),
-                        array('Engine', $this->input->getArgument('engine')),
-                        array('Mode', $this->input->getOption('mode'))
+                        array('Host', $this->_input->getOption('host')),
+                        array('Password', $this->_input->getOption('password')),
+                        array('Username', $this->_input->getOption('username')),
+                        array('Database', $this->_input->getOption('database')),
+                        array('Config', $this->_input->getOption('configuration')),
+                        array('Engine', $this->_input->getArgument('engine')),
+                        array('Mode', $this->_input->getOption('mode'))
                     )
                 );
-                $this->config->setAdditionalOverrides(
-                    array(
-                        'pre_conditions'    => array(
-                            'import_database' => array(
-                                'source' => $this->input->getOption('import')
-                            )
-                        ),
-                        'post_conditions'   => array(
-                            'export_database' => array(
-                                'destination' => $this->input->getOption('export')
-                            )
-                        ),
-                    )
-                );
-            }
-            catch (SanitizerException $exception)
-            {
+
+                if (true == $this->_input->hasOption('import') && true == $this->_input->hasOption('export')) {
+                    $this->config->setAdditionalOverrides(
+                        array(
+                            'pre_conditions' => array(
+                                'import_database' => array(
+                                    'source' => $this->_input->getOption('import')
+                                )
+                            ),
+                            'post_conditions' => array(
+                                'export_database' => array(
+                                    'destination' => $this->_input->getOption('export')
+                                )
+                            ),
+                        )
+                    );
+                }
+            } catch (SanitizerException $exception) {
                 $this->printLn($exception->getMessage(), 'fatal_error');
                 exit(-1);
             }
         }
+
         return $this->config;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->input    = $input;
-        $this->output   = $output;
+        $this->_input   = $input;
+        $this->_output  = $output;
         $configMemory   = $this->getConfig()->getGeneralConfig()->getMemory();
         $this->setMemoryUsage($input->getOption('memory'), $configMemory, self::DEFAULT_MEMORY);
         $this->loadOutputStyles();
@@ -318,10 +329,12 @@ class Sanitizer extends Command implements TerminalPrinter
         $this->sanitize();
     }
 
-    private function _loadObservers() {
+    private function _loadObservers() 
+    {
         $dispatcher = $this->getEventDispatcher();
         $observers = array(new PostConditions(), new PreConditions());
-        foreach($observers as $observer) {
+
+        foreach ($observers as $observer) {
             $observer->registerEvents($dispatcher);
         }
     }
@@ -331,7 +344,8 @@ class Sanitizer extends Command implements TerminalPrinter
      *
      * @return $this
      */
-    public function getTerminalPrinter() {
+    public function getTerminalPrinter() 
+    {
         return $this;
     }
 
@@ -345,13 +359,15 @@ class Sanitizer extends Command implements TerminalPrinter
     private function setMemoryUsage($memory, $configMemory, $defaultMemory)
     {
         //If the memory has not been overridden in the command line options
-        if(self::DEFAULT_MEMORY_NOT_SET == $memory) {
+        if (self::DEFAULT_MEMORY_NOT_SET == $memory) {
             $memory = $configMemory;
         }
+
         //If the memory has come back as zero then we revert to the default
-        if(null == $memory || 0 == $memory) {
+        if (null == $memory || 0 == $memory) {
             $memory = $defaultMemory;
         }
+
         if (false == ini_set("memory_limit", $memory)) {
             ini_set("memory_limit", $defaultMemory);
         }
@@ -364,10 +380,11 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     public function getEventDispatcher() 
     {
-        if(null == $this->eventDispatcher) {
-            $this->eventDispatcher = new EventDispatcher();
+        if (null == $this->_eventDispatcher) {
+            $this->_eventDispatcher = new EventDispatcher();
         }
-        return $this->eventDispatcher;
+
+        return $this->_eventDispatcher;
     }
 
     /**
@@ -376,7 +393,8 @@ class Sanitizer extends Command implements TerminalPrinter
      * @param $name
      * @param null $data
      */
-    public function dispatch($name, $data=null) {
+    public function dispatch($name, $data=null) 
+    {
         $dispatcher = $this->getEventDispatcher();
         $dispatcher->dispatch($name, new SimpleEvent($data));
     }
@@ -388,12 +406,13 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     public function getLog() 
     {
-        if (null == $this->log) {
-            $this->log = new Logger('Sanitizer');
-            $this->log->pushHandler(new StreamHandler($this->getConfig()->getLogPath(), Logger::INFO));
-            $this->dispatch('sanitizer.log.acquired', array('logger' => $this->log));
+        if (null == $this->_log) {
+            $this->_log = new Logger('Sanitizer');
+            $this->_log->pushHandler(new StreamHandler($this->getConfig()->getLogPath(), Logger::INFO));
+            $this->dispatch('sanitizer.log.acquired', array('logger' => $this->_log));
         }
-        return $this->log;
+
+        return $this->_log;
     }
 
     /**
@@ -423,16 +442,19 @@ class Sanitizer extends Command implements TerminalPrinter
         $this->dispatch('sanitizer.engine.loaded', array('engine' => $this->getEngine()));
     }
 
+    /**
+     * This method loads the output styles
+     */
     public function loadOutputStyles()
     {
         $style = new OutputFormatterStyle('white', 'red', array('bold'));
-        $this->output->getFormatter()->setStyle('warning', $style);
+        $this->_output->getFormatter()->setStyle('warning', $style);
         $style = new OutputFormatterStyle('white', 'blue', array('bold'));
-        $this->output->getFormatter()->setStyle('general', $style);
+        $this->_output->getFormatter()->setStyle('general', $style);
         $style = new OutputFormatterStyle('white', 'green', array('bold'));
-        $this->output->getFormatter()->setStyle('notice', $style);
+        $this->_output->getFormatter()->setStyle('notice', $style);
         $style = new OutputFormatterStyle('white', 'red', array('bold', 'underscore'));
-        $this->output->getFormatter()->setStyle('fatal_error', $style);
+        $this->_output->getFormatter()->setStyle('fatal_error', $style);
     }
 
     /**
@@ -440,10 +462,12 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     protected function outputIntro()
     {
-        if (true == $this->getConfig()->getIsInDeveloperMode() || $this->getConfig()->getIsInDeveloperMode() == OutputInterface::VERBOSITY_VERY_VERBOSE) {
+        if (true == $this->getConfig()->getIsInDeveloperMode()
+            || $this->getConfig()->getIsInDeveloperMode() == OutputInterface::VERBOSITY_VERY_VERBOSE) {
             $this->printLn("App is in developer mode, therefore all output will be shown!", 'warning');
-            $this->printLn("Verbosity ".$this->output->getVerbosity(), 'warning');
+            $this->printLn("Verbosity ".$this->_output->getVerbosity(), 'warning');
         }
+
         $this->printLn("Sanitisation mode '{$this->getConfig()->getDatabase()->getSanitizationMode()}'", 'normal');
     }
 
@@ -456,7 +480,7 @@ class Sanitizer extends Command implements TerminalPrinter
         if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_NORMAL)) {
             $tableData = $this->getTableData();
             $this->_logTableData($tableData);
-            $table = new Table($this->output);
+            $table = new Table($this->_output);
             $table->setHeaders(array('Setting', 'Value'))->setRows($tableData);
             $table->render();
             $this->askPermissionToContinue();
@@ -465,8 +489,10 @@ class Sanitizer extends Command implements TerminalPrinter
 
     protected function askPermissionToContinue()
     {
-        $helper = $this->getHelper('question');
-        if (false == $helper->ask($this->input, $this->output, new ConfirmationQuestion('Are you happy to continue? [yes|no]', false))) {
+        $helper     = $this->getHelper('question');
+        $question   = new ConfirmationQuestion('Are you happy to continue? [yes|no]', false);
+
+        if (false == $helper->ask($this->_input, $this->_output, $question)) {
             $this->printLn("Exiting due to user", "log");
             exit(-1);
         }
@@ -480,10 +506,15 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     private function getSafeToDisplayPassword($password)
     {
+        if (strlen($password) < 2) {
+            return $password;
+        }
+
         $length         = strlen($password);
         $obfuscation    = (int)$length / 2;
         $parts          = str_split($password, $obfuscation);
         $parts[1]       = str_repeat("*", strlen($parts[1]));
+
         return $parts[0].$parts[1];
     }
 
@@ -495,13 +526,16 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     public function printLn($message, $type=null)
     {
-        $this->printCache[] = array('message' => $message, 'type' => $type);
-        if (null != $this->log) {
-            $this->log->addInfo($message, array('type' => $type));
+        $this->_printCache[] = array('message' => $message, 'type' => $type);
+
+        if (null != $this->_log) {
+            $this->_log->addInfo($message, array('type' => $type));
         }
+
         if (false == $this->getSatitisationState()) {
             $this->purgePrintCache();
         }
+
         if ('fatal_error' == $type) {
             $this->purgePrintCache();
         }
@@ -512,53 +546,40 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     protected function purgePrintCache()
     {
-        foreach($this->printCache as $item)
-        {
+        foreach ($this->_printCache as $item) {
             $message    = $item['message'];
             $type       = $item['type'];
-            switch($type)
-            {
+
+            switch($type) {
             case null :
-                {
-                $this->output->writeLn($message);
-                    break;
-            }
+                $this->_output->writeLn($message);
+                break;
             case 'general' :
-                {
                 if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERY_VERBOSE)) {
-                    $this->output->writeLn($this->formatMessage($type, $message));
+                    $this->_output->writeLn($this->formatMessage($type, $message));
                 }
-                    break;
-            }
+                break;
             case 'warning' :
-                {
                 if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERBOSE)) {
-                    $this->output->writeLn($this->formatMessage($type, $message));
+                    $this->_output->writeLn($this->formatMessage($type, $message));
                 }
-                    break;
-            }
+                break;
             case 'notice' :
-                {
                 if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERY_VERBOSE)) {
-                    $this->output->writeLn($this->formatMessage($type, $message));
+                    $this->_output->writeLn($this->formatMessage($type, $message));
                 }
-                    break;
-            }
+                break;
             case 'normal' :
-                {
                 if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_NORMAL)) {
-                    $this->output->writeLn($message);
+                    $this->_output->writeLn($message);
                 }
-                    break;
-            }
+                break;
             case 'fatal_error' :
-                {
-                $this->output->writeLn($this->formatMessage($type, $message), 'warning');
+                $this->_output->writeLn($this->formatMessage($type, $message), 'warning');
                 break;
             }
-            }
         }
-        $this->printCache = array();
+        $this->_printCache = array();
     }
 
     /**
@@ -574,7 +595,8 @@ class Sanitizer extends Command implements TerminalPrinter
         if (true == $this->getConfig()->getIsInDeveloperMode()) {
             return true;
         }
-        return ($this->output->getVerbosity() >= $level);
+
+        return ($this->_output->getVerbosity() >= $level);
     }
 
     /**
@@ -605,7 +627,7 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     public function setSatitisationRunning()
     {
-        $this->satitisationRunning = true;
+        $this->_satitisationRunning = true;
     }
 
     /**
@@ -616,7 +638,7 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     public function setSatitisationNotRunning()
     {
-        $this->satitisationRunning = false;
+        $this->_satitisationRunning = false;
         $this->purgePrintCache();
     }
 
@@ -627,7 +649,7 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     public function getSatitisationState()
     {
-        return $this->satitisationRunning;
+        return $this->_satitisationRunning;
     }
 
     /**
@@ -639,8 +661,9 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     public function startProgressBar($count, $width=100)
     {
-        $this->progressBar = new ProgressBar($this->output, $count);
-        $this->progressBar->setBarWidth($width);
+        $this->_progressBar = new ProgressBar($this->_output, $count);
+        $this->_progressBar->setBarWidth($width);
+
         return $this;
     }
 
@@ -651,9 +674,10 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     public function advanceProgressBar()
     {
-        if (null != $this->progressBar) {
-            $this->progressBar->advance();
+        if (null != $this->_progressBar) {
+            $this->_progressBar->advance();
         }
+
         return $this;
     }
 
@@ -664,9 +688,10 @@ class Sanitizer extends Command implements TerminalPrinter
      */
     public function advanceProgressFinish()
     {
-        if (null != $this->progressBar) {
-            $this->progressBar->finish();
+        if (null != $this->_progressBar) {
+            $this->_progressBar->finish();
         }
+
         $this->printLn("\n");
         return $this;
     }
@@ -685,6 +710,7 @@ class Sanitizer extends Command implements TerminalPrinter
             $value  = $enteries[1];
             $this->printLn("Sanitize settings: {$name}:{$value}", 'log');
         }
+
         return $this;
     }
 
@@ -707,17 +733,21 @@ class Sanitizer extends Command implements TerminalPrinter
             array('Mode',           $this->getConfig()->getDatabase()->getSanitizationMode()));
 
         $preConditions = $this->getConfig()->getPreConditions();
-        if(null != $preConditions && true == isset($preConditions['import_database']['source'])) {
+
+        if (null != $preConditions && true == isset($preConditions['import_database']['source'])) {
             $tableData[] = array('Import SQL', $preConditions['import_database']['source']);
         }
+
         $postConditions = $this->getConfig()->getPostConditions();
-        if(null != $postConditions && true == isset($postConditions['export_database']['destination'])) {
+
+        if (null != $postConditions && true == isset($postConditions['export_database']['destination'])) {
             $tableData[] = array('Export SQL', $postConditions['export_database']['destination']);
         }
 
         if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERBOSE)) {
             $tableData[] = array('Memory Limit', ini_get("memory_limit"));
         }
+
         return $tableData;
     }
 
@@ -726,6 +756,7 @@ class Sanitizer extends Command implements TerminalPrinter
         if (null == $this->_engine) {
             throw new TableException("Someone has moved the Engine, I can't find it!");
         }
+
         return $this->_engine;
     }
 
@@ -734,8 +765,9 @@ class Sanitizer extends Command implements TerminalPrinter
         $this->_engine = $engine;
     }
 
-    private function _checkSanitizerHasTablesToSanitize($collection) {
-        if(0 == $collection->getAddedTableCount()) {
+    private function _checkSanitizerHasTablesToSanitize($collection) 
+    {
+        if (0 == $collection->getAddedTableCount()) {
             $message = "No tables from config found, nothing to process";
             $this->dispatch('sanitizer.sanitize.sanitizing.fatal_error');
             $this->setSatitisationNotRunning();
@@ -743,20 +775,24 @@ class Sanitizer extends Command implements TerminalPrinter
         }
     }
 
-    private function _checkSomeTablesAreBeingSkipped($collection) {
-        if(true == $collection->getSomeTablesAreBeingSkipped()) {
+    private function _checkSomeTablesAreBeingSkipped($collection) 
+    {
+        if (true == $collection->getSomeTablesAreBeingSkipped()) {
             $this->printLn("Some tables are being skipped", 'notice');
         }
     }
 
-    private function _skippingSanitization() {
+    private function _skippingSanitization() 
+    {
         $message = $this->getMode().' mode selected, exiting before sanitisation';
         $this->printLn($message, 'general');
-        $this->dispatch('sanitizer.sanitize.sanitizing.skipping', array(
+        $this->dispatch(
+            'sanitizer.sanitize.sanitizing.skipping', array(
             'sanitizer' => $this,
             'message' => $message,
             'mode' => $this->getMode(),
-        ));
+            )
+        );
     }
 
     /**
@@ -774,42 +810,53 @@ class Sanitizer extends Command implements TerminalPrinter
         $quick      = (Config::SANITIZATION_MODE_QUICK == $this->getConfig()->getDatabase()->getSanitizationMode());
         $this->_checkSomeTablesAreBeingSkipped($collection);
         $this->_checkSanitizerHasTablesToSanitize($collection);
-        $this->dispatch('sanitizer.sanitize.sanitizing.before', array(
+        $this->dispatch(
+            'sanitizer.sanitize.sanitizing.before', array(
             'sanitizer'             => $this,
             'table_collection'      => $tables,
             'quick'                 => $quick,
             'mode'                  => $this->getMode()
-        ));
+            )
+        );
+
         if ('sanitize' == $this->getMode()) {
             $this->startProgressBar($collection->getSize());
-            foreach($tables as $table)
-            {
+
+            foreach ($tables as $table) {
                 $this->dispatch('sanitizer.sanitize.table.before', array('table' => $table));
                 $table->setIsQuickSanitisation($quick);
-                $rows = $table->sanitize();
-                if(true == $table->doCommand()) {
-                    $sanitized[] = "{$table->getCommand()} applied to {$table->getTableName()} and effected {$rows} rows";
+                $rows   = $table->sanitize();
+                $name   = $table->getTableName();
+
+                if (true == $table->doCommand()) {
+                    $sanitized[] = "{$table->getCommand()} applied to {$name} and effected {$rows} rows";
                 } else {
                     $sanitized[] = "Sanitized {$table->getTableName()} and updated {$rows} rows";
                 }
+
                 $this->dispatch('sanitizer.sanitize.table.after', array('table' => $table));
                 $this->advanceProgressBar();
             }
+
             $this->setSatitisationNotRunning();
             $this->advanceProgressFinish();
+
             foreach ($sanitized as $san) {
                 $this->printLn($san, 'notice');
             }
         } else {
             $this->_skippingSanitization();
         }
+
         $this->setSatitisationNotRunning();
-        $this->dispatch('sanitizer.sanitize.sanitizing.after', array(
+        $this->dispatch(
+            'sanitizer.sanitize.sanitizing.after', array(
             'sanitizer'             => $this,
             'table_collection'      => $tables,
             'quick'                 => $quick,
             'mode'                  => $this->getMode()
-        ));
+            )
+        );
         $this->printLn("Sanitizer finished!");
         $this->dispatch('sanitizer.sanitize.after', array('sanitizer' => $this));
     }

@@ -15,7 +15,8 @@
   {
     "symfony/yaml": "~2.8|~3.0",
     "monolog/monolog":"~1.13.1",
-    "php": ">=5.5.1"
+    "php": ">=5.5.1",
+    "phpmd/phpmd": "dev-master"
   },
   "require-dev":
   {

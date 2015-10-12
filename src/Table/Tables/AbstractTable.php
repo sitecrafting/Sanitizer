@@ -40,66 +40,71 @@ abstract class AbstractTable extends Object
 {
     const KEY_TABLE_TYPE        = 'type';
 
-    protected $truncate         = false;
+    protected $_truncate         = false;
 
-    protected $delete           = false;
+    protected $_delete           = false;
 
-    protected $engine           = null;
+    protected $_engine           = null;
 
-    protected $primaryKeyName   = null;
+    protected $_primaryKeyName   = null;
 
-    protected $isQuick          = false;
+    protected $_isQuick          = false;
 
     public function __construct(EngineInterface $engine)
     {
-        if(null == $engine) {
+        if (null == $engine) {
             throw new TableException("Someone has passed this table a null engine");
         }
-        $this->engine = $engine;
+
+        $this->_engine = $engine;
     }
 
     public function getEngine() 
     {
-        if(null == $this->engine) {
+        if (null == $this->_engine) {
             throw new TableException("No engine found!");
         }
-        return $this->engine;
+
+        return $this->_engine;
     }
 
     protected function getIsQuickSanitisation() 
     {
-        return $this->isQuick;
+        return $this->_isQuick;
     }
 
     public function setIsQuickSanitisation($isQuick) 
     {
-        return $this->isQuick = $isQuick;
+        return $this->_isQuick = $isQuick;
     }
 
     public function addColumn(AbstractDataType $column)
     {
-        if(null == $column) {
+        if (null == $column) {
             return false;
         }
-        if(false == isset($this->data['columns'])) {
-            $this->data['columns'] = array();
+
+        if (false == isset($this->_data['columns'])) {
+            $this->_data['columns'] = array();
         }
-        if(false == in_array($column, $this->data['columns'])) {
-            $this->data['columns'][] = $column;
+
+        if (false == in_array($column, $this->_data['columns'])) {
+            $this->_data['columns'][] = $column;
             return true;
         }
+
         return false;
     }
 
     public function removeColumn(AbstractDataType $column)
     {
-        if(false == isset($this->data['columns'])) {
+        if (false == isset($this->_data['columns'])) {
             return; //it's not in something that doesn't exist!.
         }
-        foreach($this->data['columns'] as $key => $value)
-        {
-            if($value == $column) {
-                unset($this->data['columns'][$key]);
+
+        foreach ($this->_data['columns'] as $key => $value) {
+            if ($value == $column) {
+                unset($this->_data['columns'][$key]);
             }
         }
     }
@@ -111,10 +116,11 @@ abstract class AbstractTable extends Object
      */
     public function getColumns()
     {
-        if(false == isset($this->data['columns'])) {
+        if (false == isset($this->_data['columns'])) {
             return array();
         }
-        return $this->data['columns'];
+
+        return $this->_data['columns'];
     }
 
     public static function getType()
@@ -130,21 +136,16 @@ abstract class AbstractTable extends Object
      */
     public function isCommandValid($command)
     {
-        $this->truncate             = false;
-        $this->delete               = false;
+        $this->_truncate             = false;
+        $this->_delete               = false;
 
-        switch($command)
-        {
-        case 'truncate' :
-            {
-            $this->truncate     = true;
+        switch($command) {
+            case 'truncate' :
+                $this->_truncate     = true;
                 return true;
-        }
-        case 'delete' :
-            {
-            $this->delete       = true;
+            case 'delete' :
+                $this->_delete       = true;
                 return true;
-        }
         }
         return false;
     }
@@ -162,26 +163,34 @@ abstract class AbstractTable extends Object
     public function setTableData(array $tableData)
     {
         unset($tableData['type']);  /* We have already loaded this via type */
-        if(null == $this->getTableName()) {
+
+        if (null == $this->getTableName()) {
             throw new TableException('Table name must be set for data manipulation');
         }
+
         //Only data is a comment for this row
-        if(1 == sizeof($tableData) && true == isset($tableData['comment'])) {
+        if (1 == sizeof($tableData) && true == isset($tableData['comment'])) {
             $this->getTerminalPrinter()->printLn("Comment[{$this->getTableName()}]: ".$tableData['comment'], 'general');
-            throw new TableCommentException("This table '{$this->getTableName()}' only has a comment in the config, skipping");
+            $msg = "This table '{$this->getTableName()}' only has a comment in the config, skipping";
+            throw new TableCommentException($msg);
         }
+
         //Command is the most important option, it will override all others.
-        if(true == isset($tableData['command'])) {
+        if (true == isset($tableData['command'])) {
             $command = $tableData['command'];
-            if(false == $this->isCommandValid($command)) {
+
+            if (false == $this->isCommandValid($command)) {
                 throw new TableException("Command '{$command}' is set but not valid for table ".$this->getTableName());
             }
+
             $this->setCommand($command);
         }
 
-        if(false == $this->exists()) {
-            throw new TableException("Table '{$this->getTableName()}' not found in database '{$this->getDatabaseName()}'");
+        if (false == $this->exists()) {
+            $msg = "Table '{$this->getTableName()}' not found in database '{$this->getDatabaseName()}'";
+            throw new TableException($msg);
         }
+
         return true;
     }
 
@@ -194,38 +203,31 @@ abstract class AbstractTable extends Object
     protected function getInstanceFromType($configDataType, array $columnData)
     {
         $column = null;
-        switch($configDataType)
-        {
-        case 'timestamp' :
-            {
-            $column = new Types\Timestamp($columnData);
+
+        switch ($configDataType) {
+            case 'timestamp' :
+                $column = new Types\Timestamp($columnData);
                 break;
-        }
-        case 'text' :
-            {
-            $column = new Types\Text($columnData);
+            case 'text' :
+                $column = new Types\Text($columnData);
                 break;
-        }
-        case 'varchar' :
-            {
-            $column = new Types\Varchar($columnData);
+            case 'varchar' :
+                $column = new Types\Varchar($columnData);
                 break;
-        }
-        case 'integer' :
-            {
-            $column = new Types\Integer($columnData);
+            case 'integer' :
+                $column = new Types\Integer($columnData);
                 break;
+            default :
+                $msg = "No column types could be found by '{$configDataType}' on table '{$this->getTableName()}";
+                throw new TableException($msg);
         }
-        default :
-            {
-                throw new TableException("No column types could be found by '{$configDataType}' on table '{$this->getTableName()}");
-        }
-        }
-        if(null != $column) {
-            $column->setEngine($this->engine);
+
+        if (null != $column) {
+            $column->setEngine($this->_engine);
             $column->setTableName($this->getTableName());
             $column->setTable($this);
         }
+
         return $column;
     }
 
@@ -236,7 +238,7 @@ abstract class AbstractTable extends Object
      */
     public function doTruncate()
     {
-        return $this->truncate;
+        return $this->_truncate;
     }
 
     /**
@@ -246,7 +248,7 @@ abstract class AbstractTable extends Object
      */
     public function doDelete()
     {
-        return $this->delete;
+        return $this->_delete;
     }
 
     /**
@@ -266,7 +268,7 @@ abstract class AbstractTable extends Object
      */
     public function exists()
     {
-        return $this->engine->tableExists($this->getTableName());
+        return $this->_engine->tableExists($this->getTableName());
     }
 
     /**
@@ -276,7 +278,7 @@ abstract class AbstractTable extends Object
      */
     public function getDatabaseName()
     {
-        return $this->engine->getDatabaseName();
+        return $this->_engine->getDatabaseName();
     }
 
     /**
@@ -284,16 +286,18 @@ abstract class AbstractTable extends Object
      *
      * array('primaty_key' => 'value')
      *
-     * @param  $row Is the row which contains the primary key and the value etc, it is just a dumb array so there's
-     *             no way to determine which key is the primary key without querying the db.
+     * @param   $row Is the row which contains the primary key and the value etc,
+     *          it is just a dumb array so there's no way to determine which key
+     *          is the primary key without querying the db.
      * @return array
      */
     public function getPrimaryKeyData($row)
     {
-        if(null == $this->primaryKeyName) {
-            $this->primaryKeyName = $this->engine->getPrimaryKeyName($this->getTableName());
+        if (null == $this->_primaryKeyName) {
+            $this->_primaryKeyName = $this->_engine->getPrimaryKeyName($this->getTableName());
         }
-        return array($this->primaryKeyName => $row[$this->primaryKeyName]);
+
+        return array($this->_primaryKeyName => $row[$this->_primaryKeyName]);
     }
 
     /**
@@ -304,10 +308,11 @@ abstract class AbstractTable extends Object
      */
     public function getPrimaryKeyName($tableName=null)
     {
-        if(null == $tableName) {
+        if (null == $tableName) {
             $tableName = $this->getTableName();
         }
-        return $this->engine->getPrimaryKeyName($tableName);
+
+        return $this->_engine->getPrimaryKeyName($tableName);
     }
 
     /**
@@ -316,20 +321,24 @@ abstract class AbstractTable extends Object
     public function hasExecutedCommand()
     {
         $printer = $this->getTerminalPrinter();
-        if(true == $this->doCommand()) {
-            if(true == $this->doTruncate()) {
+
+        if (true == $this->doCommand()) {
+
+            if (true == $this->doTruncate()) {
                 $printer->printLn("Truncating {$this->getTableName()} ", 'notice');
-                $this->engine->truncate($this->getTableName());
+                $this->_engine->truncate($this->getTableName());
                 $printer->printLn("Truncated {$this->getTableName()} ", 'notice');
                 return true;
             }
-            if(true == $this->doDelete()) {
+
+            if (true == $this->doDelete()) {
                 $printer->printLn("Deleting {$this->getTableName()} ", 'notice');
-                $this->engine->delete($this->getTableName(), null);
+                $this->_engine->delete($this->getTableName(), null);
                 $printer->printLn("Deleted {$this->getTableName()} ", 'notice');
                 return true;
             }
         }
+
         return false;
     }
 
@@ -341,10 +350,11 @@ abstract class AbstractTable extends Object
     protected function getSelectColumns()
     {
         $selectColumns = array($this->getPrimaryKeyName($this->getTableName()));
-        foreach ($this->getColumns() as $column)
-        {
+
+        foreach ($this->getColumns() as $column) {
             $selectColumns[] = $column->getName();
         }
+
         return $selectColumns;
     }
 

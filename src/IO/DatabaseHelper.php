@@ -43,38 +43,46 @@ class DatabaseHelper
     public function exportDatabase($data, $sanitizer)
     {
         $importData = new Object($data);
-        if(null == $importData->getDestination()) {
+
+        if (null == $importData->getDestination()) {
             throw new SanitizerException('Database export needs a file name to create!');
         }
+
         $engine         = $sanitizer->getEngine();
         $databaseName   = $sanitizer->getConfig()->getDatabase()->getDatabase();
-        $dateFormat     = (null == $importData->getDateFormat()) ? self::DEFAULT_EXPORT_DATE_FORMAT : $importData->getDateFormat();
-        $timeFormat     = (null == $importData->getTimeFormat()) ? self::DEFAULT_EXPORT_TIME_FORMAT : $importData->getTimeFormat();
+        $dateFormat     = (null == $importData->getDateFormat())
+                            ? self::DEFAULT_EXPORT_DATE_FORMAT
+                            : $importData->getDateFormat();
+        $timeFormat     = (null == $importData->getTimeFormat())
+                            ? self::DEFAULT_EXPORT_TIME_FORMAT
+                            : $importData->getTimeFormat();
         $fileName       = str_replace('{date}', date($dateFormat), $importData->getDestination());
         $fileName       = str_replace('{time}', date($timeFormat), $fileName);
         $fileName       = str_replace('{database_name}', $databaseName, $fileName);
         $ok             = $engine->dump($fileName);
-        if(true == $importData->getDrop()) {
-            $engine->drop();
-            $engine->create();
-        }
+//        if (true == $importData->getDrop()) {
+//            $engine->drop();
+//            $engine->create();
+//        }
         return $ok;
     }
 
     public function importDatabase($data, $sanitizer)
     {
         $importData = new Object($data);
-        if(null == $importData->getSource()) {
+
+        if (null == $importData->getSource()) {
             return;
         }
-        if(false == file_exists($importData->getSource())) {
+
+        if (false == file_exists($importData->getSource())) {
             throw new FileNotFoundException("File not found, {$importData->getSource()}");
         }
+
         $engine = $sanitizer->getEngine();
         $engine->drop();
         $engine->create();
         $engine->useDb();
         $engine->source($importData->getSource());
-
     }
 }

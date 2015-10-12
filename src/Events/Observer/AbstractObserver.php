@@ -46,7 +46,8 @@ abstract class AbstractObserver
     public function registerEvents(EventDispatcher $dispatcher)
     {
         $events = $this->getEventsToListenForArray();
-        foreach($events as $eventName) {
+
+        foreach ($events as $eventName) {
             $dispatcher->addListener($eventName, array($this, 'trigger'));
         }
     }

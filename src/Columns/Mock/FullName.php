@@ -39,18 +39,21 @@ class FullName extends AbstractMockData
     public function getValues()
     {
         static $fullName = null;
-        if(null == $fullName) {
+
+        if (null == $fullName) {
             $firstNames     = new FirstName();
             $secondNames    = new LastName();
             $fullName = array();
-            for($ii = 0; $ii < 15; $ii++)
-            {
+
+            for ($ii = 0; $ii < 15; $ii++) {
                 $name = $firstNames->getRandomValue().' '.$secondNames->getRandomValue();
-                if(false == in_array($name, $fullName)) {
+
+                if (false == in_array($name, $fullName)) {
                     $fullName[] = $name;
                 }
             }
         }
+
         return $fullName;
     }
 }

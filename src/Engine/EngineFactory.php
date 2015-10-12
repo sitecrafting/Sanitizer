@@ -32,7 +32,7 @@ use Pegasus\Application\Sanitizer\Resource\SanitizerException;
 
 class EngineFactory
 {
-    private static $engine = null;
+    private static $_engine = null;
 
     /**
      * Start your engines,  method is used to initialise the object
@@ -44,25 +44,23 @@ class EngineFactory
      */
     public static function getInstance($config)
     {
-        if(null == self::$engine) {
+        if (null == self::$_engine) {
+
             if (false == isset($config['database_type'])) {
                 throw new SanitizerException("Engine Type/Name not found in Engine getInstance parameters");
             }
+
             $engineName = $config['database_type'];
-            switch ($engineName)
-            {
-            case 'mysql' :
-                {
-                self::$engine = new MySqlEngine($config);
+
+            switch ($engineName) {
+                case 'mysql' :
+                    self::$_engine = new MySqlEngine($config);
                     break;
-                }
-            default :
-                {
+                default :
                     throw new EngineNotFoundException("Engine {$engineName} has done a runner!");
                     break;
-                }
             }
         }
-        return self::$engine;
+        return self::$_engine;
     }
 }
