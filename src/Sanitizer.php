@@ -55,7 +55,6 @@ use Pegasus\Application\Sanitizer\Configuration\Config;
 use Pegasus\Application\Sanitizer\Events\Observer\PostConditions;
 use Pegasus\Application\Sanitizer\Events\Observer\PreConditions;
 use Pegasus\Application\Sanitizer\Events\SimpleEvent;
-use Pegasus\Application\Sanitizer\IO\DatabaseHelper;
 use Pegasus\Application\Sanitizer\Resource\SanitizerException;
 use Pegasus\Application\Sanitizer\IO\TerminalPrinter;
 use Pegasus\Application\Sanitizer\Engine\EngineInterface;
@@ -478,7 +477,7 @@ class Sanitizer extends Command implements TerminalPrinter
     private function renderOverviewTable()
     {
         if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_NORMAL)) {
-            $tableData = $this->getTableData();
+            $tableData = $this->getConfig()->getCriticalOverviewArray($this->_output->getVerbosity());
             $this->_logTableData($tableData);
             $table = new Table($this->_output);
             $table->setHeaders(array('Setting', 'Value'))->setRows($tableData);
@@ -487,6 +486,10 @@ class Sanitizer extends Command implements TerminalPrinter
         }
     }
 
+    /**
+     * Asks user for permission to continue.
+     * Exits if no permission given
+     */
     protected function askPermissionToContinue()
     {
         $helper     = $this->getHelper('question');
@@ -496,26 +499,6 @@ class Sanitizer extends Command implements TerminalPrinter
             $this->printLn("Exiting due to user", "log");
             exit(-1);
         }
-    }
-
-    /**
-     * This method takes a string and replaces the last half of the characters with *
-     *
-     * @param  $password
-     * @return string
-     */
-    private function getSafeToDisplayPassword($password)
-    {
-        if (strlen($password) < 2) {
-            return $password;
-        }
-
-        $length         = strlen($password);
-        $obfuscation    = (int)$length / 2;
-        $parts          = str_split($password, $obfuscation);
-        $parts[1]       = str_repeat("*", strlen($parts[1]));
-
-        return $parts[0].$parts[1];
     }
 
     /**
@@ -589,7 +572,7 @@ class Sanitizer extends Command implements TerminalPrinter
      * @param  $level
      * @return bool
      */
-    private function canDisplayMessage($level)
+    public function canDisplayMessage($level)
     {
         //Default to verbose
         if (true == $this->getConfig()->getIsInDeveloperMode()) {
@@ -712,43 +695,6 @@ class Sanitizer extends Command implements TerminalPrinter
         }
 
         return $this;
-    }
-
-    /**
-     * Returns an array of table data to be displayed on the terminal
-     *
-     * @return array
-     */
-    protected function getTableData()
-    {
-        $password = $this->getConfig()->getDatabase()->getPassword();
-        $tableData = array(
-            array('Config Name',    $this->getConfig()->getName()),
-            array('Host',           $this->getConfig()->getDatabase()->getHost()),
-            array('Password',       $this->getSafeToDisplayPassword($password)),
-            array('User',           $this->getConfig()->getDatabase()->getUsername()),
-            array('Database',       $this->getConfig()->getDatabase()->getDatabase()),
-            array('Config',         $this->getConfig()->getDatabase()->getConfig()),
-            array('Engine',         $this->getConfig()->getDatabase()->getEngine()),
-            array('Mode',           $this->getConfig()->getDatabase()->getSanitizationMode()));
-
-        $preConditions = $this->getConfig()->getPreConditions();
-
-        if (null != $preConditions && true == isset($preConditions['import_database']['source'])) {
-            $tableData[] = array('Import SQL', $preConditions['import_database']['source']);
-        }
-
-        $postConditions = $this->getConfig()->getPostConditions();
-
-        if (null != $postConditions && true == isset($postConditions['export_database']['destination'])) {
-            $tableData[] = array('Export SQL', $postConditions['export_database']['destination']);
-        }
-
-        if (true == $this->canDisplayMessage(OutputInterface::VERBOSITY_VERBOSE)) {
-            $tableData[] = array('Memory Limit', ini_get("memory_limit"));
-        }
-
-        return $tableData;
     }
 
     public function getEngine() 

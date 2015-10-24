@@ -29,6 +29,8 @@ namespace Pegasus\Application\Sanitizer\Configuration;
 
 use Pegasus\Application\Sanitizer\Resource\Object;
 use Pegasus\Application\Sanitizer\Configuration;
+use Symfony\Component\Console\Output\OutputInterface;
+
 
 class Config extends Object
 {
@@ -99,6 +101,31 @@ class Config extends Object
 
         $parsed = json_decode(file_get_contents($configFile), true);
         $this->setData($parsed);
+        $this->_postInit();
+    }
+
+    /**
+     * Post initialisation for data post processing
+     */
+    protected function _postInit()
+    {
+        if (false == isset($this->_data['post_conditions']['export_database']['drop'])) {
+            return;
+        }
+
+        $drop = $this->_data['post_conditions']['export_database']['drop'];
+        $this->_data['post_conditions']['export_database']['drop'] = $this->isTrue($drop);
+    }
+
+    /**
+     * Returns true if the data is within a set of allowed values for true
+     *
+     * @param $data
+     * @return bool
+     */
+    protected function isTrue($data)
+    {
+        return in_array($data, array("true", "yes", "1"));
     }
 
     /**
@@ -319,5 +346,68 @@ class Config extends Object
         }
 
         return parent::getLogPath();
+    }
+
+    /**
+     * Returns an array of table data to be displayed on the terminal
+     *
+     * @param $level verbosity level
+     * @return array
+     */
+    public function getCriticalOverviewArray($level=OutputInterface::OUTPUT_NORMAL)
+    {
+        $password = $this->getDatabase()->getPassword();
+        $tableData = array(
+            array('Config Name',    $this->getName()),
+            array('Host',           $this->getDatabase()->getHost()),
+            array('Password',       $this->getSafeToDisplayPassword($password)),
+            array('User',           $this->getDatabase()->getUsername()),
+            array('Database',       $this->getDatabase()->getDatabase()),
+            array('Config',         $this->getDatabase()->getConfig()),
+            array('Engine',         $this->getDatabase()->getEngine()),
+            array('Mode',           $this->getDatabase()->getSanitizationMode()));
+
+        $preConditions = $this->getPreConditions();
+
+        if (null != $preConditions && true == isset($preConditions['import_database']['source'])) {
+            $tableData[] = array('Import SQL', $preConditions['import_database']['source']);
+        }
+
+        $postConditions = $this->getPostConditions();
+
+        if (null != $postConditions && true == isset($postConditions['export_database']['destination'])) {
+            $tableData[]    = array('Export SQL', $postConditions['export_database']['destination']);
+            if (true == isset($postConditions['export_database']['drop'])) {
+                var_dump($postConditions['export_database']['drop']);
+                $dumping        = (true == $postConditions['export_database']['drop'] ? 'YES' : 'no');
+                $tableData[]    = array('Drop DB after export', $dumping);
+            }
+        }
+
+        if (OutputInterface::VERBOSITY_VERBOSE == $level) {
+            $tableData[] = array('Memory Limit', ini_get("memory_limit"));
+        }
+
+        return $tableData;
+    }
+
+    /**
+     * This method takes a string and replaces the last half of the characters with *
+     *
+     * @param  $password
+     * @return string
+     */
+    private function getSafeToDisplayPassword($password)
+    {
+        if (strlen($password) < 2) {
+            return $password;
+        }
+
+        $length         = strlen($password);
+        $obfuscation    = (int)$length / 2;
+        $parts          = str_split($password, $obfuscation);
+        $parts[1]       = str_repeat("*", strlen($parts[1]));
+
+        return $parts[0].$parts[1];
     }
 }

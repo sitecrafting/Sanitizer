@@ -168,12 +168,11 @@ class MySqlEngine extends AbstractEngine implements EngineInterface
 
     public function source($fileName)
     {
-        $sql = file_get_contents($fileName);
-        $result = $this->query($sql);
+        $command = "mysql -u {$this->_userName} -p{$this->_password} {$this->_databaseName} < {$fileName}";
+        exec($command, $output = array(), $worked);
 
-        if (false == $result) {
-            $this->logError($sql);
-            throw new FatalEngineException("Unable to import from source file, {$sql}");
+        if (0 != $worked) {
+            throw new FatalEngineException("Unable to import from source file, {$fileName}");
         }
 
         return true;
