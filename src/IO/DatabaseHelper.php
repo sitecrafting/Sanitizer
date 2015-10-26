@@ -30,6 +30,7 @@ namespace Pegasus\Application\Sanitizer\IO;
 
 use Pegasus\Application\Sanitizer\Resource\Object;
 use Pegasus\Application\Sanitizer\Resource\SanitizerException;
+use Pegasus\Application\Sanitizer\Sanitizer;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 class DatabaseHelper
@@ -40,7 +41,16 @@ class DatabaseHelper
 
     const DEFAULT_EXPORT_TIME_FORMAT = "G-i-s-e";
 
-    public function exportDatabase($data, $sanitizer)
+    /**
+     * Export a database to specified file
+     *
+     * @param $data
+     * @param Sanitizer $sanitizer
+     * @return mixed
+     * @throws SanitizerException
+     * @throws \Pegasus\Application\Sanitizer\TableException
+     */
+    public function exportDatabase($data, Sanitizer $sanitizer)
     {
         $importData = new Object($data);
 
@@ -50,24 +60,34 @@ class DatabaseHelper
 
         $engine         = $sanitizer->getEngine();
         $databaseName   = $sanitizer->getConfig()->getDatabase()->getDatabase();
-        $dateFormat     = (null == $importData->getDateFormat())
-                            ? self::DEFAULT_EXPORT_DATE_FORMAT
-                            : $importData->getDateFormat();
-        $timeFormat     = (null == $importData->getTimeFormat())
-                            ? self::DEFAULT_EXPORT_TIME_FORMAT
-                            : $importData->getTimeFormat();
-        $fileName       = str_replace('{date}', date($dateFormat), $importData->getDestination());
-        $fileName       = str_replace('{time}', date($timeFormat), $fileName);
-        $fileName       = str_replace('{database_name}', $databaseName, $fileName);
+        $dateFormat     = $importData->getDateFormat();
+        $timeFormat     = $importData->getTimeFormat();
+        $dateFormat     = (null == $dateFormat) ? self::DEFAULT_EXPORT_DATE_FORMAT : $dateFormat;
+        $timeFormat     = (null == $timeFormat) ? self::DEFAULT_EXPORT_TIME_FORMAT : $timeFormat;
+        $fileName       = str_replace(
+            array('{date}', '{time}', '{database_name}'),
+            array(date($dateFormat), date($timeFormat), $databaseName),
+            $importData->getDestination()
+        );
         $ok             = $engine->dump($fileName);
-//        if (true == $importData->getDrop()) {
-//            $engine->drop();
-//            $engine->create();
-//        }
+
+        //Only dump if the export was ok
+        if (true == $ok && true == $importData->getDrop()) {
+            $sanitizer->getTerminalPrinter()->printLn("Dropping database");
+            $engine->drop();
+            $engine->create();
+        }
+
         return $ok;
     }
 
-    public function importDatabase($data, $sanitizer)
+    /**
+     * Import a database from file
+     *
+     * @param $data
+     * @param $sanitizer
+     */
+    public function importDatabase($data, Sanitizer $sanitizer)
     {
         $importData = new Object($data);
 
@@ -84,5 +104,22 @@ class DatabaseHelper
         $engine->create();
         $engine->useDb();
         $engine->source($importData->getSource());
+    }
+
+    /**
+     * Run sql from file
+     *
+     * @param $fileName
+     * @param Sanitizer $sanitizer
+     * @throws \Pegasus\Application\Sanitizer\TableException
+     */
+    public function loadFromSource($fileName, Sanitizer $sanitizer)
+    {
+        if (false == file_exists($fileName)) {
+            throw new FileNotFoundException("File not found, {$fileName}");
+        }
+
+        $engine = $sanitizer->getEngine();
+        $engine->source($fileName);
     }
 }

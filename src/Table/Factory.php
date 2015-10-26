@@ -44,7 +44,10 @@ use Pegasus\Application\Sanitizer\Table\Tables\Update;
 
 class Factory
 {
-    public function getInstance($tableName, array $tableConfig, TerminalPrinter $printer, EngineInterface $engine) 
+    public static function getInstance($tableName,
+           array $tableConfig,
+           TerminalPrinter $printer,
+           EngineInterface $engine)
     {
         /* we default the type to flat */
         $table = null;
