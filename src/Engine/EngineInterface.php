@@ -86,4 +86,6 @@ interface EngineInterface
     public function dump($fileName);
 
     public function getDatabaseName();
+
+    public function copyDown($config, $fileName=null);
 }

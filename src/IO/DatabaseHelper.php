@@ -28,6 +28,8 @@
 
 namespace Pegasus\Application\Sanitizer\IO;
 
+use Pegasus\Application\Sanitizer\Engine\EngineFactory;
+use Pegasus\Application\Sanitizer\Engine\Exceptions\EngineException;
 use Pegasus\Application\Sanitizer\Resource\Object;
 use Pegasus\Application\Sanitizer\Resource\SanitizerException;
 use Pegasus\Application\Sanitizer\Sanitizer;
@@ -104,6 +106,46 @@ class DatabaseHelper
         $engine->create();
         $engine->useDb();
         $engine->source($importData->getSource());
+    }
+
+    /**
+     * This method is used to copy down a database
+     *
+     * @param $data
+     * @param Sanitizer $sanitizer
+     * @return bool|Object
+     * @throws SanitizerException
+     * @throws \EngineException
+     * @throws \Pegasus\Application\Sanitizer\Engine\Exceptions\EngineNotFoundException
+     */
+    public function copyDown($data, Sanitizer $sanitizer)
+    {
+        $importData = new Object($data);
+
+        if (null == $importData->getDatabaseType()) {
+            $importData->setDatabaseType('mysql');
+        }
+
+        $importData->setSkipInit(true);
+        $engine     = EngineFactory::getInstance($importData->getData(), true);
+        $result   = $engine->copyDown($importData);
+
+        if (false == $result) {
+            throw new \EngineException(
+                "Error copying down database, check the credentials are correct and the server is accessible"
+            );
+        }
+
+        $filePath = $result->getFileName();
+
+        if (false == file_exists($filePath)) {
+            throw new \EngineException("Copy down dump file not found");
+        }
+
+        $this->importDatabase(array('source' => $filePath), $sanitizer);
+        unlink($filePath);
+        return $result;
+
     }
 
     /**

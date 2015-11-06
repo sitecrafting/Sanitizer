@@ -15,7 +15,7 @@ class FactorySpec extends ObjectBehavior
     }
 
     private function _getEngine() {
-        return EngineFactory::getInstance(
+        return EngineFactory::getSingleton(
             array
             (
                 'database_type'     => 'mysql',

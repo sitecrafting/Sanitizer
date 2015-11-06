@@ -83,19 +83,30 @@ class PreConditions extends AbstractObserver
 
     private function _processEvent($configData) 
     {
+        $helper = new DatabaseHelper();
+
         if (null == $configData || false == is_array($configData)) {
             return;
         }
 
         foreach ($configData as $key => $data) {
             switch ($key) {
-                case "import_database" : {
+                case "import_database" :
                     $this->_getSanitizer()->getTerminalPrinter()->printLn("Importing database...");
-                    $helper = new DatabaseHelper();
                     $helper->importDatabase($data, $this->_getSanitizer());
                     $this->_getSanitizer()->getTerminalPrinter()->printLn("Database imported \n");
                     break;
-                    }
+                case "copy_down_database" :
+                    $this->_getSanitizer()->getTerminalPrinter()->printLn("Copying down database...");
+                    $result = $helper->copyDown($data, $this->_getSanitizer());
+                    $this->_getSanitizer()->getTerminalPrinter()->printLn("Commands", 'debug');
+                    $this->_getSanitizer()->getTerminalPrinter()->printLn(
+                        implode("\n", $result->getCommands()),
+                        'debug'
+                    );
+                    $this->_getSanitizer()->getTerminalPrinter()->printLn("Commands", 'debug');
+                    $this->_getSanitizer()->getTerminalPrinter()->printLn("Database copied down \n");
+                    break;
             }
         }
     }

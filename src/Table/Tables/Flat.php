@@ -142,6 +142,11 @@ class Flat extends AbstractTable
             $rowsUpdated = 0;
             $rows = $this->getEngine()->select($this->getTableName(), $this->getSelectColumns());
 
+            if (false == $rows) {
+                $printer->printLn("No rows round for {$this->getTableName()} ", 'warning');
+                return 0;
+            }
+
             foreach ($rows as $row) {
                 $rowSubset = $this->getColumnsForEngineQuery();
                 $rowsUpdated += $this->getEngine()->update(

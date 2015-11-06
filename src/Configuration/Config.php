@@ -206,7 +206,7 @@ class Config extends Object
      *
      * @param array $overrides Is the override data structure
      */
-    public function setAdditionalOverrides(array $overrides) 
+    public function setAdditionalOverrides(array $overrides)
     {
         if (null == $overrides || 0 == sizeof($overrides)) {
             return;
@@ -219,9 +219,9 @@ class Config extends Object
                         if (true == is_array($childNodesLevelTwo)) {
                             foreach ($childNodesLevelTwo as $childNodesLevelThreekey => $childNodesLevelThree) {
                                 if (true == isset(
-                                    $this->_data[$configNode]
-                                    [$childNodLevelTwoKey][$childNodesLevelThreekey]
-                                )
+                                        $this->_data[$configNode]
+                                        [$childNodLevelTwoKey][$childNodesLevelThreekey]
+                                    )
                                     && null != $childNodesLevelThree) {
                                     $this->_data[$configNode][$childNodLevelTwoKey][$childNodesLevelThreekey]
                                         = $childNodesLevelThree;
@@ -375,11 +375,24 @@ class Config extends Object
 
         $postConditions = $this->getPostConditions();
 
-        if (null != $postConditions && true == isset($postConditions['export_database']['destination'])) {
-            $tableData[]    = array('Export SQL', $postConditions['export_database']['destination']);
-            if (true == isset($postConditions['export_database']['drop'])) {
-                var_dump($postConditions['export_database']['drop']);
-                $dumping        = (true == $postConditions['export_database']['drop'] ? 'YES' : 'no');
+        if (null != $preConditions && true == isset($preConditions['copy_down_database'])) {
+            $object         = new Object($preConditions['copy_down_database']);
+            $tableData[]    = array("Copy down", "Yes (from {$object->getHost()}.{$object->getDatabase()})");
+            if (OutputInterface::VERBOSITY_VERBOSE == $level) {
+                $skipping       = $object->getSkipTableData();
+                $skipping       = (true == is_array($skipping)) ? $skipping : array();
+                foreach ($skipping as $skip) {
+                    $tableData[] = array('Copy down skipping', $skip);
+                }
+            }
+        }
+
+        if (null != $postConditions) {
+            $object = new Object($postConditions['export_database']);
+            if(null != $object->getDestination());
+            $tableData[]    = array('Export SQL',  $object->getDestination());
+            if (null ==  $object->getDrop()) {
+                $dumping        = (true == $object->getDrop() ? 'YES' : 'no');
                 $tableData[]    = array('Drop DB after export', $dumping);
             }
         }

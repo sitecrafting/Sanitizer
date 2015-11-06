@@ -44,6 +44,16 @@ use Pegasus\Application\Sanitizer\Table\Tables\Update;
 
 class Factory
 {
+    /**
+     * This method returns a table or false on failure
+     *
+     * @param $tableName
+     * @param array $tableConfig
+     * @param TerminalPrinter $printer
+     * @param EngineInterface $engine
+     * @return false|Eav|Flat|Update
+     * @throws TableColumnTypeException
+     */
     public static function getInstance($tableName,
            array $tableConfig,
            TerminalPrinter $printer,
@@ -62,14 +72,12 @@ class Factory
                 case Update::getType() :
                     $table = new Update($engine);
                     break;
-                /*
-                 * Space for different types
-                 */
-                default : /* type not found */
+                default :
                     throw new TableColumnTypeException("Column type '{$columnType}' not valid for table {$tableName}");
             }
         }
 
+        //Default to flat type if not set
         if (null == $table) {
             $table = new Flat($engine);
         }
@@ -78,10 +86,6 @@ class Factory
         $table->setTableName($tableName);
         $valid = $table->setTableData($tableConfig);
 
-        if (true == $valid) {
-            return $table;
-        }
-
-        return $valid;
+       return (true == $valid) ? $table : $valid;
     }
 }

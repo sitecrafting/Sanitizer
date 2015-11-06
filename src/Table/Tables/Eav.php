@@ -90,6 +90,12 @@ class Eav extends AbstractTable
         $column->setControlColumn($controlColumn);
     }
 
+    /**
+     * Sanitize the EAV table
+     *
+     * @return bool|int
+     * @throws TableException
+     */
     public function sanitize()
     {
         $rows = 0;
@@ -144,6 +150,17 @@ class Eav extends AbstractTable
         return $rows;
     }
 
+    /**
+     * Sanitise subset
+     *
+     * @param $tableName
+     * @param $controlColumnName
+     * @param $subsetIndex
+     * @param $columnName
+     * @param $mockModel
+     * @return int
+     * @throws Table\Exceptions\TableException
+     */
     private function sanitizeSubset($tableName, $controlColumnName, $subsetIndex, $columnName, $mockModel)
     {
         if (true == $this->getIsQuickSanitisation()) {
@@ -159,6 +176,10 @@ class Eav extends AbstractTable
                 $this->getSelectColumns(),
                 array($controlColumnName => $subsetIndex)
             );
+
+            if (false == $rows) {
+                return 0;
+            }
 
             foreach ($rows as $row) {
                 $newData = array();

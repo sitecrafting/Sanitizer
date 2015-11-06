@@ -81,7 +81,7 @@ class Sanitizer extends Command implements TerminalPrinter
     /**
      * Defines the version of the application
      */
-    const VERSION = '0.2.0.beta';
+    const VERSION = '0.3.0.beta';
 
     /**
      * Default memory limit for this application is 1024M
@@ -426,7 +426,7 @@ class Sanitizer extends Command implements TerminalPrinter
     private function loadDatabaseEngine()
     {
         $this->setEngine(
-            EngineFactory::getInstance(
+            EngineFactory::getSingleton(
                 array
                 (
                     'database_type' => $this->getConfig()->getDatabase()->getEngine(),

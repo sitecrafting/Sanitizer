@@ -29,6 +29,7 @@ namespace Pegasus\Application\Sanitizer\Engine;
 
 use Pegasus\Application\Sanitizer\Engine\Exceptions\EngineException;
 use Pegasus\Application\Sanitizer\Engine\Exceptions\FatalEngineException;
+use Pegasus\Application\Sanitizer\Resource\Object;
 use Pegasus\Application\Sanitizer\Sanitizer;
 
 class MySqlEngine extends AbstractEngine implements EngineInterface
@@ -68,7 +69,9 @@ class MySqlEngine extends AbstractEngine implements EngineInterface
 
         if (false == $result) {
             $this->logError($query);
-            throw new FatalEngineException("Table exists check failed, error logged");
+            throw new FatalEngineException(
+                "Table exists check failed for {$tableName} for DB {$this->_databaseName}, error logged"
+            );
         }
 
         $result = $result->fetchAll();
@@ -182,11 +185,80 @@ class MySqlEngine extends AbstractEngine implements EngineInterface
 
     public function dump($fileName)
     {
+        $worked     = 0;
+        $output     = null;
         $command = "mysqldump -u {$this->_userName} -p{$this->_password} ";
         $command .= "-h {$this->_server} {$this->_databaseName} > '{$fileName}'";
-        exec($command, $output = array(), $worked);
+        exec($command, $output, $worked);
 
         return (0 == $worked) ? true : $output;
+    }
+
+    /**
+     * This method copies down a database from a specified host
+     *
+     * @param $fileName
+     * @param $config
+     * @return bool|Object
+     */
+    public function copyDown($config, $fileName=null)
+    {
+        $worked                 = 0;
+        $output                 = null;
+        $quick                  = "--single-transaction --quick --lock-tables=false ";
+        $skipTableDataExport    = true;
+
+        if (true == is_array($config)) {
+            $config = new Object($config);
+        }
+
+        if (null == $fileName) {
+            $fileName = 'sanitizer_temp.sql';
+        }
+
+        $copyDownTableCommand   = "mysqldump -u {$this->_userName} -p{$this->_password} -h {$this->_server} ";
+        $copyDownDataCommand    = "mysqldump -u {$this->_userName} -p{$this->_password} -h {$this->_server} ";
+
+        if ("true" == $config->getQuick()) {
+            $copyDownTableCommand .= $quick;
+            $copyDownDataCommand .= $quick;
+        }
+
+        $skipTableData = $config->getSkipTableData();
+
+        if (true == is_array($skipTableData) && 0 != sizeof($skipTableData)) {
+            $copyDownTableCommand .= "--no-data ";
+            $skipTableDataExport = false;
+
+            foreach ($skipTableData as $skipTable) {
+                $skipTable = trim($skipTable);
+                $copyDownDataCommand .= "--ignore-table={$this->_databaseName}.{$skipTable} ";
+            }
+        }
+
+        $copyDownTableCommand   .= "{$this->_databaseName} > {$fileName}";
+        $copyDownDataCommand    .= "{$this->_databaseName} >> {$fileName}";
+
+        exec($copyDownTableCommand, $output, $worked);
+
+        if (0 != $worked) {
+            return false;
+        }
+
+        $worked                 = 0;
+        $output                 = null;
+
+        if (false == $skipTableDataExport) {
+            exec($copyDownDataCommand, $output, $worked);
+
+            if (0 != $worked) {
+                return false;
+            }
+        }
+
+        $objectData = array('commands' => array($copyDownTableCommand, $copyDownDataCommand), 'file_name' => $fileName);
+        return new Object($objectData);
+
     }
 
     public function getDatabaseName()

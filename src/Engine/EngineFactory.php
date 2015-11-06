@@ -42,25 +42,42 @@ class EngineFactory
      * @throws EngineNotFoundException
      * @throws \Exception
      */
-    public static function getInstance($config)
+    public static function getSingleton($config)
     {
         if (null == self::$_engine) {
-
-            if (false == isset($config['database_type'])) {
-                throw new SanitizerException("Engine Type/Name not found in Engine getInstance parameters");
-            }
-
-            $engineName = $config['database_type'];
-
-            switch ($engineName) {
-                case 'mysql' :
-                    self::$_engine = new MySqlEngine($config);
-                    break;
-                default :
-                    throw new EngineNotFoundException("Engine {$engineName} has done a runner!");
-                    break;
-            }
+            self::$_engine = self::getInstance($config);
         }
+
         return self::$_engine;
+    }
+
+    /**
+     * Returns a database engine instance
+     *
+     * @param $config
+     * @return null|MySqlEngine
+     * @throws EngineNotFoundException
+     * @throws SanitizerException
+     */
+    public static function getInstance($config)
+    {
+        $engine = null;
+
+        if (false == isset($config['database_type'])) {
+            throw new SanitizerException("Engine Type/Name not found in Engine getInstance parameters");
+        }
+
+        $engineName = $config['database_type'];
+
+        switch ($engineName) {
+            case 'mysql' :
+                $engine = new MySqlEngine($config);
+                break;
+            default :
+                throw new EngineNotFoundException("Engine {$engineName} has done a runner!");
+                break;
+        }
+
+        return $engine;
     }
 }

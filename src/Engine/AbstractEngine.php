@@ -70,9 +70,11 @@ abstract class AbstractEngine
                             $this->_databaseType = $value;
                             break;
                         case 'database_name' :
+                        case 'database'      :
                             $this->_databaseName = $value;
                             break;
-                        case 'server' :
+                        case 'server'   :
+                        case 'host'     :
                             $this->_server = $value;
                             break;
                         case 'username' :
@@ -85,7 +87,6 @@ abstract class AbstractEngine
                             $this->_charset = $value;
                             break;
                     }
-                    //$this->$option = $value;
                 }
             }
 
@@ -170,6 +171,9 @@ abstract class AbstractEngine
             }
         }
         catch (\PDOException $e) {
+            if (true == isset($options['skip_init'])) {
+                return true;
+            }
             throw new \Exception($e->getMessage());
         }
     }
