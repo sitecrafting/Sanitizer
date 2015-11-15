@@ -56,12 +56,21 @@ class Validation extends Sanitizer
 {
     static $validator = null;
 
+    /**
+     * Default constructor.
+     * Set validation to running
+     */
     public function __construct()
     {
         $this->setValidationRunning();
         parent::__construct();
     }
 
+    /**
+     * Run the validation - does not sanitise
+     *
+     * @throws TableException
+     */
     protected function sanitize()
     {
         $collection = new Collection($this->getEngine());
@@ -69,6 +78,9 @@ class Validation extends Sanitizer
         $this->setValidationNotRunning();
     }
 
+    /**
+     * Configurage this instance from the command line
+     */
     protected function configure()
     {
         $this
@@ -131,7 +143,8 @@ class Validation extends Sanitizer
     }
 
     /**
-     * Added for meaning
+     * Added for semantics.
+     * Sets the running flag to true
      */
     protected function setValidationRunning()
     {
@@ -140,21 +153,12 @@ class Validation extends Sanitizer
 
     /**
      * Added for meaning
+     * Sets the running flag to false
      */
     protected function setValidationNotRunning()
     {
         $this->_satitisationRunning = false;
         $this->purgePrintCache();
-    }
-
-    public function getLog()
-    {
-        if (null == $this->_log) {
-            $this->_log = new Logger('Validation');
-            $this->_log->pushHandler(new StreamHandler($this->getConfig()->getLogPath(), Logger::INFO));
-        }
-
-        return $this->_log;
     }
 
     /**
@@ -179,6 +183,9 @@ class Validation extends Sanitizer
         /* do nothing */
     }
 
+    /**
+     * Purges the print cache
+     */
     protected function purgePrintCache()
     {
         $table = new Table($this->_output);

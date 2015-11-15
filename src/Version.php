@@ -48,11 +48,21 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Version extends Sanitizer
 {
+    /**
+     * Simply sers the descrption and name
+     */
     protected function configure()
     {
         $this->setName('version')->setDescription('Shows the sanitizer version');
     }
 
+    /**
+     * Simple displays the version
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return void
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln("Sanitizer Version: ".$this->getVersion());

@@ -29,7 +29,6 @@
 namespace Pegasus\Application\Sanitizer\IO;
 
 use Pegasus\Application\Sanitizer\Engine\EngineFactory;
-use Pegasus\Application\Sanitizer\Engine\Exceptions\EngineException;
 use Pegasus\Application\Sanitizer\Resource\Object;
 use Pegasus\Application\Sanitizer\Resource\SanitizerException;
 use Pegasus\Application\Sanitizer\Sanitizer;
@@ -37,10 +36,19 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 class DatabaseHelper
 {
+    /**
+     * Default export file name
+     */
     const DEFAULT_EXPORT_FILE_NAME = '{database_name}_export_{date}_{time}.sql';
 
+    /**
+     * Default export date format
+     */
     const DEFAULT_EXPORT_DATE_FORMAT = "d-m-Y";
 
+    /**
+     * Default export time format
+     */
     const DEFAULT_EXPORT_TIME_FORMAT = "G-i-s-e";
 
     /**
@@ -145,7 +153,6 @@ class DatabaseHelper
         $this->importDatabase(array('source' => $filePath), $sanitizer);
         unlink($filePath);
         return $result;
-
     }
 
     /**
