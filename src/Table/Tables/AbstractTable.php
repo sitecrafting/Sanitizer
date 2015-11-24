@@ -123,6 +123,12 @@ abstract class AbstractTable extends Object
         return $this->_data['columns'];
     }
 
+    /**
+     * Returns the type identifier
+     *
+     * @return string
+     * @throws \Exception if not overridden
+     */
     public static function getType()
     {
         throw new \Exception('Method to be re-written by children');

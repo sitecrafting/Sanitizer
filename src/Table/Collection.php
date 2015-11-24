@@ -34,6 +34,7 @@ use Pegasus\Application\Sanitizer\IO\TerminalPrinter;
 use Pegasus\Application\Sanitizer\Table;
 use Pegasus\Application\Sanitizer\Table\Exceptions\TableException;
 use Pegasus\Application\Sanitizer\Table\Exceptions\TableCommentException;
+use Pegasus\Application\Sanitizer\Table\Exceptions\TableColumnTypeException;
 
 class Collection
 {
@@ -94,7 +95,9 @@ class Collection
                     exit(-200);
                 } catch(TableCommentException $e) {
                     $printer->printLn($e->getMessage(), 'notice');
-                } catch(SanitizerException $e) {
+                } catch(TableColumnTypeException $e) {
+                    $printer->printLn($e->getMessage(), 'fatal_error');
+                }catch(SanitizerException $e) {
                     $printer->printLn($e->getMessage(), 'warning');
                 }
             }

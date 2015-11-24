@@ -81,7 +81,7 @@ class Sanitizer extends Command implements TerminalPrinter
     /**
      * Defines the version of the application
      */
-    const VERSION = '0.3.1.beta';
+    const VERSION = '0.3.2.beta';
 
     /**
      * Default memory limit for this application is 1024M
@@ -559,6 +559,7 @@ class Sanitizer extends Command implements TerminalPrinter
                 break;
             case 'fatal_error' :
                 $this->_output->writeLn($this->formatMessage($type, $message), 'warning');
+                exit(1);
                 break;
             }
         }

@@ -40,6 +40,7 @@ use Pegasus\Application\Sanitizer\Table\Exceptions\TableColumnTypeException;
 use Pegasus\Application\Sanitizer\Table\Tables\AbstractTable;
 use Pegasus\Application\Sanitizer\Table\Tables\Eav;
 use Pegasus\Application\Sanitizer\Table\Tables\Flat;
+use Pegasus\Application\Sanitizer\Table\Tables\Replace;
 use Pegasus\Application\Sanitizer\Table\Tables\Update;
 
 class Factory
@@ -71,6 +72,9 @@ class Factory
                     break;
                 case Update::getType() :
                     $table = new Update($engine);
+                    break;
+                case Replace::getType() :
+                    $table = new Replace($engine);
                     break;
                 default :
                     throw new TableColumnTypeException("Column type '{$columnType}' not valid for table {$tableName}");

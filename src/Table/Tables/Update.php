@@ -33,10 +33,11 @@ use Pegasus\Application\Sanitizer\Columns\Types;
 
 class Update extends AbstractTable
 {
-    const FIELD_DATA_TYPE = 'data_type';
-
-    const FIELD_COLUMN = 'column';
-
+    /**
+     * Returns the type identifier
+     *
+     * @return string
+     */
     public static function getType()
     {
         return 'update';
