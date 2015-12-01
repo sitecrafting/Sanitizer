@@ -541,6 +541,30 @@
     },
     "log_visitor":{
       "command":"truncate"
+    },
+    "cms_block": {
+    "type":"replace",
+    "rules": [
+      {
+        "data_type":"text",
+        "comment":"Remove all absolute URLs",
+        "column":"content",
+        "replace":["http://example.com", "https://someexample.com"],
+        "with":""
+      }
+    ]
+  },
+    "cms_page": {
+      "type":"replace",
+      "rules": [
+        {
+          "data_type":"text",
+          "comment":"Remove all absolute URLs",
+          "column":"content",
+          "replace":["http://example.com", "https://someexample.com"],
+          "with":""
+        }
+      ]
     }
   }
 }
