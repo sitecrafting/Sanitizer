@@ -13,14 +13,14 @@
   ],
   "require":
   {
-    "symfony/yaml": "~2.8|~3.0",
+    "symfony/yaml": "3.0.0",
     "monolog/monolog":"~1.13.1",
-    "php": ">=5.5.1",
+    "php": ">=5.5.9",
     "phpmd/phpmd": "dev-master"
   },
   "require-dev":
   {
-    "behat/behat": "2.4.*@stable",
+    "behat/behat": ">3.0.0",
     "kherge/box": "~2.0",
     "phpspec/phpspec": "~2.0",
     "squizlabs/php_codesniffer": "2.*",

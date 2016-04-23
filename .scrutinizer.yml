@@ -18,7 +18,7 @@ filter:
 build:
     environment:
         php:
-            version: 5.4.30
+            version: '5.5.25'
 
     cache:
         directories: [ vendor/ ]
