@@ -1,0 +1,31 @@
+tools:
+    external_code_coverage: false
+    php_code_coverage:      false
+    php_code_sniffer:
+        config: { standard: 'phpcs.xml' }
+    php_changetracking: false
+    php_sim: false
+    php_cs_fixer: true
+    php_mess_detector: true
+    php_pdepend: true
+    php_analyzer: true
+    sensiolabs_security_checker: true
+
+filter:
+    paths:
+        - 'src'
+
+build:
+    environment:
+        php:
+            version: '5.5.25'
+
+    cache:
+        directories: [ vendor/ ]
+
+inherit: true
+
+
+build_failure_conditions:
+    - 'issues.new.exists'
+    - 'project.metric_change("scrutinizer.quality", < 0)'
