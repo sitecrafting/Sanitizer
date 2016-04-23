@@ -19,8 +19,6 @@ build:
     environment:
         php:
             version: 5.4.30
-        override:
-            - { command: 'composer install --no-interaction', idle_timeout: 600 }
 
     cache:
         directories: [ vendor/ ]
