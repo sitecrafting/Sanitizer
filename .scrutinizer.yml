@@ -1,19 +1,54 @@
-tools:
-    external_code_coverage: false
-    php_code_coverage:      false
-    php_code_sniffer:
-        config: { standard: 'phpcs.xml' }
-    php_changetracking: false
-    php_sim: false
-    php_cs_fixer: true
-    php_mess_detector: true
-    php_pdepend: true
-    php_analyzer: true
-    sensiolabs_security_checker: true
-
 filter:
+    excluded_paths:
+        - 'bin/*'
+        - 'spec/*'
     paths:
         - 'src'
+checks:
+    php:
+        encourage_postdec_operator: true
+        custom_coding_standard:
+            ruleset_path: ruleset.xml
+        coding_standard:
+            name: Magento
+        classes_in_camel_caps: true
+        use_self_instead_of_fqcn: true
+        uppercase_constants: true
+        simplify_boolean_return: true
+        return_doc_comments: true
+        return_doc_comment_if_not_inferrable: true
+        remove_extra_empty_lines: true
+        properties_in_camelcaps: true
+        prefer_while_loop_over_for_loop: true
+        phpunit_assertions: true
+        parameters_in_camelcaps: true
+        parameter_doc_comments: true
+        param_doc_comment_if_not_inferrable: true
+        optional_parameters_at_the_end: true
+        no_short_variable_names:
+            minimum: '2'
+        no_short_method_names:
+            minimum: '3'
+        no_goto: true
+        more_specific_types_in_doc_comments: true
+        line_length:
+            max_length: '700'
+        function_in_camel_caps: true
+        avoid_unnecessary_concatenation: true
+        avoid_todo_comments: true
+        avoid_perl_style_comments: true
+        avoid_multiple_statements_on_same_line: true
+        avoid_fixme_comments: true
+
+coding_style:
+    php: {  }
+
+build: true
+
+checks:
+    php:
+        code_rating: true
+        duplication: true
 
 build:
     environment:
@@ -22,6 +57,14 @@ build:
 
     cache:
         directories: [ vendor/ ]
+
+    tests:
+        override:
+            -
+                command: 'phpunit --coverage-clover=some-file'
+                coverage:
+                    file: 'some-file'
+                    format: 'php-clover'
 
 inherit: true
 
