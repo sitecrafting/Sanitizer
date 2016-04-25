@@ -39,16 +39,11 @@ checks:
         avoid_perl_style_comments: true
         avoid_multiple_statements_on_same_line: true
         avoid_fixme_comments: true
+        code_rating: true
+        duplication: true
 
 coding_style:
     php: {  }
-
-build: true
-
-checks:
-    php:
-        code_rating: true
-        duplication: true
 
 build:
     environment:
@@ -65,9 +60,6 @@ build:
                 coverage:
                     file: 'some-file'
                     format: 'php-clover'
-
-inherit: true
-
 
 build_failure_conditions:
     - 'issues.new.exists'
