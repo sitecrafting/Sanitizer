@@ -56,7 +56,7 @@ build:
             -
                 command: 'phpunit --coverage-clover=some-file'
                 coverage:
-                    file: 'phpunit.xml'
+                    file: 'code_coverage_clover.xml'
                     format: 'php-clover'
 
 build_failure_conditions:
