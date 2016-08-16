@@ -159,7 +159,8 @@ Within the tables element you specify the table name, in this case *customer_add
 #### Pre Conditions
 
 Before sanitizer starts you can instruct it via the config to import a database. It must contain the
-source and this can be a relative or an absolute path.
+source and this can be a relative or an absolute path. 
+It can also contain any number of supporting SQL files denoted by "source_{increment}" (see below)
 
 ```json
 "pre_conditions":
@@ -167,6 +168,7 @@ source and this can be a relative or an absolute path.
     "import_database":
     {
       "source":"sql/sanitizer.sql"
+      "source_1":"sql/uat_core_config_data.sql"
     }
   },
 ```

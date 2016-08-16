@@ -16,7 +16,8 @@
     "symfony/yaml": "3.0.0",
     "monolog/monolog":"~1.13.1",
     "php": ">=5.5.9",
-    "phpmd/phpmd": "dev-master"
+    "phpmd/phpmd": "dev-master",
+    "symfony/dependency-injection":"3.1.0"
   },
   "require-dev":
   {

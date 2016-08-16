@@ -100,20 +100,33 @@ class DatabaseHelper
     public function importDatabase($data, Sanitizer $sanitizer)
     {
         $importData = new Object($data);
+        $sources    = [];
 
-        if (null == $importData->getSource()) {
-            return;
+        if (null != $importData->getSource()) {
+            $sources[] = $importData->getSource();
         }
 
-        if (false == file_exists($importData->getSource())) {
-            throw new FileNotFoundException("File not found, {$importData->getSource()}");
+        $counter = 1;
+
+        while (true == isset($data['source_'.$counter])) {
+            $sources[] = $data['source_'.$counter++];
+        }
+
+        foreach ($sources as $source) {
+            if (false == file_exists($source)) {
+                throw new FileNotFoundException("File not found, {$source}");
+            }
         }
 
         $engine = $sanitizer->getEngine();
         $engine->drop();
         $engine->create();
         $engine->useDb();
-        $engine->source($importData->getSource());
+
+        foreach ($sources as $source) {
+            $sanitizer->getTerminalPrinter()->printLn("Importing {$source}");
+            $engine->source($source);
+        }
     }
 
     /**

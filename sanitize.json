@@ -18,7 +18,8 @@
   {
     "import_database":
     {
-      "source":"sql/sanitizer.sql"
+      "source":"sql/sanitizer.sql",
+      "source_1":"sql/uat_core_config_data.sql"
     }
   },
   "post_conditions":
