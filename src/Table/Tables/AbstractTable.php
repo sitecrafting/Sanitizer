@@ -28,6 +28,7 @@
 namespace Pegasus\Application\Sanitizer\Table\Tables;
 
 use Pegasus\Application\Sanitizer\Columns\Types\AbstractDataType;
+use Pegasus\Application\Sanitizer\Engine\Exceptions\FatalEngineException;
 use Pegasus\Application\Sanitizer\Resource\Object;
 use Pegasus\Application\Sanitizer\Table;
 use Pegasus\Application\Sanitizer\Table\Exceptions\TableException;
@@ -332,7 +333,10 @@ abstract class AbstractTable extends Object
 
             if (true == $this->doTruncate()) {
                 $printer->printLn("Truncating {$this->getTableName()} ", 'notice');
-                $this->_engine->truncate($this->getTableName());
+                if (false === $this->_engine->truncate($this->getTableName())) {
+                    $message = "Truncation didn't occur correctly on {$this->getTableName()}, rows found";
+                    throw new FatalEngineException($message);
+                }
                 $printer->printLn("Truncated {$this->getTableName()} ", 'notice');
                 return true;
             }

@@ -100,7 +100,7 @@ class DatabaseHelper
     public function importDatabase($data, Sanitizer $sanitizer)
     {
         $importData = new Object($data);
-        $sources    = [];
+        $sources    = array();
 
         if (null != $importData->getSource()) {
             $sources[] = $importData->getSource();

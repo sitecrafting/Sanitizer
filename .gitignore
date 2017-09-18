@@ -5,3 +5,7 @@
 /vendor
 sanitizer_temp.sql
 /test
+/*.log
+pdepend
+phpmd
+sanitize.phar

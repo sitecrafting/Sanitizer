@@ -705,9 +705,16 @@ abstract class AbstractEngine
         return $this->exec('DELETE FROM "' . $table . '"' . $this->whereClause($where));
     }
 
+    /**
+     * Truncates a table
+     *
+     * @param $table
+     * @return bool true if no rows left in the table
+     */
     public function truncate($table)
     {
-        return $this->exec('TRUNCATE FROM "' . $table . '"');
+        $this->exec("TRUNCATE TABLE `{$table}`;");
+        return (0 == $this->query("SELECT COUNT(*) FROM {$table};")->fetchAll());
     }
 
     public function replace($table, $columns, $search = null, $replace = null, $where = null)

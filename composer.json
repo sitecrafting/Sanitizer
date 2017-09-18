@@ -13,19 +13,19 @@
   ],
   "require":
   {
-    "symfony/yaml": "3.0.0",
-    "monolog/monolog":"~1.13.1",
+    "symfony/yaml": "^3.3.9",
+    "monolog/monolog":"1.23.0",
     "php": ">=5.5.9",
     "phpmd/phpmd": "dev-master",
-    "symfony/dependency-injection":"3.1.0"
+    "symfony/dependency-injection":"3.3.9"
   },
   "require-dev":
   {
     "behat/behat": ">3.0.0",
-    "kherge/box": "~2.0",
+    "kherge/box": "~2.5",
     "phpspec/phpspec": "~2.0",
     "squizlabs/php_codesniffer": "2.*",
-    "pegasuscommerce/vagrant_transient": "dev-master"
+    "pegasuscommerce/vagrant_transient": "0.2.4"
   },
   "autoload":
   {
