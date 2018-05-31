@@ -1,0 +1,13 @@
+name: sanitizer
+recipe: lamp
+config:
+  webroot: .
+services:
+  appserver:
+    type: php:7.1
+    run:
+      - "cd $LANDO_MOUNT && composer install"
+tooling:
+  sanitize:
+    service: appserver
+    cmd: php src/Application.php sanitize

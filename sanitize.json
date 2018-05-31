@@ -1,26 +1,14 @@
 {
-  "name":"Default Magento CE 1.9.1.1 for Sanitisation",
+  "name":"WP Sanitization",
   "developer_mode":"no",
   "log_path":"sanitizer.log",
   "database":
   {
-    "host":"localhost",
-    "username":"root",
-    "password":"password",
-    "database":"sanitizer",
+    "host":"database",
+    "username":"lamp",
+    "password":"lamp",
+    "database":"lamp",
     "sanitization_mode":"full"
-  },
-  "general_config":
-  {
-    "memory":"4096M"
-  },
-  "pre_conditions":
-  {
-    "import_database":
-    {
-      "source":"sql/sanitizer.sql",
-      "source_1":"sql/uat_core_config_data.sql"
-    }
   },
   "post_conditions":
   {
@@ -34,538 +22,48 @@
   },
   "tables":
   {
-    "core_config_data":{
-      "data_type":"text",
-      "type":"update",
-      "rules": [
-        {
-          "data_type":"text",
-          "comment":"Base Un-secure URL",
-          "column":"value",
-          "where":
+    "wp_users": [
+      {
+        "column": "user_email",
+        "data_type": "varchar",
+        "mock_model":"Email"
+      },
+      {
+        "column": "display_name",
+        "data_type": "varchar",
+        "mock_model":"FullName"
+      },
+      {
+        "column": "user_login",
+        "data_type": "varchar",
+        "mock_model":"UserName"
+      },
+      {
+        "column": "user_pass",
+        "data_type": "varchar",
+        "mock_model":"Password"
+      },
+      {
+        "column": "user_nicename",
+        "data_type": "varchar",
+        "mock_model":"UserName"
+      }
+    ],
+    "wp_postmeta": {
+      "column": "meta_value",
+      "data_type":"varchar",
+      "type":"eav",
+      "control_column":
+      {
+        "name":"meta_key",
+        "values": {
+          "_billing_email":
           {
-            "path":"web/unsecure/base_url"
-          },
-          "to":"http://test-url.dev:8080/"
-        },
-        {
-          "data_type":"text",
-          "comment":"Base Secure URL",
-          "column":"value",
-          "where":
-          {
-            "path":"web/secure/base_url"
-          },
-          "to":"http://test-url.dev:8080/"
-        }
-      ]
-    },
-    "customer_address_entity": [
-      {
-        "column": "created_at",
-        "data_type":"timestamp"
-      },
-      {
-        "column": "updated_at",
-        "data_type":"timestamp"
-      }
-    ],
-    "customer_address_entity_datetime": {
-      "comment": "Currently no Magento instances we have include any data in here"
-    },
-    "customer_address_entity_decimal": {
-      "comment": "Currently no Magento instances we have include any data in here"
-    },
-    "customer_address_entity_int": {
-      "comment":"All region data in current db, please expand if you have more data"
-    },
-    "customer_address_entity_text":
-      {
-        "column": "value",
-        "data_type":"text",
-        "type":"eav",
-        "control_column":
-        {
-          "name":"attribute_id",
-          "values":
-            {
-              "25":
-              {
-                "comment":"Street",
-                "mock_model":"Street"
-              }
-            }
-        }
-      },
-    "customer_address_entity_varchar":
-      {
-        "column": "value",
-        "data_type":"varchar",
-        "type":"eav",
-        "control_column":
-        {
-          "name":"attribute_id",
-          "values":
-            {
-              "19":
-              {
-                "comment":"Predix / Title",
-                "mock_model":"Title"
-              },
-              "20":
-              {
-                "comment":"First Name",
-                "mock_model":"FirstName"
-              },
-              "22":
-              {
-                "comment":"Last Name",
-                "mock_model":"LastName"
-              },
-              "24":
-              {
-                "comment":"Company Name",
-                "mock_model":"Company"
-              },
-              "26":
-              {
-                "comment":"City",
-                "mock_model":"City"
-              },
-              "27":
-              {
-                "comment":"County Id",
-                "mock_model":"Country"
-              },
-              "28":
-              {
-                "comment":"Region",
-                "mock_model":"Region"
-              },
-              "30":
-              {
-                "comment":"Post Code",
-                "mock_model":"PostCode"
-              },
-              "32":
-              {
-                "comment":"Fax Number",
-                "mock_model":"Telephone"
-              }
-            }
+            "comment":"Billing Email",
+            "mock_model":"Email"
+          }
         }
       }
-    ,
-    "customer_entity":[
-      {
-        "column": "created_at",
-        "data_type":"timestamp"
-      },
-      {
-        "column": "updated_at",
-        "data_type":"timestamp"
-      },
-      {
-        "column": "email",
-        "data_type":"text",
-        "mock_model":"Email"
-      }
-    ],
-    "customer_entity_datetime":{
-      "comment":"Currently no Magento instances we have include any data in here"
-    },
-    "customer_entity_decimal": {
-      "comment":"Currently no Magento instances we have include any data in here"
-    },
-    "customer_entity_int":
-      {
-        "column": "value",
-        "data_type":"integer",
-        "type":"eav",
-        "control_column":
-        {
-          "name":"attribute_id",
-          "values":
-            {
-              "13":
-              {
-                "comment":"Default Billing Address - doesn't need to change as the data within the address will be changed"
-              },
-              "14":
-              {
-                "comment":"Default Shipping Address - doesn't need to change as the data within the address will be changed"
-              },
-              "148":
-              {
-                "comment":"Login Attempts - Not personal data but meta data"
-              }
-            }
-        }
-      }
-    ,
-    "customer_entity_text":{
-      "comment":"Currently no Magento instances we have include any data in here"
-    },
-    "customer_entity_varchar":
-      {
-        "column": "value",
-        "data_type":"integer",
-        "type":"eav",
-        "control_column":
-        {
-          "name":"attribute_id",
-          "values":
-            {
-              "4":
-              {
-                "comment":"Predix / Title",
-                "mock_model":"Title"
-              },
-              "5":
-              {
-                "comment":"First Name",
-                "mock_model":"FirstName"
-              },
-              "6":
-              {
-                "comment":"Last Name",
-                "mock_model":"MiddleName"
-              },
-              "7":
-              {
-                "comment":"Last Name",
-                "mock_model":"LastName"
-              },
-              "8":
-              {
-                "comment":"Suffix",
-                "mock_model":"Suffix"
-              },
-              "13":
-              {
-                "comment":"VAT Number",
-                "mock_model":"Vat"
-              }
-            }
-        }
-      }
-    ,
-    "sales_flat_order":[
-      {
-        "column": "customer_email",
-        "data_type":"text",
-        "mock_model":"Email"
-      },
-      {
-        "column": "customer_firstname",
-        "data_type":"text",
-        "mock_model":"FirstName"
-      },
-      {
-        "column": "customer_lastname",
-        "data_type":"text",
-        "mock_model":"LastName"
-      },
-      {
-        "column": "customer_middlename",
-        "data_type":"text",
-        "mock_model":"MiddleName"
-      },
-      {
-        "column": "customer_prefix",
-        "data_type":"text",
-        "mock_model":"Title"
-      },
-      {
-        "column": "customer_suffix",
-        "data_type":"text",
-        "mock_model":"Suffix"
-      },
-      {
-        "column": "customer_taxvat",
-        "data_type":"text",
-        "mock_model":"Vat"
-      },
-      {
-        "column": "remote_ip",
-        "data_type":"text",
-        "default":"127.0.0.1"
-      }
-    ],
-    "sales_flat_order_address":[
-      {
-        "column": "fax",
-        "data_type":"text",
-        "mock_model":"Telephone"
-      },
-      {
-        "column": "region",
-        "data_type":"text",
-        "mock_model":"Region"
-      },
-      {
-        "column": "postcode",
-        "data_type":"text",
-        "mock_model":"PostCode"
-      },
-      {
-        "column": "lastname",
-        "data_type":"text",
-        "mock_model":"LastName"
-      },
-      {
-        "column": "street",
-        "data_type":"text",
-        "mock_model":"Street"
-      },
-      {
-        "column": "city",
-        "data_type":"text",
-        "mock_model":"City"
-      },
-      {
-        "column": "email",
-        "data_type":"text",
-        "mock_model":"Email"
-      },
-      {
-        "column": "country_id",
-        "data_type":"text",
-        "mock_model":"Country"
-      },
-      {
-        "column": "telephone",
-        "data_type":"text",
-        "mock_model":"Telephone"
-      },
-      {
-        "column": "firstname",
-        "data_type":"text",
-        "mock_model":"FirstName"
-      },
-      {
-        "column": "prefix",
-        "data_type":"text",
-        "mock_model":"Title"
-      },
-      {
-        "column": "middlename",
-        "data_type":"text",
-        "mock_model":"MiddleName"
-      },
-      {
-        "column": "suffix",
-        "data_type":"text",
-        "mock_model":"Suffix"
-      },
-      {
-        "column": "company",
-        "data_type":"text",
-        "mock_model":"Company"
-      }
-    ],
-    "sales_flat_order_grid":[
-      {
-        "column": "shipping_name",
-        "data_type":"text",
-        "mock_model":"FullName"
-      },
-      {
-        "column": "billing_name",
-        "data_type":"text",
-        "mock_model":"FullName"
-      },
-      {
-        "column": "created_at",
-        "data_type":"timestamp"
-      },
-      {
-        "column": "updated_at",
-        "data_type":"timestamp"
-      }
-    ],
-    "sales_flat_order_status_history":{
-      "data_type":"text",
-      "type":"update",
-      "rules": [
-        {
-          "comment":"Update all comments",
-          "column":"comment",
-          "to":"Comment has been sanitised"
-        }
-      ]
-    },
-    "sales_flat_quote":{
-      "command":"truncate"
-    },
-    "sales_flat_quote_address":{
-      "command":"truncate"
-    },
-    "sales_flat_quote_address_item":{
-      "command":"truncate"
-    },
-    "sales_flat_quote_item":{
-      "command":"truncate"
-    },
-    "sales_flat_quote_item_option":{
-      "command":"truncate"
-    },
-    "sales_flat_quote_payment":{
-      "command":"truncate"
-    },
-    "sales_flat_quote_shipping_rate":{
-      "command":"truncate"
-    },
-    "sendfriend_log":{
-      "command":"truncate"
-    },
-
-    "sales_flat_invoice_comment":{
-      "command":"truncate"
-    },
-    "sales_flat_invoice_grid":[
-      {
-        "column": "billing_name",
-        "data_type":"text",
-        "mock_model":"FullName"
-      },
-      {
-        "column": "created_at",
-        "data_type":"timestamp"
-      },
-      {
-        "column": "order_created_at",
-        "data_type":"timestamp"
-      }
-    ],
-    "sales_flat_shipment":{
-      "comment":"No sensitive data in this table"
-    },
-    "sales_flat_shipment_comment":{
-      "command":"truncate"
-    },
-    "sales_flat_shipment_grid":[
-      {
-        "column": "shipping_name",
-        "data_type":"text",
-        "mock_model":"FullName"
-      },
-      {
-        "column": "created_at",
-        "data_type":"timestamp"
-      },
-      {
-        "column": "order_created_at",
-        "data_type":"timestamp"
-      }
-    ],
-    "sales_flat_shipment_item":{
-      "comment":"No sensitive data in this table"
-    },
-    "sales_flat_shipment_track":[
-      {
-        "column": "track_number",
-        "data_type":"text",
-        "mock_model":"TrackingNumber"
-      }
-    ],
-    "catalogsearch_fulltext":{
-      "comment":"No sensitive data in this table"
-    },
-    "catalogsearch_query":{
-      "comment":"No sensitive data in this table"
-    },
-    "catalogsearch_result":{
-      "comment":"No sensitive data in this table"
-    },
-    "core_url_rewrite":{
-      "comment":"No sensitive data in this table"
-    },
-
-    "sales_flat_creditmemo":{
-      "comment":"No sensitive data in this table"
-    },
-    "sales_flat_creditmemo_grid":[
-      {
-        "column": "billing_name",
-        "data_type":"text",
-        "mock_model":"FullName"
-      }
-    ],
-    "newsletter_subscriber":[
-      {
-        "column": "subscriber_email",
-        "data_type":"text",
-        "mock_model":"Email"
-      }
-    ],
-
-    "sales_payment_transaction":[
-      {
-        "column": "txn_id",
-        "data_type":"varchar",
-        "mock_model":"TransactionId"
-      }
-    ],
-    "dataflow_batch_export":{
-      "command":"truncate"
-    },
-    "dataflow_batch_import":{
-      "command":"truncate"
-    },
-    "sales_flat_creditmemo_item":{
-      "comment":"No sensitive data in this table"
-    },
-    "sales_flat_invoice":{
-      "comment":"No sensitive data in this table"
-    },
-    "core_session":{
-      "command":"truncate"
-    },
-    "core_cache_tag":{
-      "command":"truncate"
-    },
-    "log_url_info":{
-      "command":"truncate"
-    },
-    "log_visitor_info":{
-      "command":"truncate"
-    },
-    "log_visitor_online":{
-      "command":"truncate"
-    },
-    "log_url":{
-      "command":"truncate"
-    },
-    "report_event":{
-      "command":"truncate"
-    },
-    "log_visitor":{
-      "command":"truncate"
-    },
-    "cms_block": {
-    "type":"replace",
-    "rules": [
-      {
-        "data_type":"text",
-        "comment":"Remove all absolute URLs",
-        "column":"content",
-        "replace":["http://example.com", "https://someexample.com"],
-        "with":""
-      }
-    ]
-  },
-    "cms_page": {
-      "type":"replace",
-      "rules": [
-        {
-          "data_type":"text",
-          "comment":"Remove all absolute URLs",
-          "column":"content",
-          "replace":["http://example.com", "https://someexample.com"],
-          "with":""
-        }
-      ]
     }
   }
 }
